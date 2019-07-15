@@ -1,0 +1,111 @@
+---
+title: "Body Weight"
+author: "Hamza"
+date: "15 July 2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Body Weight Data Extractions
+
+```{r load packages, include=FALSE}
+
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+```
+
+```{r, echo=FALSE}
+data <- read.xlsx("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Body Weight\\R_metafor\\Body Weight_metafor\\Extraction_Sheet_4.0.xlsx", sheet = 1)
+```
+
+```{r}
+data <- read.xlsx("C:\\Users\\Hamza\\Dropbox\\Meta Analysis Project\\Extraction\\Body Weight\\R_metafor\\Body Weight_metafor\\Extraction_Sheet_4.0.xlsx", sheet = 1)
+```
+
+```{r, echo=FALSE}
+#Add effect size ID's
+data$ES.ID <- paste("ES", sprintf("%03d",c(1:dim(data)[1])), sep="")
+```
+
+```{r, echo=FALSE}
+#Calculate Effect Size (SMD)
+Effect_Size <- escalc(measure="SMD", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
+
+#meta-analysis
+Overall_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Effect_Size)
+summary(Overall_Model)
+
+#meta-regression
+Overall_Model_exp_type <- rma.mv(yi, vi, mods = ~as.factor(Exposure_Type) -1, random = ~ 1 | Cohort_ID, method = "REML", data=Effect_Size)
+summary(Overall_Model_exp_type)
+
+SMD_Hist <- hist(Effect_Size$vi, breaks=100)
+```
+
+```{r, echo=FALSE}
+#subsetting and filtering data for multigenerational (SMD)
+Multi_SMD <- Effect_Size %>%
+  select(Paper_ID, Cohort_ID, Rodent_type, Strain, F0_Parent_Exposed, Exposure_Type, Mean_Control, SD_Control, SEM_Control, Sample_Size_n_Control, Mean_Treatment, SD_Treatment, SEM_Treatment, Sample_Size_n_Treatment, ES.ID, yi, vi) %>%
+  filter(Exposure_Type == "Multigenerational")
+```
+
+
+```{r, echo=FALSE}
+#subsetting and filtering data for one off exposure SMD
+One_Off_SMD <- Effect_Size %>%
+  select(Paper_ID, Cohort_ID, Rodent_type, Strain, F0_Parent_Exposed, Exposure_Type, Mean_Control, SD_Control, SEM_Control, Sample_Size_n_Control, Mean_Treatment, SD_Treatment, SEM_Treatment, Sample_Size_n_Treatment, ES.ID, yi, vi) %>%
+  filter(Exposure_Type == "One off")
+```
+
+#Options for subsetting
+- Rodent Type
+- Sex
+
+#Options for Analysis
+- Adding Random and Fixed Moderators ?
+
+
+```{r, echo=FALSE}
+#Random effects model multigenerational (SMD)
+Multi_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Multi_SMD)  
+Multi_Model
+```
+```{r, echo=FALSE}
+#Here we want to obtain an I^2 value to determine heterogeniety
+
+W <- diag(1/Multi_SMD$vi)
+X <- model.matrix(Multi_Model)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+100 * sum(Multi_Model$sigma2) / (sum(Multi_Model$sigma2) + (Multi_Model$k-Multi_Model$p)/sum(diag(P)))
+```
+
+```{r, echo=FALSE}
+forest(Multi_Model, slab = paste(Multi_SMD$Cohort_ID))
+funnel(Multi_Model)
+
+```
+
+
+
+```{r}
+#Random effects model one off exposure SMD
+One_Off_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=One_Off_SMD)
+One_Off_Model
+```
+```{r}
+#I^2
+W <- diag(1/One_Off_SMD$vi)
+X <- model.matrix(One_Off_Model)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+100 * sum(One_Off_Model$sigma2) / (sum(One_Off_Model$sigma2) + (One_Off_Model$k-One_Off_Model$p)/sum(diag(P)))
+```
+```{r}
+forest(One_Off_Model, slab=paste(One_Off_SMD$Cohort_ID))
+funnel(One_Off_Model)
+```
