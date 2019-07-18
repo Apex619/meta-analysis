@@ -1,13 +1,13 @@
 ---
-title: "Body Weight"
-author: "Hamza"
+title: "Meta-analysis: transgenerational effects of a HFD in rodents"
+author: "Hamza Anwer  "
 date: "15 July 2019"
 output: word_document
 ---
 
 ## Body Weight Data Extractions - lnRR
 
-```{r load packages, include=FALSE}
+```{r, include=FALSE, mesage = FALSE, warning = FALSE}
 
 library(tidyverse)
 library(openxlsx)  
@@ -16,20 +16,64 @@ library(metafor)
 library(ggplot2)
 ```
 
+
 ```{r, echo=FALSE}
 #Filepath may change accoding to the computer used
 data <- read.xlsx("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Body Weight\\R_metafor\\Body Weight_metafor\\Extraction_Sheet_4.0.xlsx", sheet = 1)
-```
-
-```{r, echo=FALSE}
 #Add effect size ID's
 data$ES.ID <- paste("ES", sprintf("%03d",c(1:dim(data)[1])), sep="")
 ```
 
+
+# **1. Calculating the effects size (log repsonse ratio)**
 ```{r, echo=FALSE}
 #Calculate Effect Size (lnRR)
 Effect_Size <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
+```
 
+# **2. Meta-analysis on total dataset**
+
+## **a. What random effect structure to use ?**
+
+Choose random effect structure by conducting LRTs (likelihood ratio tests), and for that we need ML (maximum likelihood) estimates
+
+Possible random effects: paper ID, cohort, species, lineage, age, shared control, strain 
+
+```{r}
+meta1null <- rma.mv(yi, vi, data=Effect_Size, method = 'ML') 
+meta1study <- rma.mv(yi, vi,random = ~1|Paper_ID, data=Effect_Size, method = 'ML') 
+meta2study <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size, method = 'ML') 
+meta3study <- rma.mv(yi, vi,random = ~1|Rodent_type, data=Effect_Size, method = 'ML') 
+```
+adding random effects to models and then running anovas to see if the AIC is low (important) or high (not important) when compared to the model with NO random effects
+
+```{r, echo=FALSE}
+anova(meta1null, meta3study)
+```
+We can see that the anova gives usa very high value for the rodent type, so it isn't important ! However, it's very low for study ID and cohort ID (important !)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
 #Meta-analysis overall model
 Overall_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Effect_Size)
 summary(Overall_Model)
@@ -42,7 +86,7 @@ summary(Overall_Model_exp_type)
 
 lnRR_Hist <- hist(Effect_Size$vi, breaks=100)
 ```
-
+# **2. Subsetting Data into multigenerational and one off exposure**
 ```{r, echo=FALSE}
 #subsetting and filtering data for multigenerational (lnRR)
 Multi_SMD <- Effect_Size %>%
@@ -57,13 +101,6 @@ One_Off_SMD <- Effect_Size %>%
   select(Paper_ID, Cohort_ID, Rodent_type, Strain, F0_Parent_Exposed, Exposure_Type, Mean_Control, SD_Control, SEM_Control, Sample_Size_n_Control, Mean_Treatment, SD_Treatment, SEM_Treatment, Sample_Size_n_Treatment, ES.ID, yi, vi) %>%
   filter(Exposure_Type == "One off")
 ```
-
-#Options for subsetting
-- Rodent Type
-- Sex
-
-#Options for Analysis
-- Adding Random and Fixed Moderators ?
 
 
 ```{r, echo=FALSE}
