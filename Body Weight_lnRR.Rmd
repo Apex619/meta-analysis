@@ -5,7 +5,7 @@ date: "15 July 2019"
 output: word_document
 ---
 
-## Body Weight Data Extractions - SMD
+## Body Weight Data Extractions - lnRR
 
 ```{r load packages, include=FALSE}
 
@@ -27,22 +27,24 @@ data$ES.ID <- paste("ES", sprintf("%03d",c(1:dim(data)[1])), sep="")
 ```
 
 ```{r, echo=FALSE}
-#Calculate Effect Size (SMD)
-Effect_Size <- escalc(measure="SMD", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
+#Calculate Effect Size (lnRR)
+Effect_Size <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
 
 #Meta-analysis overall model
 Overall_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Effect_Size)
 summary(Overall_Model)
+forest(Overall_Model)
+funnel(Overall_Model)
 
 #meta-regression
 Overall_Model_exp_type <- rma.mv(yi, vi, mods = ~as.factor(Exposure_Type) -1, random = ~ 1 | Cohort_ID, method = "REML", data=Effect_Size)
 summary(Overall_Model_exp_type)
 
-SMD_Hist <- hist(Effect_Size$vi, breaks=100)
+lnRR_Hist <- hist(Effect_Size$vi, breaks=100)
 ```
 
 ```{r, echo=FALSE}
-#subsetting and filtering data for multigenerational (SMD)
+#subsetting and filtering data for multigenerational (lnRR)
 Multi_SMD <- Effect_Size %>%
   select(Paper_ID, Cohort_ID, Rodent_type, Strain, F0_Parent_Exposed, Exposure_Type, Mean_Control, SD_Control, SEM_Control, Sample_Size_n_Control, Mean_Treatment, SD_Treatment, SEM_Treatment, Sample_Size_n_Treatment, ES.ID, yi, vi) %>%
   filter(Exposure_Type == "Multigenerational")
@@ -65,7 +67,7 @@ One_Off_SMD <- Effect_Size %>%
 
 
 ```{r, echo=FALSE}
-#Random effects model multigenerational (SMD)
+#Random effects model multigenerational (lnRR)
 Multi_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Multi_SMD)  
 Multi_Model
 ```
@@ -91,7 +93,7 @@ funnel(Multi_Model)
 
 
 ```{r}
-#Random effects model one off exposure SMD
+#Random effects model one off exposure lnRR
 One_Off_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=One_Off_SMD)
 One_Off_Model
 ```

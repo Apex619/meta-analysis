@@ -31,7 +31,7 @@ Multi_lnCVR <- Effect_Size_lnCVR %>%
 #Random effects model for lnCVR
 Multi_Model_lnCVR <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Multi_lnCVR) 
 Multi_Model_lnCVR
-#I^2
+#I^2 (General Equation)
 W <- diag(1/Multi_lnCVR$vi)
 X <- model.matrix(Multi_Model_lnCVR)
 P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
