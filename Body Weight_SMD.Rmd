@@ -70,12 +70,16 @@ Multi_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Mu
 Multi_Model
 ```
 ```{r, echo=FALSE}
-#Here we want to obtain an I^2 value to determine heterogeniety
+#Here we want to obtain an I^2 value to determine heterogeniety (General Equation for I^2)
 
 W <- diag(1/Multi_SMD$vi)
 X <- model.matrix(Multi_Model)
 P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
 100 * sum(Multi_Model$sigma2) / (sum(Multi_Model$sigma2) + (Multi_Model$k-Multi_Model$p)/sum(diag(P)))
+
+#For a model with moderators, I^2 is computed as such:
+
+Multi_Model$I2
 ```
 
 ```{r, echo=FALSE}
