@@ -37,64 +37,30 @@ Effect_Size <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=
 
 Choose random effect structure by conducting LRTs (likelihood ratio tests), and for that we need ML (maximum likelihood) estimates
 
-Possible random effects: paper ID, cohort_ID, strain, lineage, shared control, age
+Possible random effects: paper ID, cohort_ID, strain, lineage, shared control. I'm adding random effects to models and then running anovas to see if the AIC is low (important) or high (not important) when compared to the model with NO random effects. After finding the lowest values, I'll put them together for the best model.
 
 ```{r}
 meta1null <- rma.mv(yi, vi, data=Effect_Size, method = 'ML') 
 metastudy <- rma.mv(yi, vi,random = ~1|Cohort_ID, data=Effect_Size, method = 'ML') 
-meta1study <- rma.mv(yi, vi,random = ~1|Age_Days, data=Effect_Size, method = 'ML') 
-meta2study <- rma.mv(yi, vi,random = ~1|Rodent_type, data=Effect_Size, method = 'ML') 
-meta3study <- rma.mv(yi, vi,random = ~1|Lineage_HFD, data=Effect_Size, method = 'ML') 
-meta4study <- rma.mv(yi, vi,random = ~1|Shared_Control, data=Effect_Size, method = 'ML') 
-meta5study <- rma.mv(yi, vi,random = ~1|Strain, data=Effect_Size, method = 'ML') 
+anova(meta1null, metastudy)
+meta0study <- rma.mv(yi, vi,random = ~1|Paper_ID, data=Effect_Size, method = 'ML') 
+anova(meta1null, meta0study)
+meta1study <- rma.mv(yi, vi,random = ~1|Rodent_type, data=Effect_Size, method = 'ML') 
+anova(meta1null, meta1study)
+meta2study <- rma.mv(yi, vi,random = ~1|Lineage_HFD, data=Effect_Size, method = 'ML') 
+anova(meta1null, meta2study)
+meta3study <- rma.mv(yi, vi,random = ~1|Shared_Control, data=Effect_Size, method = 'ML') 
+anova(meta1null, meta3study)
+meta4study <- rma.mv(yi, vi,random = ~1|Strain, data=Effect_Size, method = 'ML') 
+anova(meta1null, meta4study)
 
-metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID,~1|Age_Days), data=Effect_Size, method = 'ML') 
-```
-adding random effects to models and then running anovas to see if the AIC is low (important) or high (not important) when compared to the model with NO random effects. 
-
-```{r, echo=FALSE}
-anova(meta1null, meta6study)
+metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size, method = 'ML') 
+anova(meta1null, metastudy_best)
 ```
 
 Results:
-I had a look at different random effects and compiled a model that I think is best. Paper ID, Cohort ID, and Age seem to yiled the lowest AIC values. The rest don't seem to be that important. 
+I had a look at different random effects and compiled a model that I think is best. Paper ID, Cohort ID yielded the lowest AIC value. 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-#Meta-analysis overall model
-Overall_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Effect_Size)
-summary(Overall_Model)
-forest(Overall_Model)
-funnel(Overall_Model)
-
-#meta-regression
-Overall_Model_exp_type <- rma.mv(yi, vi, mods = ~as.factor(Exposure_Type) -1, random = ~ 1 | Cohort_ID, method = "REML", data=Effect_Size)
-summary(Overall_Model_exp_type)
-
-lnRR_Hist <- hist(Effect_Size$vi, breaks=100)
-```
 # **3. Subsetting Data into multigenerational and one off exposure**
 ```{r, echo=FALSE}
 #subsetting and filtering data for multigenerational (lnRR)
@@ -105,16 +71,8 @@ Multi_SMD <- Effect_Size %>%
 
 
 ```{r, echo=FALSE}
-#subsetting and filtering data for one off exposure SMD
-One_Off_SMD <- Effect_Size %>%
-  select(Paper_ID, Cohort_ID, Rodent_type, Strain, F0_Parent_Exposed, Exposure_Type, Mean_Control, SD_Control, SEM_Control, Sample_Size_n_Control, Mean_Treatment, SD_Treatment, SEM_Treatment, Sample_Size_n_Treatment, ES.ID, yi, vi) %>%
-  filter(Exposure_Type == "One off")
-```
-
-
-```{r, echo=FALSE}
 #Random effects model multigenerational (lnRR)
-Multi_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Multi_SMD)  
+Multi_Model <- rma.mv(yi, vi, method = "REML", data=Multi_SMD)  
 Multi_Model
 ```
 ```{r, echo=FALSE}
