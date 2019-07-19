@@ -43,11 +43,12 @@ Possible random effects: paper ID, cohort_ID, strain, lineage, shared control, a
 meta1null <- rma.mv(yi, vi, data=Effect_Size, method = 'ML') 
 metastudy <- rma.mv(yi, vi,random = ~1|Cohort_ID, data=Effect_Size, method = 'ML') 
 meta1study <- rma.mv(yi, vi,random = ~1|Age_Days, data=Effect_Size, method = 'ML') 
-metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID,~1|Age_Days), data=Effect_Size, method = 'ML') 
 meta2study <- rma.mv(yi, vi,random = ~1|Rodent_type, data=Effect_Size, method = 'ML') 
 meta3study <- rma.mv(yi, vi,random = ~1|Lineage_HFD, data=Effect_Size, method = 'ML') 
 meta4study <- rma.mv(yi, vi,random = ~1|Shared_Control, data=Effect_Size, method = 'ML') 
 meta5study <- rma.mv(yi, vi,random = ~1|Strain, data=Effect_Size, method = 'ML') 
+
+metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID,~1|Age_Days), data=Effect_Size, method = 'ML') 
 ```
 adding random effects to models and then running anovas to see if the AIC is low (important) or high (not important) when compared to the model with NO random effects. 
 
@@ -94,7 +95,7 @@ summary(Overall_Model_exp_type)
 
 lnRR_Hist <- hist(Effect_Size$vi, breaks=100)
 ```
-# **2. Subsetting Data into multigenerational and one off exposure**
+# **3. Subsetting Data into multigenerational and one off exposure**
 ```{r, echo=FALSE}
 #subsetting and filtering data for multigenerational (lnRR)
 Multi_SMD <- Effect_Size %>%
