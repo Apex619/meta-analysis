@@ -37,20 +37,28 @@ Effect_Size <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=
 
 Choose random effect structure by conducting LRTs (likelihood ratio tests), and for that we need ML (maximum likelihood) estimates
 
-Possible random effects: paper ID, cohort, species, lineage, age, shared control, strain 
+Possible random effects: paper ID, cohort_ID, strain, lineage, shared control, age
 
 ```{r}
 meta1null <- rma.mv(yi, vi, data=Effect_Size, method = 'ML') 
-meta1study <- rma.mv(yi, vi,random = ~1|Paper_ID, data=Effect_Size, method = 'ML') 
-meta2study <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size, method = 'ML') 
-meta3study <- rma.mv(yi, vi,random = ~1|Rodent_type, data=Effect_Size, method = 'ML') 
+metastudy <- rma.mv(yi, vi,random = ~1|Cohort_ID, data=Effect_Size, method = 'ML') 
+meta1study <- rma.mv(yi, vi,random = ~1|Age_Days, data=Effect_Size, method = 'ML') 
+metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID,~1|Age_Days), data=Effect_Size, method = 'ML') 
+meta2study <- rma.mv(yi, vi,random = ~1|Rodent_type, data=Effect_Size, method = 'ML') 
+meta3study <- rma.mv(yi, vi,random = ~1|Lineage_HFD, data=Effect_Size, method = 'ML') 
+meta4study <- rma.mv(yi, vi,random = ~1|Shared_Control, data=Effect_Size, method = 'ML') 
+meta5study <- rma.mv(yi, vi,random = ~1|Strain, data=Effect_Size, method = 'ML') 
 ```
-adding random effects to models and then running anovas to see if the AIC is low (important) or high (not important) when compared to the model with NO random effects
+adding random effects to models and then running anovas to see if the AIC is low (important) or high (not important) when compared to the model with NO random effects. 
 
 ```{r, echo=FALSE}
-anova(meta1null, meta3study)
+anova(meta1null, meta6study)
 ```
-We can see that the anova gives usa very high value for the rodent type, so it isn't important ! However, it's very low for study ID and cohort ID (important !)
+
+Results:
+I had a look at different random effects and compiled a model that I think is best. Paper ID, Cohort ID, and Age seem to yiled the lowest AIC values. The rest don't seem to be that important. 
+
+
 
 
 
