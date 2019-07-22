@@ -59,9 +59,9 @@ anova(meta1null, metastudy_best)
 ```
 
 Results:
-I had a look at different random effects and compiled a model that I think is best. Paper ID, Cohort ID yielded the lowest AIC value. 
+I had a look at different random effects and compiled a model that I think is best. Paper ID, Cohort ID yielded the lowest AIC values when looked at independently, with rodent type, lineage, sahred control and strain producing very high values. As such, I will only incorporate Paper_ID and Cohort_ID as my random effects. 
 
-# **3. Subsetting Data into multigenerational and one off exposure**
+# **3. Preliminary Analysis**
 ```{r, echo=FALSE}
 #subsetting and filtering data for multigenerational (lnRR)
 Multi_SMD <- Effect_Size %>%
