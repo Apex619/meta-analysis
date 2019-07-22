@@ -1,0 +1,111 @@
+---
+title: "Meta-analysis: transgenerational effects of a HFD in rodents"
+author: "Hamza Anwer  "
+date: "15 July 2019"
+output: word_document
+---
+
+## Body Weight Data Extractions - lnRR
+
+```{r, include=FALSE, mesage = FALSE, warning = FALSE}
+
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+```
+
+
+```{r, echo=FALSE}
+#Filepath may change accoding to the computer used
+data <- read.xlsx("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Body Weight\\R_metafor\\Body Weight_metafor\\Extraction_Sheet_4.0.xlsx", sheet = 1)
+#Add effect size ID's
+data$ES.ID <- paste("ES", sprintf("%03d",c(1:dim(data)[1])), sep="")
+```
+
+
+# **1. Calculating the effects size (log response ratio)**
+```{r, echo=FALSE}
+#Calculate Effect Size (lnRR)
+Effect_Size <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
+```
+
+# **2. Meta-analysis on total dataset**
+
+## **a. What random effect structure to use ?**
+
+Choose random effect structure by conducting LRTs (likelihood ratio tests), and for that we need ML (maximum likelihood) estimates
+
+Possible random effects: paper ID, cohort_ID, strain, lineage, shared control. I'm adding random effects to models and then running anovas to see if the AIC is low (important) or high (not important) when compared to the model with NO random effects. After finding the lowest values, I'll put them together for the best model.
+
+```{r}
+meta1null <- rma.mv(yi, vi, data=Effect_Size, method = 'ML') 
+metastudy <- rma.mv(yi, vi,random = ~1|Cohort_ID, data=Effect_Size, method = 'ML') 
+anova(meta1null, metastudy)
+meta0study <- rma.mv(yi, vi,random = ~1|Paper_ID, data=Effect_Size, method = 'ML') 
+anova(meta1null, meta0study)
+meta1study <- rma.mv(yi, vi,random = ~1|Rodent_type, data=Effect_Size, method = 'ML') 
+anova(meta1null, meta1study)
+meta4study <- rma.mv(yi, vi,random = ~1|Strain, data=Effect_Size, method = 'ML') 
+anova(meta1null, meta4study)
+
+metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size, method = 'ML') 
+anova(meta0study, metastudy_best)
+
+metastudy_best2 <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID,~1|Rodent_type,~1|Strain), data=Effect_Size, method = 'ML') 
+anova(metastudy_best, metastudy_best2)
+```
+
+Results:
+I had a look at different random effects and compiled a model that I think is best. Paper ID, Cohort ID yielded the lowest AIC values when looked at independently, with rodent type, and strain producing very high values. As such, I will only incorporate Paper_ID and Cohort_ID as my random effects. 
+
+Need to add comments for each model !
+
+# **3. Preliminary Analysis**
+
+```{r, echo=FALSE}
+#Random effects model multigenerational (lnRR)
+Multi_Model <- rma.mv(yi, vi, method = "REML", data=Multi_SMD)  
+Multi_Model
+```
+```{r, echo=FALSE}
+#Here we want to obtain an I^2 value to determine heterogeniety (General Equation for I^2)
+
+W <- diag(1/Multi_SMD$vi)
+X <- model.matrix(Multi_Model)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+100 * sum(Multi_Model$sigma2) / (sum(Multi_Model$sigma2) + (Multi_Model$k-Multi_Model$p)/sum(diag(P)))
+
+#For a model with moderators, I^2 is computed as such:
+
+Multi_Model$I2
+```
+
+```{r, echo=FALSE}
+forest(Multi_Model, slab = paste(Multi_SMD$Cohort_ID))
+funnel(Multi_Model)
+
+```
+
+
+
+```{r}
+#Random effects model one off exposure lnRR
+One_Off_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=One_Off_SMD)
+One_Off_Model
+```
+```{r}
+#I^2
+W <- diag(1/One_Off_SMD$vi)
+X <- model.matrix(One_Off_Model)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+100 * sum(One_Off_Model$sigma2) / (sum(One_Off_Model$sigma2) + (One_Off_Model$k-One_Off_Model$p)/sum(diag(P)))
+```
+```{r}
+forest(One_Off_Model, slab=paste(One_Off_SMD$Cohort_ID))
+funnel(One_Off_Model)
+```
+
+
+
