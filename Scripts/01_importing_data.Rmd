@@ -1,0 +1,29 @@
+---
+title: "01_importing_data"
+output: html_document
+---
+
+```{r, include=FALSE, mesage = FALSE, warning = FALSE}
+
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+```
+
+#Importing Data(all traits)
+```{r}
+Body_Weight <- read.csv("C:\\Users\\USER\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\data\\Body_Weight.csv")
+Glucose <- read.xlsx("C:\\Users\\USER\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\data\\Glucose.xlsx")
+Insulin <- read.xlsx("C:\\Users\\USER\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\data\\Insulin.xlsx")
+Adiposity <- read.xlsx("C:\\Users\\USER\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\data\\Adiposity.xlsx")
+Leptin <- read.xlsx("C:\\Users\\USER\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\data\\Leptin.xlsx")
+Glucose <- read.xlsx("C:\\Users\\USER\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\data\\Glucose.xlsx")
+```
+
+# Adding effect size ID's to each trait
+```{r}
+
+```
+
