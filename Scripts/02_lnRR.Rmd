@@ -52,7 +52,7 @@ anova(meta1null, meta4study)
 
 metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size, method = 'ML') 
 anova(meta0study, metastudy_best)
-
+summary(metastudy_best)
 metastudy_best2 <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID,~1|Rodent_type,~1|Strain), data=Effect_Size, method = 'ML') 
 anova(metastudy_best, metastudy_best2)
 ```
@@ -61,6 +61,33 @@ Results:
 I had a look at different random effects and compiled a model that I think is best. Paper ID, Cohort ID yielded the lowest AIC values when looked at independently, with rodent type, and strain producing very high values. As such, I will only incorporate Paper_ID and Cohort_ID as my random effects. 
 
 Need to add comments for each model !
+
+```{r}
+ES_ID <- factor(1:dim(Effect_Size)[1])
+Effect_Size$ES_ID <-ES_ID
+model0 <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID, ~1|ES_ID), data=Effect_Size)
+summary(model0)
+
+model1 <- rma.mv(yi, vi, mod = ~ Exposure_Type-1, random = list(~1|Paper_ID,~1|Strain, ~1|ES_ID), data=Effect_Size)
+summary(model1)
+
+
+model2 <- rma.mv(yi, vi, random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|ES_ID), data=Effect_Size[Effect_Size$Exposure_Type == "One off",])
+summary(model2)
+
+model3 <- rma(yi, vi, data=Effect_Size[Effect_Size$Exposure_Type == "One off",])
+summary(model3)
+funnel(model3)
+
+model4 <- rma.mv(yi, vi, mod = ~scale(Age_Days), random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|ES_ID), data=Effect_Size[Effect_Size$Exposure_Type == "One off",])
+summary(model4)
+
+model5 <- rma.mv(yi, vi, mod = ~scale(Age_Days), random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|ES_ID), data=Effect_Size[Effect_Size$Exposure_Type != "One off",])
+summary(model5)
+
+```
+
+
 
 # **3. Preliminary Analysis**
 
