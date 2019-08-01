@@ -82,9 +82,12 @@ funnel(model3)
 model4 <- rma.mv(yi, vi, mod = ~scale(Age_Days), random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|ES_ID), data=Effect_Size[Effect_Size$Exposure_Type == "One off",])
 summary(model4)
 
-model5 <- rma.mv(yi, vi, mod = ~scale(Age_Days), random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|ES_ID), data=Effect_Size[Effect_Size$Exposure_Type != "One off",])
+
+model5 <- rma.mv(yi, vi, mod = Age_Days, random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|ES_ID), data=Effect_Size[Effect_Size$Exposure_Type != "One off",])
 summary(model5)
 
+prediction <- predict(model5, newmods = 100)
+prediction
 ```
 
 
