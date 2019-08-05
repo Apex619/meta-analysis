@@ -89,7 +89,7 @@ summary(model5)
 prediction <- predict(model5, newmods = 100)
 prediction
 ```
-
+# Summarize models and choose which to present in main report !
 
 
 # **3. Preliminary Analysis**
