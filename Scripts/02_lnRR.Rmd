@@ -53,6 +53,7 @@ anova(meta1null, meta4study)
 metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size, method = 'ML') 
 anova(meta0study, metastudy_best)
 summary(metastudy_best)
+forest(metastudy_best)
 metastudy_best2 <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID,~1|Rodent_type,~1|Strain), data=Effect_Size, method = 'ML') 
 anova(metastudy_best, metastudy_best2)
 ```
@@ -137,5 +138,46 @@ forest(One_Off_Model, slab=paste(One_Off_SMD$Cohort_ID))
 funnel(One_Off_Model)
 ```
 
+
+```{r}
+#Body Weight
+Effect_Size_lnCVR_Body_Weight <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
+metastudy_best_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_lnCVR_Body_Weight, method = 'REML') 
+summary(metastudy_best_lnCVR)
+
+metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size, method = 'ML') 
+summary(metastudy_best)
+forest(metastudy_best)
+
+#Glucose
+
+Effect_Size_Glucose <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose)
+
+Glucose_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose, method = 'ML') 
+summary(Glucose_model)
+
+#Insulin
+Effect_Size_Insulin <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Insulin)
+
+Insulin_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin, method = 'ML') 
+summary(Insulin_model)
+
+#Triglycerides
+Effect_Size_TG <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Triglycerides)
+
+TG_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG, method = 'ML') 
+summary(TG_model)
+
+#Adiposity
+Effect_Size_Adiposity <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Adiposity)
+
+Adiposity_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity, method = 'ML') 
+summary(Adiposity_model)
+
+#Leptin
+
+
+
+```
 
 
