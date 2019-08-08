@@ -120,7 +120,6 @@ funnel(Multi_Model)
 ```
 
 
-
 ```{r}
 #Random effects model one off exposure lnRR
 One_Off_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=One_Off_SMD)
@@ -133,6 +132,8 @@ X <- model.matrix(One_Off_Model)
 P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
 100 * sum(One_Off_Model$sigma2) / (sum(One_Off_Model$sigma2) + (One_Off_Model$k-One_Off_Model$p)/sum(diag(P)))
 ```
+
+
 ```{r}
 forest(One_Off_Model, slab=paste(One_Off_SMD$Cohort_ID))
 funnel(One_Off_Model)
@@ -142,36 +143,39 @@ funnel(One_Off_Model)
 ```{r}
 #Body Weight
 Effect_Size_lnCVR_Body_Weight <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
-metastudy_best_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_lnCVR_Body_Weight, method = 'REML') 
+metastudy_best_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_lnCVR_Body_Weight[Effect_Size_lnCVR_Body_Weight$Exposure_Type == "One off",], method = 'REML') 
 summary(metastudy_best_lnCVR)
+forest(metastudy_best_lnCVR)
 
-metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size, method = 'ML') 
+metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size[Effect_Size$Exposure_Type == "One off",], method = 'ML') 
 summary(metastudy_best)
 forest(metastudy_best)
 
 #Glucose
 
-Effect_Size_Glucose <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose)
+Effect_Size_Glucose <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose) 
 
-Glucose_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose, method = 'ML') 
+Glucose_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'ML') 
 summary(Glucose_model)
+
+
 
 #Insulin
 Effect_Size_Insulin <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Insulin)
 
-Insulin_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin, method = 'ML') 
+Insulin_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "One off",], method = 'ML') 
 summary(Insulin_model)
 
 #Triglycerides
 Effect_Size_TG <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Triglycerides)
 
-TG_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG, method = 'ML') 
+TG_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG[Effect_Size_TG$Exposure_Type == "One off",], method = 'ML') 
 summary(TG_model)
 
 #Adiposity
 Effect_Size_Adiposity <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Adiposity)
 
-Adiposity_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity, method = 'ML') 
+Adiposity_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity[Effect_Size_Adiposity$Exposure_Type == "One off",], method = 'ML') 
 summary(Adiposity_model)
 
 #Leptin
