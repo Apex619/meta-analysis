@@ -15,48 +15,47 @@ library(ggplot2)
 ```
 
 ```{r}
-#Calculate Effect Size (lnCVR)
-Effect_Size_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
-model_lnCVR <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Effect_Size_lnCVR)
+#Calculate Effect Size and run models(lnCVR) for one off exposure
+
+#Body Weight
+Effect_Size_lnCVR_Body_Weight <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
+metastudy_best_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_lnCVR_Body_Weight[Effect_Size_lnCVR_Body_Weight$Exposure_Type == "One off",], method = 'REML') 
+summary(metastudy_best_lnCVR)
+forest(metastudy_best_lnCVR)
+
+metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size[Effect_Size$Exposure_Type == "One off",], method = 'ML') 
+summary(metastudy_best)
+forest(metastudy_best)
+
+#Glucose
+
+Effect_Size_Glucose_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose) 
+
+Glucose_model_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'ML') 
+summary(Glucose_model_lnCVR)
+
+
+
+#Insulin
+Effect_Size_Insulin_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Insulin)
+
+Insulin_model_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "One off",], method = 'ML') 
+summary(Insulin_model_lnCVR)
+
+#Triglycerides
+Effect_Size_TG_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Triglycerides)
+
+TG_model_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG[Effect_Size_TG$Exposure_Type == "One off",], method = 'ML') 
+summary(TG_model_lnCVR)
+
+#Adiposity
+Effect_Size_Adiposity_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Adiposity)
+
+Adiposity_model_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity[Effect_Size_Adiposity$Exposure_Type == "One off",], method = 'ML') 
+summary(Adiposity_model_lnCVR)
+
+#Leptin
 ```
 
-```{r}
-#subsetting and filtering data for multigenerational (lnCVR)
-Multi_lnCVR <- Effect_Size_lnCVR %>%
-  select(Paper_ID, Cohort_ID, Rodent_type, Strain, F0_Parent_Exposed, Exposure_Type, Mean_Control, SD_Control, SEM_Control, Sample_Size_n_Control, Mean_Treatment, SD_Treatment, SEM_Treatment, Sample_Size_n_Treatment, ES.ID, yi, vi) %>%
-  filter(Exposure_Type == "Multigenerational")
-```
 
-```{r}
-#Random effects model for lnCVR
-Multi_Model_lnCVR <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=Multi_lnCVR) 
-Multi_Model_lnCVR
-#I^2 (General Equation)
-W <- diag(1/Multi_lnCVR$vi)
-X <- model.matrix(Multi_Model_lnCVR)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-100 * sum(Multi_Model_lnCVR$sigma2) / (sum(Multi_Model_lnCVR$sigma2) + (Multi_Model_lnCVR$k-Multi_Model_lnCVR$p)/sum(diag(P)))
-forest(Multi_Model_lnCVR, slab = paste(Multi_lnCVR$Cohort_ID))
-funnel(Multi_Model_lnCVR)
-```
-
-```{r}
-#subsetting and filtering data for one off exposure (lnCVR)
-One_Off_lnCVR <- Effect_Size_lnCVR %>%
-  select(Paper_ID, Cohort_ID, Rodent_type, Strain, F0_Parent_Exposed, Exposure_Type, Mean_Control, SD_Control, SEM_Control, Sample_Size_n_Control, Mean_Treatment, SD_Treatment, SEM_Treatment, Sample_Size_n_Treatment, ES.ID, yi, vi) %>%
-  filter(Exposure_Type == "One off")
-```
-
-```{r}
-#Random effects model one off exposure lnCVR
-One_Off_Model_lnCVR <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=One_Off_lnCVR)
-One_Off_Model_lnCVR
-#I^2
-W <- diag(1/One_Off_lnCVR$vi)
-X <- model.matrix(One_Off_Model_lnCVR)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-100 * sum(One_Off_Model_lnCVR$sigma2) / (sum(One_Off_Model_lnCVR$sigma2) + (One_Off_Model_lnCVR$k-One_Off_Model_lnCVR$p)/sum(diag(P)))
-forest(One_Off_Model_lnCVR, slab=paste(One_Off_lnCVR$Cohort_ID))
-funnel(One_Off_Model_lnCVR)
-```
 
