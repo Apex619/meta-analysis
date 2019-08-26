@@ -27,6 +27,11 @@ metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Ef
 summary(metastudy_best)
 forest(metastudy_best)
 
+Effect_Size_lnCVR_Body_Weight <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=Body_Weight)
+metastudy_best_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_lnCVR_Body_Weight[Effect_Size_lnCVR_Body_Weight$Exposure_Type == "One off",], method = 'REML') 
+summary(metastudy_best_lnCVR)
+forest(metastudy_best_lnCVR)
+
 #Glucose
 
 Effect_Size_Glucose_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose) 

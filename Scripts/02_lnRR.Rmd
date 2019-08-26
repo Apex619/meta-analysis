@@ -27,7 +27,7 @@ data$ES.ID <- paste("ES", sprintf("%03d",c(1:dim(data)[1])), sep="")
 
 # **1. Calculating the effects size (log response ratio)**
 ```{r, echo=FALSE}
-#Calculate Effect Size (lnRR)
+#Calculate Effect Size (lnRR) for body weight
 Effect_Size <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
 ```
 
@@ -142,46 +142,160 @@ funnel(One_Off_Model)
 
 ```{r}
 #Body Weight
-Effect_Size_lnCVR_Body_Weight <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
-metastudy_best_lnCVR <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_lnCVR_Body_Weight[Effect_Size_lnCVR_Body_Weight$Exposure_Type == "One off",], method = 'REML') 
-summary(metastudy_best_lnCVR)
-forest(metastudy_best_lnCVR)
+#ADD HISTOGRAMS!!!NEED TO CHECK IF THERE ARE ANY UNUSUAL EFFECT SIZES
+#ADD CONSISTENT DATA FRAME NAMES
+# ASSIGN TO SAME DATA FRAME INSTEAD OF CREATING NEW DATAFRAMES, THEN RENMAE YI AND VI FOR LNR AND YI AND VI FOR LNCVR
+# STEP 2 IS CALCUALTING EFFECT SIZES AND STEP 3 IS THE DATA SUMMARY, AND THEN AFTER THAT RUN META-ANALYTIC MODELS !!!! FIRST MODEL ANSWERS FIRST QUESTIONS, AND THEN PROGRESS WITH ANSWERING YOUR OTHER QUESTIONS ! 
+# Viualize and decide what is next
+# Also do the multigenerational data
+# rename models: eg. OF_lnRR_BW_MA
+# Create vectors, then use dataframe("name" = *vector*)
 
-metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size[Effect_Size$Exposure_Type == "One off",], method = 'ML') 
-summary(metastudy_best)
-forest(metastudy_best)
+#Body Weight One Off
+lnRR_BW_MA_ES <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=Body_Weight)
 
-#Glucose
+OF_lnRR_BW_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=lnRR_BW_MA_ES[lnRR_BW_MA_ES$Exposure_Type == "One off",], method = 'REML') 
+summary(OF_lnRR_BW_MA)
+forest(OF_lnRR_BW_MA)
+
+#Body Weight MG
+MG_lnRR_BW_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=lnRR_BW_MA_ES[lnRR_BW_MA_ES$Exposure_Type == "Multigenerational",], method = 'REML') 
+summary(MG_lnRR_BW_MA)
+forest(MG_lnRR_BW_MA)
+
+#Glucose one off
 
 Effect_Size_Glucose <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose) 
 
-Glucose_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'ML') 
-summary(Glucose_model)
+OF_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'ML') 
+summary(OF_lnRR_Glucose_MA)
 
+#Glucose MG
+MG_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "Multigenerational",], method = 'ML') 
+summary(MG_lnRR_Glucose_MA)
 
-
-#Insulin
+#Insulin one off
 Effect_Size_Insulin <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Insulin)
 
-Insulin_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "One off",], method = 'ML') 
-summary(Insulin_model)
+OF_lnRR_Insulin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "One off",], method = 'ML') 
+summary(OF_lnRR_Insulin_MA)
 
-#Triglycerides
+#Insulin MG
+MG_lnRR_Insulin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "Multigenerational",], method = 'ML') 
+summary(MG_lnRR_Insulin_MA)
+
+#Triglycerides One off
 Effect_Size_TG <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Triglycerides)
 
-TG_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG[Effect_Size_TG$Exposure_Type == "One off",], method = 'ML') 
-summary(TG_model)
+OF_lnRR_TG_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG[Effect_Size_TG$Exposure_Type == "One off",], method = 'ML') 
+summary(OF_lnRR_TG_MA)
 
-#Adiposity
+#Triglycerides MG
+MG_lnRR_TG_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG[Effect_Size_TG$Exposure_Type == "Multigenerational",], method = 'ML') 
+summary(MG_lnRR_TG_MA)
+
+#Adiposity one off
 Effect_Size_Adiposity <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Adiposity)
 
-Adiposity_model <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity[Effect_Size_Adiposity$Exposure_Type == "One off",], method = 'ML') 
-summary(Adiposity_model)
+OF_lnRR_Adiposity_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity[Effect_Size_Adiposity$Exposure_Type == "One off",], method = 'ML') 
+summary(OF_lnRR_Adiposity_MA)
+
+#Adiposity MG
+MG_lnRR_Adiposity_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity[Effect_Size_Adiposity$Exposure_Type == "Multigenerational",], method = 'ML') 
+summary(MG_lnRR_Adiposity_MA)
 
 #Leptin
+Effect_Size_Leptin <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Leptin)
 
+OF_lnRR_Leptin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Leptin[Effect_Size_Leptin$Exposure_Type == "One off",], method = 'ML') 
+summary(OF_lnRR_Leptin_MA)
+
+#Leptin MG
+MG_lnRR_Leptin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Leptin[Effect_Size_Leptin$Exposure_Type == "Multigenerational",], method = 'ML') 
+summary(MG_lnRR_Leptin_MA)
 
 
 ```
+
+```{r}
+# Making a table of meta-analytic results for ln_RR
+
+experiment_type <- c(rep("OF", 6), rep("MG", 6))
+
+trait_type <- rep(c("Body_Weight", "Glucose", "Triglycerides", "Insulin", "Adiposity", "Leptin"), 2)  
+
+lnRR_MA_means <- c(OF_lnRR_BW_MA$b, OF_lnRR_Glucose_MA$b, OF_lnRR_TG_MA$b, OF_lnRR_Insulin_MA$b, OF_lnRR_Adiposity_MA$b, OF_lnRR_Leptin_MA$b, MG_lnRR_BW_MA$b, MG_lnRR_Glucose_MA$b, MG_lnRR_TG_MA$b, MG_lnRR_Insulin_MA$b, MG_lnRR_Adiposity_MA$b, MG_lnRR_Leptin_MA$b)
+
+lnRR_MA_means
+
+lnRR_MA_cilb <- c(OF_lnRR_BW_MA$ci.lb, OF_lnRR_Glucose_MA$ci.lb, OF_lnRR_TG_MA$ci.lb, OF_lnRR_Insulin_MA$ci.lb, OF_lnRR_Adiposity_MA$ci.lb, OF_lnRR_Leptin_MA$ci.lb, MG_lnRR_BW_MA$ci.lb, MG_lnRR_Glucose_MA$ci.lb, MG_lnRR_TG_MA$ci.lb, MG_lnRR_Insulin_MA$ci.lb, MG_lnRR_Adiposity_MA$ci.lb, MG_lnRR_Leptin_MA$ci.lb)
+
+lnRR_MA_cilb
+
+lnRR_MA_ciub <- c(OF_lnRR_BW_MA$ci.ub, OF_lnRR_Glucose_MA$ci.ub, OF_lnRR_TG_MA$ci.ub, OF_lnRR_Insulin_MA$ci.ub, OF_lnRR_Adiposity_MA$ci.ub, OF_lnRR_Leptin_MA$ci.ub, MG_lnRR_BW_MA$ci.ub, MG_lnRR_Glucose_MA$ci.ub, MG_lnRR_TG_MA$ci.ub, MG_lnRR_Insulin_MA$ci.ub, MG_lnRR_Adiposity_MA$ci.ub, MG_lnRR_Leptin_MA$ci.ub)
+
+lnRR_MA_ciub
+
+lnRR_MA_k <- c(OF_lnRR_BW_MA$k, OF_lnRR_Glucose_MA$k, OF_lnRR_TG_MA$k, OF_lnRR_Insulin_MA$k, OF_lnRR_Adiposity_MA$k, OF_lnRR_Leptin_MA$k, MG_lnRR_BW_MA$k, MG_lnRR_Glucose_MA$k, MG_lnRR_TG_MA$k, MG_lnRR_Insulin_MA$k, MG_lnRR_Adiposity_MA$k, MG_lnRR_Leptin_MA$k)
+
+lnRR_MA_k
+
+length(OF_lnRR_BW_MA$s.levels[1][[1]])
+
+lnRR_MA_Npapers <- c(length(OF_lnRR_BW_MA$s.levels[1][[1]]), 
+                     length(OF_lnRR_Glucose_MA$s.levels[1][[1]]),
+                     length(OF_lnRR_TG_MA$s.levels[1][[1]]),
+                     length(OF_lnRR_Insulin_MA$s.levels[1][[1]]),
+                     length(OF_lnRR_Adiposity_MA$s.levels[1][[1]]),
+                     length(OF_lnRR_Leptin_MA$s.levels[1][[1]]),
+                     length(MG_lnRR_BW_MA$s.levels[1][[1]]),
+                     length(MG_lnRR_Glucose_MA$s.levels[1][[1]]),
+                     length(MG_lnRR_TG_MA$s.levels[1][[1]]),
+                     length(MG_lnRR_Insulin_MA$s.levels[1][[1]]),
+                     length(MG_lnRR_Adiposity_MA$s.levels[1][[1]]),
+                     length(MG_lnRR_Leptin_MA$s.levels[1][[1]])
+                     )
+                     
+lnRR_MA_Npapers
+
+lnRR_MA_Ncohorts <- c(length(OF_lnRR_BW_MA$s.levels[2][[1]]), 
+                     length(OF_lnRR_Glucose_MA$s.levels[2][[1]]),
+                     length(OF_lnRR_TG_MA$s.levels[2][[1]]),
+                     length(OF_lnRR_Insulin_MA$s.levels[2][[1]]),
+                     length(OF_lnRR_Adiposity_MA$s.levels[2][[1]]),
+                     length(OF_lnRR_Leptin_MA$s.levels[2][[1]]),
+                     length(MG_lnRR_BW_MA$s.levels[2][[1]]),
+                     length(MG_lnRR_Glucose_MA$s.levels[2][[1]]),
+                     length(MG_lnRR_TG_MA$s.levels[2][[1]]),
+                     length(MG_lnRR_Insulin_MA$s.levels[2][[1]]),
+                     length(MG_lnRR_Adiposity_MA$s.levels[2][[1]]),
+                     length(MG_lnRR_Leptin_MA$s.levels[2][[1]])
+                     )
+                     
+lnRR_MA_Ncohorts  
+
+#create data fame
+lnRR_MA_results <- data.frame(Experiment_type = experiment_type, trait = trait_type, mean = lnRR_MA_means, ci.lb= lnRR_MA_cilb, ci.ub= lnRR_MA_ciub, k= lnRR_MA_k, N_papers = lnRR_MA_Npapers, N_cohorts=lnRR_MA_Ncohorts)
+
+lnRR_MA_results
+
+lnRR_MA_results <- unite(lnRR_MA_results, "labels", c("Experiment_type", "trait"), sep = " - ", remove = FALSE)
+
+lnRR_MA_results
+
+#Plotting
+
+plot_lnRR <- ggplot(lnRR_MA_results, aes(x=trait, y=mean, colour=Experiment_type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = trait, y = mean), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  coord_flip()
+
+?geom_point
+ 
+plot_lnRR
+
+```
+
 
 
