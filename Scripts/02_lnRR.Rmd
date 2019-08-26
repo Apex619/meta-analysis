@@ -167,51 +167,51 @@ forest(MG_lnRR_BW_MA)
 
 Effect_Size_Glucose <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose) 
 
-OF_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'ML') 
+OF_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'REML') 
 summary(OF_lnRR_Glucose_MA)
 
 #Glucose MG
-MG_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "Multigenerational",], method = 'ML') 
+MG_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "Multigenerational",], method = 'REML') 
 summary(MG_lnRR_Glucose_MA)
 
 #Insulin one off
 Effect_Size_Insulin <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Insulin)
 
-OF_lnRR_Insulin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "One off",], method = 'ML') 
+OF_lnRR_Insulin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "One off",], method = 'REML') 
 summary(OF_lnRR_Insulin_MA)
 
 #Insulin MG
-MG_lnRR_Insulin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "Multigenerational",], method = 'ML') 
+MG_lnRR_Insulin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "Multigenerational",], method = 'REML') 
 summary(MG_lnRR_Insulin_MA)
 
 #Triglycerides One off
 Effect_Size_TG <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Triglycerides)
 
-OF_lnRR_TG_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG[Effect_Size_TG$Exposure_Type == "One off",], method = 'ML') 
+OF_lnRR_TG_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG[Effect_Size_TG$Exposure_Type == "One off",], method = 'REML') 
 summary(OF_lnRR_TG_MA)
 
 #Triglycerides MG
-MG_lnRR_TG_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG[Effect_Size_TG$Exposure_Type == "Multigenerational",], method = 'ML') 
+MG_lnRR_TG_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_TG[Effect_Size_TG$Exposure_Type == "Multigenerational",], method = 'REML') 
 summary(MG_lnRR_TG_MA)
 
 #Adiposity one off
 Effect_Size_Adiposity <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Adiposity)
 
-OF_lnRR_Adiposity_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity[Effect_Size_Adiposity$Exposure_Type == "One off",], method = 'ML') 
+OF_lnRR_Adiposity_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity[Effect_Size_Adiposity$Exposure_Type == "One off",], method = 'REML') 
 summary(OF_lnRR_Adiposity_MA)
 
 #Adiposity MG
-MG_lnRR_Adiposity_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity[Effect_Size_Adiposity$Exposure_Type == "Multigenerational",], method = 'ML') 
+MG_lnRR_Adiposity_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Adiposity[Effect_Size_Adiposity$Exposure_Type == "Multigenerational",], method = 'REML') 
 summary(MG_lnRR_Adiposity_MA)
 
 #Leptin
 Effect_Size_Leptin <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Leptin)
 
-OF_lnRR_Leptin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Leptin[Effect_Size_Leptin$Exposure_Type == "One off",], method = 'ML') 
+OF_lnRR_Leptin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Leptin[Effect_Size_Leptin$Exposure_Type == "One off",], method = 'REML') 
 summary(OF_lnRR_Leptin_MA)
 
 #Leptin MG
-MG_lnRR_Leptin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Leptin[Effect_Size_Leptin$Exposure_Type == "Multigenerational",], method = 'ML') 
+MG_lnRR_Leptin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Leptin[Effect_Size_Leptin$Exposure_Type == "Multigenerational",], method = 'REML') 
 summary(MG_lnRR_Leptin_MA)
 
 
@@ -291,8 +291,6 @@ plot_lnRR <- ggplot(lnRR_MA_results, aes(x=trait, y=mean, colour=Experiment_type
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(title ="Difference between treatment and control in means", x = "Traits", y = "lnRR") +
   coord_flip()
-
-?geom_point
  
 plot_lnRR
 
