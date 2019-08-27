@@ -25,15 +25,15 @@ data$ES.ID <- paste("ES", sprintf("%03d",c(1:dim(data)[1])), sep="")
 ```
 
 
-# **1. Calculating the effects size (log response ratio)**
+
 ```{r, echo=FALSE}
 #Calculate Effect Size (lnRR) for body weight
 Effect_Size <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
 ```
 
-# **2. Meta-analysis on total dataset**
 
-## **a. What random effect structure to use ?**
+
+## **1. What random effect structure to use ?**
 
 Choose random effect structure by conducting LRTs (likelihood ratio tests), and for that we need ML (maximum likelihood) estimates
 
@@ -92,54 +92,7 @@ prediction
 ```
 # Summarize models and choose which to present in main report !
 
-
-# **3. Preliminary Analysis**
-
-```{r, echo=FALSE}
-#Random effects model multigenerational (lnRR)
-Multi_Model <- rma.mv(yi, vi, method = "REML", data=Multi_SMD)  
-Multi_Model
-```
-```{r, echo=FALSE}
-#Here we want to obtain an I^2 value to determine heterogeniety (General Equation for I^2)
-
-W <- diag(1/Multi_SMD$vi)
-X <- model.matrix(Multi_Model)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-100 * sum(Multi_Model$sigma2) / (sum(Multi_Model$sigma2) + (Multi_Model$k-Multi_Model$p)/sum(diag(P)))
-
-#For a model with moderators, I^2 is computed as such:
-
-Multi_Model$I2
-```
-
-```{r, echo=FALSE}
-forest(Multi_Model, slab = paste(Multi_SMD$Cohort_ID))
-funnel(Multi_Model)
-
-```
-
-
-```{r}
-#Random effects model one off exposure lnRR
-One_Off_Model <- rma.mv(yi, vi, random = ~ 1 | Cohort_ID, method = "REML", data=One_Off_SMD)
-One_Off_Model
-```
-```{r}
-#I^2
-W <- diag(1/One_Off_SMD$vi)
-X <- model.matrix(One_Off_Model)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-100 * sum(One_Off_Model$sigma2) / (sum(One_Off_Model$sigma2) + (One_Off_Model$k-One_Off_Model$p)/sum(diag(P)))
-```
-
-
-```{r}
-forest(One_Off_Model, slab=paste(One_Off_SMD$Cohort_ID))
-funnel(One_Off_Model)
-```
-
-
+# **2. Calculating the effects size (log response ratio)**
 ```{r}
 #Body Weight
 #ADD HISTOGRAMS!!!NEED TO CHECK IF THERE ARE ANY UNUSUAL EFFECT SIZES
