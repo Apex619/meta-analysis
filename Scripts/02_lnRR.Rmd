@@ -16,7 +16,7 @@ library(metafor)
 library(ggplot2)
 ```
 
-
+## Importing Data
 ```{r, echo=FALSE}
 #Filepath may change accoding to the computer used
 data <- read.xlsx("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Body Weight\\R_metafor\\Body Weight_metafor\\Extraction_Sheet_4.0.xlsx", sheet = 1)
@@ -24,12 +24,6 @@ data <- read.xlsx("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction
 data$ES.ID <- paste("ES", sprintf("%03d",c(1:dim(data)[1])), sep="")
 ```
 
-
-
-```{r, echo=FALSE}
-#Calculate Effect Size (lnRR) for body weight
-Effect_Size <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=data)
-```
 
 
 
@@ -170,6 +164,7 @@ summary(MG_lnRR_Leptin_MA)
 
 ```
 
+# **2. Summary table and figure**
 ```{r}
 # Making a table of meta-analytic results for ln_RR
 
