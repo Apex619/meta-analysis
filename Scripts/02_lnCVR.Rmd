@@ -28,7 +28,7 @@ MG_lnCVR_BW_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Ef
 
 #Glucose
 
-Effect_Size_Glucose_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose) 
+Effect_Size_Glucose_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose_Amalgamated) 
 
 OF_lnCVR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose_lnCVR[Effect_Size_Glucose_lnCVR$Exposure_Type == "One off",], method = 'REML') 
 
