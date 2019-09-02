@@ -110,9 +110,9 @@ MG_lnRR_BW_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=lnR
 summary(MG_lnRR_BW_MA)
 forest(MG_lnRR_BW_MA)
 
-#Glucose one off
+#Glucose one off (change data sheet for amalgamated vs not amalgamated)
 
-Effect_Size_Glucose <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose) 
+Effect_Size_Glucose <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose_Amalgamated) 
 
 OF_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'REML') 
 summary(OF_lnRR_Glucose_MA)
