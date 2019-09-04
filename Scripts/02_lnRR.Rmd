@@ -113,6 +113,7 @@ forest(MG_lnRR_BW_MA)
 #Glucose one off (change data sheet for amalgamated vs not amalgamated)
 
 Effect_Size_Glucose <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Glucose_Amalgamated) 
+hist(Effect_Size_Glucose$yi)
 
 OF_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'REML') 
 summary(OF_lnRR_Glucose_MA)
@@ -122,7 +123,7 @@ MG_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), dat
 summary(MG_lnRR_Glucose_MA)
 
 #Insulin one off
-Effect_Size_Insulin <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Insulin)
+Effect_Size_Insulin <- escalc(measure="ROM", m1i=New_Mean__1, sd1i=New_SD__1, n1i=Sample_Size_n_Treatment, m2i=New_Mean, sd2i=New_SD, n2i=Sample_Size_n_Control, data=Insulin_AUC)
 
 OF_lnRR_Insulin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin[Effect_Size_Insulin$Exposure_Type == "One off",], method = 'REML') 
 summary(OF_lnRR_Insulin_MA)
@@ -242,7 +243,25 @@ plot_lnRR <- ggplot(lnRR_MA_results, aes(x=trait, y=mean, colour=Experiment_type
  
 plot_lnRR
 
+ggsave("../figs/plot_lnRR.png")
+
 ```
+```{r}
+#Meta-regression
+str(lnRR_BW_MA_ES) #is it a factor
+is.factor(lnRR_BW_MA_ES$Sex)
+
+levels(lnRR_BW_MA_ES$Sex)
+table(lnRR_BW_MA_ES$Sex)
+lnRR_BW_MA_ES$Sex <- gsub(" ", "", lnRR_BW_MA_ES$Sex) #cleaning spaces
+
+Body_Weight_Sex <- rma.mv(yi, vi,mods = ~ relevel(as.factor(Sex), ref="Male"), random = list(~1|Paper_ID,~1|Cohort_ID), data=lnRR_BW_MA_ES[lnRR_BW_MA_ES$Exposure_Type == "One off",], method = 'REML') 
+
+Body_Weight_Sex <- rma.mv(yi, vi,mods = ~ Sex -1, random = list(~1|Paper_ID,~1|Cohort_ID), data=lnRR_BW_MA_ES[lnRR_BW_MA_ES$Exposure_Type == "One off",], method = 'REML') 
+
+summary(Body_Weight_Sex)
+```
+
 
 
 

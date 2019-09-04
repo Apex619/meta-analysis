@@ -150,6 +150,9 @@ plot_lnCVR <- ggplot(lnCVR_MA_results, aes(x=trait, y=mean, colour=Experiment_ty
   coord_flip()
  
 plot_lnCVR
+
+ggsave("../figs/plot_lnCVR.png")
+
 ```
 
 
