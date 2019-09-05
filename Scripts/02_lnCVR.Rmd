@@ -38,7 +38,7 @@ MG_lnCVR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), da
 
 
 #Insulin
-Effect_Size_Insulin_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control_Orig, sd2i=SD_Control_Orig, n2i=Sample_Size_n_Control, data=Insulin)
+Effect_Size_Insulin_lnCVR <- escalc(measure="CVR", m1i=New_Mean__1, sd1i=New_SD__1, n1i=Sample_Size_n_Treatment, m2i=New_Mean, sd2i=New_SD, n2i=Sample_Size_n_Control, data=Insulin_AUC)
 
 OF_lnCVR_Insulin_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Insulin_lnCVR[Effect_Size_Insulin_lnCVR$Exposure_Type == "One off",], method = 'REML') 
 

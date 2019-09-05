@@ -16,16 +16,6 @@ library(metafor)
 library(ggplot2)
 ```
 
-## Importing Data
-```{r, echo=FALSE}
-#Filepath may change accoding to the computer used
-data <- read.xlsx("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Body Weight\\R_metafor\\Body Weight_metafor\\Extraction_Sheet_4.0.xlsx", sheet = 1)
-#Add effect size ID's
-data$ES.ID <- paste("ES", sprintf("%03d",c(1:dim(data)[1])), sep="")
-```
-
-
-
 
 ## **1. What random effect structure to use ?**
 
@@ -247,6 +237,14 @@ ggsave("../figs/plot_lnRR.png")
 
 ```
 ```{r}
+#ALL TRAITS ANALYSIS
+
+Effect_Size_All_Traits <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
+
+All_Traits_Analysis <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML') 
+```
+
+```{r}
 #Meta-regression
 str(lnRR_BW_MA_ES) #is it a factor
 is.factor(lnRR_BW_MA_ES$Sex)
@@ -260,6 +258,12 @@ Body_Weight_Sex <- rma.mv(yi, vi,mods = ~ relevel(as.factor(Sex), ref="Male"), r
 Body_Weight_Sex <- rma.mv(yi, vi,mods = ~ Sex -1, random = list(~1|Paper_ID,~1|Cohort_ID), data=lnRR_BW_MA_ES[lnRR_BW_MA_ES$Exposure_Type == "One off",], method = 'REML') 
 
 summary(Body_Weight_Sex)
+
+#Glucose, tolerance test vs. fbg
+
+Glucose_Test_Type <- rma.mv(yi, vi,mods = ~ Tolerance_test, random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'REML') 
+
+summary(Glucose_Test_Type)
 ```
 
 
