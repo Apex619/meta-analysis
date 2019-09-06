@@ -14,7 +14,68 @@ library(openxlsx)
 library(knitr)
 library(metafor)
 library(ggplot2)
+library(readxl)
+library(janitor)
 ```
+
+```{r} 
+#Importing Data
+ALL_TRAITS <- read_excel("data/ALL_TRAITS.xlsx")
+str(ALL_TRAITS)
+
+#convert categorical variables into factors
+ALL_TRAITS$Trait <- factor(ALL_TRAITS$Trait)
+ALL_TRAITS$Exposure_Type <- factor(ALL_TRAITS$Exposure_Type)
+ALL_TRAITS$Sex <- factor(ALL_TRAITS$Sex)
+ALL_TRAITS$Generation <- factor(ALL_TRAITS$Generation)
+ALL_TRAITS$Cohort_ID <- factor(ALL_TRAITS$Cohort_ID)
+ALL_TRAITS$Paper_ID <- factor(ALL_TRAITS$Paper_ID)
+ALL_TRAITS$Rodent_type <- factor(ALL_TRAITS$Rodent_type)
+ALL_TRAITS$F2_Diet_at_measurement <- factor(ALL_TRAITS$F2_Diet_at_measurement)
+ALL_TRAITS$Strain <- factor(ALL_TRAITS$Strain)
+ALL_TRAITS$F0_Parent_Exposed <- factor(ALL_TRAITS$F0_Parent_Exposed)
+
+```
+```{r}
+#Data checks
+
+#Initial results section ! Showing how many effect sizes we had and the distribution of these effect sizes ! 
+
+#Checking continuous variables
+hist(ALL_TRAITS$Age_Days)
+hist(ALL_TRAITS$Sample_Size_n_Control)
+hist(ALL_TRAITS$Sample_Size_n_Treatment)
+
+#checking categorical variables
+tabyl(ALL_TRAITS, Trait)
+tabyl(ALL_TRAITS, Exposure_Type) 
+tabyl(ALL_TRAITS, Sex) 
+tabyl(ALL_TRAITS, Generation) 
+tabyl(ALL_TRAITS, Cohort_ID) 
+tabyl(ALL_TRAITS, Paper_ID) 
+tabyl(ALL_TRAITS, Rodent_type) 
+tabyl(ALL_TRAITS, F2_Diet_at_measurement) 
+tabyl(ALL_TRAITS, Strain) 
+tabyl(ALL_TRAITS, F0_Parent_Exposed) 
+
+#two-way tables
+tabyl(ALL_TRAITS, Trait, Exposure_Type)
+tabyl(ALL_TRAITS, Exposure_Type, Sex)
+
+
+#three-way tables
+tabyl(ALL_TRAITS, Paper_ID, Trait, Exposure_Type)
+tabyl(ALL_TRAITS, Sex, Exposure_Type, Trait)
+#Will have to skip some of the models because we can't exactly compare males and females for certain traits ! There just isn't enough data or balance !
+
+
+#Will always need to look at whether we need to exclude data or not, for example, when using sex as a moderator, there isn't much balance and so we can exclude "Both" from the analysis.
+
+
+```
+
+
+
 
 
 ## **1. What random effect structure to use ?**
@@ -236,13 +297,63 @@ plot_lnRR
 ggsave("../figs/plot_lnRR.png")
 
 ```
+
+
 ```{r}
 #ALL TRAITS ANALYSIS
 
 Effect_Size_All_Traits <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
 
-All_Traits_Analysis <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML') 
+hist(Effect_Size_All_Traits$yi)
+hist(log(Effect_Size_All_Traits$vi))
 ```
+
+```{r}
+#Modelling all traits exposure type
+
+All_Traits_Analysis <- rma.mv(yi, vi, mods = ~relevel(Exposure_Type, ref="One off"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis)
+
+#Intercept only model
+All_Traits_Analysis <- rma.mv(yi, vi, mods = ~relevel(Exposure_Type, ref="One off")-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis)
+```
+
+
+```{r}
+# Sex as a moderator
+All_Traits_Analysis_Sex <- rma.mv(yi, vi, mods = ~relevel(Sex, ref = "Female")-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis_Sex)
+
+#subsetted
+All_Traits_Analysis_Sex <- rma.mv(yi, vi, mods = ~relevel(Sex, ref = "Female"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML', subset = (Sex!="Both"))
+
+summary(All_Traits_Analysis_Sex)
+
+#Generation 
+All_Traits_Analysis <- rma.mv(yi, vi, mods = ~relevel(Generation, ref="F2")-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis)
+
+#Generation interaction with exposure type 
+All_Traits_Analysis <- rma.mv(yi, vi, mods = ~relevel(Generation, ref="F2") * Exposure_Type, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis)
+```
+
+
+
+
+```{r}
+#Notes
+
+#Converting to factors is crucial when attempting to run models with categorical variables ! To do so, we need to use the function: "as.factor" 
+#I also need to make sure to do exploratory analysis BEFORE meeting with Shinichi, the data should be clean and ready to analyse! I need to do histograms to be able to identify any issues with the effect sizes !
+```
+
 
 ```{r}
 #Meta-regression
