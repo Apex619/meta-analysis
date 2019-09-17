@@ -155,10 +155,6 @@ ggsave("../figs/plot_lnCVR.png")
 
 ```
 
-## Meta-regression
-```{r}
-
-```
 
 
 
