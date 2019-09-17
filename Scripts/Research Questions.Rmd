@@ -1,0 +1,92 @@
+---
+title: "Research Questions"
+author: "Hamza"
+date: "17 September 2019"
+output: html_document
+---
+
+```{r load packages, include=FALSE}
+
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+```
+
+# Research Questions
+```{r}
+# Research Questions 
+
+#1. What is the overall effect of exposure of F0 generation to obesogenic diets on F2 and F3 (if applicable) offspring? 
+#2.	What is the overall effect of continuous multigenerational exposure to obesogenic diets on generations F2, F3? 
+#3.	Are the effects of exposure of F0 generation to obesogenic diets on F2 and F3 offspring different between #paternal and maternal F0 exposure lines? 
+#4.	Are the effects of exposure of F0 generation to obesogenic diets on F2 and F3 generations different between female and male offspring?
+#5.	Which traits are the most affected in F2 and subsequent generations?
+
+#For each of the questions listed above, we will look at the effects on both trait means and variability, comparing control and treatment groups at each generation.
+
+```
+
+# Question 1
+```{r}
+
+## lnRR
+
+Effect_Size_All_Traits <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
+
+hist(Effect_Size_All_Traits$yi)
+hist(log(Effect_Size_All_Traits$vi))
+```
+
+```{r}
+# Modelling all traits with no mods
+All_Traits_Analysis_0mods <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis_0mods)
+```
+
+```{r}
+# Modelling all traits exposure type
+
+All_Traits_Analysis_mods <- rma.mv(yi, vi, mods = ~relevel(Exposure_Type, ref="One off"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis)
+forest(All_Traits_Analysis)
+```
+
+```{r}
+# Intercept only model
+All_Traits_Analysis <- rma.mv(yi, vi, mods = ~relevel(Exposure_Type, ref="One off")-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis)
+```
+
+```{r}
+# lnCVR
+Effect_Size_All_Traits_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
+
+hist(Effect_Size_All_Traits_lnCVR$yi)
+hist(log(Effect_Size_All_Traits_lnCVR$vi))
+```
+
+```{r}
+# Modelling all traits with no mods
+All_Traits_Analysis_0mods_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_lnCVR)
+```
+
+```{r}
+# Modelling all traits exposure type
+
+All_Traits_Analysis_mods_lnCVR <- rma.mv(yi, vi, mods = ~relevel(Exposure_Type, ref="One off"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_mods_lnCVR)
+```
+
+
+
+
+
+

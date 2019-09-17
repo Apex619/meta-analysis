@@ -1,8 +1,10 @@
 ---
-title: "Meta-analysis: transgenerational effects of a HFD in rodents"
-author: "Hamza Anwer  "
+title: 'Meta-analysis: transgenerational effects of a HFD in rodents'
+author: 'Hamza Anwer  '
 date: "15 July 2019"
-output: word_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ## Body Weight Data Extractions - lnRR
@@ -20,7 +22,7 @@ library(janitor)
 
 ```{r} 
 #Importing Data
-ALL_TRAITS <- read_excel("data/ALL_TRAITS.xlsx")
+ALL_TRAITS <- read_excel("../data/ALL_TRAITS.xlsx")
 str(ALL_TRAITS)
 
 #convert categorical variables into factors
