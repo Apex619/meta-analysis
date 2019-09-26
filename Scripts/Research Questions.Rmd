@@ -132,7 +132,33 @@ All_Traits_Analysis_lnCVR_Sex <- rma.mv(yi, vi, mods = ~relevel(Sex, ref="Female
 
 summary(All_Traits_Analysis_lnCVR_Sex)
 ```
+Summarizing
+```{r}
 
+df <- data.frame(
+  group = c("Adiposity", "Body Weight", "Glucose", "Insulin", "Leptin", "Triglycerides"),
+  value = c(65, 146, 40, 45, 12, 33)
+  )
+head(df)
+
+bp<- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+bp
+
+pie <- bp + coord_polar("y", start=0)
+pie
+
+library(expss)
+ALL_TRAITS = apply_labels(ALL_TRAITS,
+                          Trait = "Trait",
+                          Rodent_type = "Rodent",
+                          Strain = "Strain",
+                          F0_Parent_Exposed = "F0 Parent Exposed",
+                          Sex = "Sex",
+                          Exposure_Type = "Exposure type"
+)
+cro(ALL_TRAITS$Trait, ALL_TRAITS$Exposure_Type)
+```
 
 
 
