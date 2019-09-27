@@ -171,6 +171,8 @@ hist(Effect_Size_Glucose$yi)
 OF_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "One off",], method = 'REML') 
 summary(OF_lnRR_Glucose_MA)
 
+OF_lnRR_Glucose_MA
+
 #Glucose MG
 MG_lnRR_Glucose_MA <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_Glucose[Effect_Size_Glucose$Exposure_Type == "Multigenerational",], method = 'REML') 
 summary(MG_lnRR_Glucose_MA)
