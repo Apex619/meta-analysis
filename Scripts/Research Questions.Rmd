@@ -172,8 +172,12 @@ OF_ALL$F0_Parent_Exposed <- factor(OF_ALL$F0_Parent_Exposed)
 # Modelling all traits with no mods (lnRR)
 All_Traits_Analysis_0mods_MG <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
 
+summary(All_Traits_Analysis_0mods_MG)
+
 
 All_Traits_Analysis_0mods_OF <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_OF)
 
 #Adding moderators
 All_Traits_Analysis_0mods_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
@@ -190,6 +194,8 @@ All_Traits_Analysis_0mods_MG_rodent <- rma.mv(yi, vi, mods = ~Rodent_type, rando
 summary(All_Traits_Analysis_0mods_MG_rodent)
 
 
+
+
 All_Traits_Analysis_0mods_OF_rodent <- rma.mv(yi, vi, mods = ~Rodent_type, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_rodent)
@@ -202,106 +208,24 @@ summary(All_Traits_Analysis_0mods_MG_sex)
 All_Traits_Analysis_0mods_OF_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_sex)
-
-All_Traits_Analysis_0mods_MG_age <- rma.mv(yi, vi, mods = ~Age_Days, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
-
-summary(All_Traits_Analysis_0mods_MG_age)
-
-
-All_Traits_Analysis_0mods_OF_age <- rma.mv(yi, vi, mods = ~Age_Days, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
-
-summary(All_Traits_Analysis_0mods_OF_age)
 ```
 
-# **Summary table and figures**
+
 ```{r}
-# Making a table of meta-analytic results for ln_RR
 
-experiment_type_overall <- c(rep("OF", 5), rep("MG", 5))
-
-mod_type <- rep(c("Overall", "F0 Parent", "Rodent", "Sex", "Age"), 2)  
-
-lnRR_MA_means_overall <- c(All_Traits_Analysis_0mods_MG$b, All_Traits_Analysis_0mods_OF$b, All_Traits_Analysis_0mods_MG_f0$b, All_Traits_Analysis_0mods_OF_f0$b, All_Traits_Analysis_0mods_MG_rodent$b, All_Traits_Analysis_0mods_OF_rodent$b, All_Traits_Analysis_0mods_MG_sex$b, All_Traits_Analysis_0mods_OF_sex$b, All_Traits_Analysis_0mods_MG_age$b, All_Traits_Analysis_0mods_OF_age$b)
-
-lnRR_MA_means
-
-lnRR_MA_cilb_overall <- c(All_Traits_Analysis_0mods_MG$ci.lb, All_Traits_Analysis_0mods_OF$ci.lb, All_Traits_Analysis_0mods_MG_f0$ci.lb, All_Traits_Analysis_0mods_OF_f0$ci.lb, All_Traits_Analysis_0mods_MG_rodent$ci.lb, All_Traits_Analysis_0mods_OF_rodent$ci.lb, All_Traits_Analysis_0mods_MG_sex$ci.lb, All_Traits_Analysis_0mods_OF_sex$ci.lb, All_Traits_Analysis_0mods_MG_age$ci.lb, All_Traits_Analysis_0mods_OF_age$ci.lb)
-
-lnRR_MA_cilb_overall
-
-lnRR_MA_ciuci.uci.uci.ub <- c(All_Traits_Analysis_0mods_MG$ci.ub, All_Traits_Analysis_0mods_OF$ci.ub, All_Traits_Analysis_0mods_MG_f0$ci.ub, All_Traits_Analysis_0mods_OF_f0$ci.ub, All_Traits_Analysis_0mods_MG_rodent$ci.ub, All_Traits_Analysis_0mods_OF_rodent$ci.ub, All_Traits_Analysis_0mods_MG_sex$ci.ub, All_Traits_Analysis_0mods_OF_sex$ci.ub, All_Traits_Analysis_0mods_MG_age$ci.ub, All_Traits_Analysis_0mods_OF_age$ci.ub)
-
-lnRR_MA_ciub_overall
-
-lnRR_MA_k_overall <- c(All_Traits_Analysis_0mods_MG$k, All_Traits_Analysis_0mods_OF$k, All_Traits_Analysis_0mods_MG_f0$k, All_Traits_Analysis_0mods_OF_f0$k, All_Traits_Analysis_0mods_MG_rodent$k, All_Traits_Analysis_0mods_OF_rodent$k, All_Traits_Analysis_0mods_MG_sex$k, All_Traits_Analysis_0mods_OF_sex$k, All_Traits_Analysis_0mods_MG_age$k, All_Traits_Analysis_0mods_OF_age$k)
-
-lnRR_MA_k_overall
-
-length(OF_lnRR_BW_MA$s.levels[1][[1]])
-
-lnRR_MA_mods_overall <- c(length(All_Traits_Analysis_0mods_MG$s.levels[1][[1]]), 
-                     length(All_Traits_Analysis_0mods_OF$s.levels[1][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_f0$s.levels[1][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_f0$s.levels[1][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_rodent$s.levels[1][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_rodent$s.levels[1][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_sex$s.levels[1][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_sex$s.levels[1][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_age$s.levels[1][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_age$s.levels[1][[1]])
-                     )
-                     
-lnRR_MA_mods_overall
-
-lnRR_MA_papers_overall <- c(length(All_Traits_Analysis_0mods_MG$s.levels[2][[1]]), 
-                     length(All_Traits_Analysis_0mods_OF$s.levels[2][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_f0$s.levels[2][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_f0$s.levels[2][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_rodent$s.levels[2][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_rodent$s.levels[2][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_sex$s.levels[2][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_sex$s.levels[2][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_age$s.levels[2][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_age$s.levels[2][[1]])
-                     )
-                     
-lnRR_MA_papers_overall
-
-lnRR_MA_Ncohorts_overall <- c(length(All_Traits_Analysis_0mods_MG$s.levels[3][[1]]), 
-                     length(All_Traits_Analysis_0mods_OF$s.levels[3][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_f0$s.levels[3][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_f0$s.levels[3][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_rodent$s.levels[3][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_rodent$s.levels[3][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_sex$s.levels[3][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_sex$s.levels[3][[1]]),
-                     length(All_Traits_Analysis_0mods_MG_age$s.levels[3][[1]]),
-                     length(All_Traits_Analysis_0mods_OF_age$s.levels[3][[1]])
-                     )
-                     
-lnRR_MA_Ncohorts_overall  
-
-#create data fame
-lnRR_MA_results <- data.frame(Experiment_type = experiment_type, trait = trait_type, mean = lnRR_MA_means, ci.lb= lnRR_MA_cilb, ci.ub= lnRR_MA_ciub, k= lnRR_MA_k, N_papers = lnRR_MA_Npapers, N_cohorts=lnRR_MA_Ncohorts)
-
-lnRR_MA_results
-
-lnRR_MA_results <- unite(lnRR_MA_results, "labels", c("Experiment_type", "trait"), sep = " - ", remove = FALSE)
-
-lnRR_MA_results
 
 #Plotting
 
-plot_lnRR <- ggplot(lnRR_MA_results, aes(x=trait, y=mean, colour=Experiment_type)) + 
+plot_lnRR_overall <- ggplot(Table_results_overall, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = trait, y = mean), position = position_dodge(0.3))+
+  geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means", x = "Traits", y = "lnRR") +
+  labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR") +
   coord_flip()
  
-plot_lnRR
+plot_lnRR_overall
 
-ggsave("../figs/plot_lnRR.png")
+ggsave("../figs/plot_lnRR_overall.png")
 
 ```
 
