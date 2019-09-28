@@ -62,7 +62,7 @@ OF_ALL$F0_Parent_Exposed <- factor(OF_ALL$F0_Parent_Exposed)
 
 
 
-# **2. overall analysis splitting by exposure type (log response ratio)**
+# **Overall analysis splitting by exposure type (log response ratio)**
 ```{r}
 # Modelling all traits with no mods (lnRR)
 All_Traits_Analysis_0mods_MG <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
@@ -120,6 +120,8 @@ plot_lnRR_overall <- ggplot(Table_results_overall, aes(x=ID, y=Effect_Size_lnRR,
 plot_lnRR_overall
 
 ggsave("../figs/plot_lnRR_overall.png")
+
+##
 
 ```
 
