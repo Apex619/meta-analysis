@@ -28,112 +28,7 @@ library(ggplot2)
 
 ```
 
-# Question 1
-```{r}
 
-## (lnRR)
-
-Effect_Size_All_Traits <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
-
-write.csv(Effect_Size_All_Traits, file = "es.csv")
-
-hist(Effect_Size_All_Traits$yi)
-hist(log(Effect_Size_All_Traits$vi))
-```
-
-```{r}
-# Modelling all traits with no mods (lnRR)
-All_Traits_Analysis_0mods <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-summary(All_Traits_Analysis_0mods)
-```
-
-```{r}
-# Modelling all traits exposure type (lnRR)
-
-All_Traits_Analysis_mods <- rma.mv(yi, vi, mods = ~Exposure_Type, random = list(~1|Trait,~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-summary(All_Traits_Analysis_mods)
-
-```
-
-```{r}
-# Intercept only model (lnRR)
-All_Traits_Analysis <- rma.mv(yi, vi, mods = ~relevel(Exposure_Type, ref="One off")-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-summary(All_Traits_Analysis)
-```
-
-```{r}
-# lnCVR
-Effect_Size_All_Traits_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
-
-hist(Effect_Size_All_Traits_lnCVR$yi)
-hist(log(Effect_Size_All_Traits_lnCVR$vi))
-```
-
-```{r}
-# Modelling all traits with no mods (lnCVR)
-All_Traits_Analysis_0mods_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
-
-summary(All_Traits_Analysis_0mods_lnCVR)
-```
-
-```{r}
-# Modelling all traits exposure type (lnCVR)
-
-All_Traits_Analysis_mods_lnCVR <- rma.mv(yi, vi, mods = ~relevel(Exposure_Type, ref="One off"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
-
-summary(All_Traits_Analysis_mods_lnCVR)
-```
-
-# Question 2
-
-```{r}
-#lnRR
-All_Traits_Analysis_MG <- rma.mv(yi, vi, mods = ~relevel(Exposure_Type, ref="Multigenerational"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-summary(All_Traits_Analysis_MG)
-
-```
-```{r}
-#lnCVR
-
-All_Traits_Analysis_lnCVR_MG <- rma.mv(yi, vi, mods = ~relevel(Exposure_Type, ref="Multigenerational"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
-
-summary(All_Traits_Analysis_lnCVR_MG)
-```
-
-# Question 3
-```{r}
-#lnRR
-All_Traits_Analysis_F0_Parents <- rma.mv(yi, vi, mods = ~relevel(F0_Parent_Exposed, ref="Female"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-summary(All_Traits_Analysis_F0_Parents)
-```
-```{r}
-#lnCVR
-
-All_Traits_Analysis_lnCVR_F0_Parents <- rma.mv(yi, vi, mods = ~relevel(F0_Parent_Exposed, ref="Female"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
-
-summary(All_Traits_Analysis_lnCVR_F0_Parents)
-```
-
-# Question 4
-```{r}
-#lnRR
-All_Traits_Analysis_Sex <- rma.mv(yi, vi, mods = ~relevel(Sex, ref="Female"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-summary(All_Traits_Analysis_Sex)
-```
-
-```{r}
-#lnCVR
-
-All_Traits_Analysis_lnCVR_Sex <- rma.mv(yi, vi, mods = ~relevel(Sex, ref="Female"), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
-
-summary(All_Traits_Analysis_lnCVR_Sex)
-```
 
 ```{r}
 MG_ALL$Trait <- factor(MG_ALL$Trait)
@@ -193,9 +88,6 @@ All_Traits_Analysis_0mods_MG_rodent <- rma.mv(yi, vi, mods = ~Rodent_type, rando
 
 summary(All_Traits_Analysis_0mods_MG_rodent)
 
-
-
-
 All_Traits_Analysis_0mods_OF_rodent <- rma.mv(yi, vi, mods = ~Rodent_type, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_rodent)
@@ -208,6 +100,8 @@ summary(All_Traits_Analysis_0mods_MG_sex)
 All_Traits_Analysis_0mods_OF_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_sex)
+
+
 ```
 
 
