@@ -96,6 +96,8 @@ meta1study <- rma.mv(yi, vi,random = ~1|Rodent_type, data=Effect_Size, method = 
 anova(meta1null, meta1study)
 meta4study <- rma.mv(yi, vi,random = ~1|Strain, data=Effect_Size, method = 'ML') 
 anova(meta1null, meta4study)
+meta6study <- rma.mv(yi, vi,random = ~1|Trait, data=Effect_Size_All_Traits, method = 'ML') 
+summary(meta6study)
 
 metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size, method = 'ML') 
 anova(meta0study, metastudy_best)

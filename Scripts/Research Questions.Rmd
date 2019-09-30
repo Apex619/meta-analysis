@@ -155,21 +155,31 @@ summary(All_Traits_Analysis_0mods_OF_sex)
 
 ```{r}
 
+#Plotting Overall with moderators (need to add sample sizes !!!)
 
-
-
-#Plotting Overall with moderators
-
-plot_lnRR_overall_mods <- ggplot(Table_results_overall, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
+plot_lnRR_overall_mods_exp <- ggplot(Table_results_overall, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(title ="Difference between treatment and control in means, overall mods", x = "ID", y = "lnRR") +
   coord_flip()
  
-plot_lnRR_overall_mods
+plot_lnRR_overall_mods_exp
 
 ```
+```{r}
+#Plotting lnRR when separated by exposure as well as trait
+
+plot_lnRR <- ggplot(lnRR_MA_results, aes(x=trait, y=mean, colour=Experiment_type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = trait, y = mean), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Difference between treatment and control in means", x = "Traits", y = "lnRR") +
+  coord_flip()
+ 
+plot_lnRR
+```
+
 
 
 
