@@ -6,7 +6,6 @@ output: html_document
 ---
 
 ```{r load packages, include=FALSE}
-
 library(tidyverse)
 library(openxlsx)  
 library(knitr)
@@ -29,7 +28,7 @@ library(ggplot2)
 ```
 
 
-
+#Converting characters into factors
 ```{r}
 MG_ALL$Trait <- factor(MG_ALL$Trait)
 MG_ALL$Exposure_Type <- factor(MG_ALL$Exposure_Type)
@@ -62,17 +61,65 @@ OF_ALL$F0_Parent_Exposed <- factor(OF_ALL$F0_Parent_Exposed)
 
 
 
-# **Overall analysis splitting by exposure type (log response ratio)**
+# **Overall analysis and then splitting by exposure type (log response ratio)**
 ```{r}
-# Modelling all traits with no mods (lnRR)
+# Modelling all traits with no mods MG (lnRR)
 All_Traits_Analysis_0mods_MG <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG)
 
+#Heterogeneity I2 (adapt for all models)
+W <- diag(1/MG_ALL$vi)
+X <- model.matrix(All_Traits_Analysis_0mods_MG)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_MG <- 100 * sum(All_Traits_Analysis_0mods_MG$sigma2) / (sum(All_Traits_Analysis_0mods_MG$sigma2) + (All_Traits_Analysis_0mods_MG$k-All_Traits_Analysis_0mods_MG$p)/sum(diag(P)))
+I2_MG
 
+# OF ALL
 All_Traits_Analysis_0mods_OF <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF)
+
+W <- diag(1/OF_ALL$vi)
+X <- model.matrix(All_Traits_Analysis_0mods_OF)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_OF <- 100 * sum(All_Traits_Analysis_0mods_OF$sigma2) / (sum(All_Traits_Analysis_0mods_OF$sigma2) + (All_Traits_Analysis_0mods_OF$k-All_Traits_Analysis_0mods_OF$p)/sum(diag(P)))
+I2_OF
+
+#ALL OF and MG
+
+All_Traits_Analysis_0mods <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis_0mods)
+
+#Dataframe was created using results from above meta-analysis models
+
+#Plotting overall
+
+plot_lnRR_overall <- ggplot(Overall_effect_size, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR") +
+  coord_flip()
+ 
+plot_lnRR_overall
+
+#Plotting overall when split by multigenerational and one off exposure
+
+plot_lnRR_overall_exposure <- ggplot(Overall_MG_OF, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR") +
+  coord_flip()
+ 
+plot_lnRR_overall_exposure
+
+
+```
+
+```{r}
 
 #Adding moderators
 All_Traits_Analysis_0mods_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
@@ -105,23 +152,22 @@ summary(All_Traits_Analysis_0mods_OF_sex)
 ```
 
 
+
 ```{r}
 
 
-#Plotting
 
-plot_lnRR_overall <- ggplot(Table_results_overall, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
+
+#Plotting Overall with moderators
+
+plot_lnRR_overall_mods <- ggplot(Table_results_overall, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR") +
+  labs(title ="Difference between treatment and control in means, overall mods", x = "ID", y = "lnRR") +
   coord_flip()
  
-plot_lnRR_overall
-
-ggsave("../figs/plot_lnRR_overall.png")
-
-##
+plot_lnRR_overall_mods
 
 ```
 
