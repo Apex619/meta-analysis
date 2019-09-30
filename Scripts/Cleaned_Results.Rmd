@@ -41,13 +41,21 @@ Overall_effects_not_split <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analys
 
 Table_results_overall <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Table results.xlsx")
 
+Overall_lnCVR <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall_lnCVR.xlsx")
+
+MG_ALL_lnCVR <- read.csv("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\MG_ALL_lnCVR.csv")
+
+OF_ALL_lnCVR <- read.csv("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\OF_ALL_lnCVR.csv")
+
+Overall_MG_OF_lnCVR <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall_MG_OF_lnCVR.xlsx")
+
 ```
 
-## Meta-analysis
+## Meta-analysis overall results (lnRR)
 
-### Calculating effect sizes
+### 1. Calculating effect sizes (Done)
 
-Here, we calculated our effect sizes (log response ratio lnRR) for our complete data set (all traits).
+We calculated our effect sizes (log response ratio lnRR) for our complete data set (all traits).
 ```{r, include = FALSE}
 
 Effect_Size_All_Traits <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
@@ -56,7 +64,7 @@ hist(Effect_Size_All_Traits$yi)
 hist(log(Effect_Size_All_Traits$vi))
 ```
 
-### Deciding random effects
+### 2. Deciding random effects (Done)
 We used AIC values to decide which random effects to use. Combining "Trait", "Paper_ID" and "Cohort_ID" yielded the lowest AIC values. 
 ```{r, include= FALSE}
 meta1null <- rma.mv(yi, vi, data=Effect_Size_All_Traits, method = 'ML') 
@@ -67,15 +75,13 @@ meta0study <- rma.mv(yi, vi,random = list(~1|Paper_ID, ~1|Cohort_ID), data=Effec
 anova(meta1null, meta0study)
 meta1study <- rma.mv(yi, vi,random = ~1|Trait, data=Effect_Size_All_Traits, method = 'ML') 
 anova(meta1null, meta1study)
-```
-
-```{r}
 metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID,~1|Trait), data=Effect_Size_All_Traits, method = 'ML') 
 anova(meta0study, metastudy_best)
 
 ```
 
-#### Running meta-analysis (overall, and then overall split by exposure type)
+#### 3. Running meta-analysis (overall, and then overall split by exposure type)
+I conducted meta-analysis, first on the complete dataset, and then on subsetted data (split by one off and multigenerational exposure)
 
 ```{r, include = FALSE}
 #ALL OF and MG
@@ -111,26 +117,29 @@ I2_OF
 #Dataframe was created using results from above meta-analysis models
 ```
 
+### Plotting overall results
+```{r,echo=FALSE}
 
-```{r}
-#Plotting overall
 
 plot_lnRR_overall <- ggplot(Overall_effect_size, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR") +
+  labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR", subtitle = "k=341") +
   coord_flip()
- 
 plot_lnRR_overall
+```
 
-#Plotting overall when split by multigenerational and one off exposure
+### Plotting overall results when split by multigenerational and one off exposure
+```{r, echo = FALSE}
+
+
 
 plot_lnRR_overall_exposure <- ggplot(Overall_MG_OF, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR") +
+  labs(title ="Difference between treatment and control in means, overall, exp type", x = "ID", y = "lnRR") +
   coord_flip()
  
 plot_lnRR_overall_exposure
@@ -154,9 +163,11 @@ All_Data_Analysis_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|
 
 summary(All_Data_Analysis_sex)
 ```
-```{r}
 
-#Plotting these results from data frame 
+### Plotting overall results with moderators
+```{r, echo=FALSE}
+
+
 
 plot_lnRR_overall_mods <- ggplot(Overall_effects_not_split, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
@@ -168,8 +179,12 @@ plot_lnRR_overall_mods <- ggplot(Overall_effects_not_split, aes(x=ID, y=Effect_S
 plot_lnRR_overall_mods
 
 ```
-#### Split by exposure type and with moderators
+
 ```{r, include=FALSE}
+
+#Split by exposure type and with moderators
+
+
 #Adding moderators
 All_Traits_Analysis_0mods_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
 
@@ -201,10 +216,10 @@ summary(All_Traits_Analysis_0mods_OF_sex)
 ```
 
 
+### Plotting Overall results with moderators (split by exposure type)
+```{r, echo = FALSE}
 
-```{r}
 
-#Plotting Overall with moderators and splitting by exposure type
 
 plot_lnRR_overall_mods_exp <- ggplot(Table_results_overall, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
@@ -215,6 +230,59 @@ plot_lnRR_overall_mods_exp <- ggplot(Table_results_overall, aes(x=ID, y=Effect_S
  
 plot_lnRR_overall_mods_exp
 
+
 ```
 
+## Meta-analysis overall results (lnCVR)
 
+### 4. Calculating effect sizes (Done)
+
+We calculated our effect sizes (lnCVR) for our complete data set (all traits).
+```{r, include = FALSE}
+
+Effect_Size_All_Traits_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
+```
+
+#### 5. Running meta-analysis for lnCVR (overall, and then overall split by exposure type)
+I conducted meta-analysis using lnCVR, first on the complete dataset, and then on subsetted data (split by one off and multigenerational exposure)
+
+```{r, include = FALSE}
+#ALL OF and MG
+
+All_Traits_Analysis_0mods_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_lnCVR)
+
+# Modelling all traits with no mods MG (lnCVR)
+All_Traits_Analysis_0mods_MG_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+
+summary(All_Traits_Analysis_0mods_MG_lnCVR)
+
+#Heterogeneity I2 (adapt for all models)
+W <- diag(1/MG_ALL_lnCVR$vi)
+X <- model.matrix(All_Traits_Analysis_0mods_MG_lnCVR)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_MG_lnCVR <- 100 * sum(All_Traits_Analysis_0mods_MG_lnCVR$sigma2) / (sum(All_Traits_Analysis_0mods_MG_lnCVR$sigma2) + (All_Traits_Analysis_0mods_MG_lnCVR$k-All_Traits_Analysis_0mods_MG_lnCVR$p)/sum(diag(P)))
+I2_MG
+
+# Modelling all traits with no mods OF (lnCVR)
+All_Traits_Analysis_0mods_OF_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_OF_lnCVR)
+
+#Dataframe was created using results from above meta-analysis models
+```
+
+### Plotting overall results lnCVR
+```{r,echo=FALSE}
+
+
+plot_lnCVR_overall <- ggplot(Overall_lnCVR, aes(x=ID, y=Effect_Size_lnCVR, colour=Experiment_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = Effect_Size_lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Difference between treatment and control in means, overall lnCVR", x = "ID", y = "lnCVR", subtitle = "k=341") +
+  coord_flip()
+plot_lnCVR_overall
+```
