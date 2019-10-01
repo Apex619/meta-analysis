@@ -4,6 +4,15 @@ author: "Hamza"
 date: "1 October 2019"
 output: html_document
 ---
+```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+library(readxl)
+```
+
 
 ## Meta-regression Body Weight
 
@@ -85,7 +94,7 @@ plot_BW_exp_type
 ```
 #### Running meta-analysis (Overall with moderators, and then overall split by exposure type with moderators)
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 #Adding moderators
 BW_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
 
@@ -137,9 +146,20 @@ summary(Body_Weight_OF_Sex)
 Body_Weight_Mods_lnRR <- tibble(
   Experiment_Type = c("Multigenerational","Multigenerational", "One off","One off","One off","Multigenerational","Multigenerational","Multigenerational", "One off","One off","One off"),
   ID = c("F0 Male", "F0 Female", "F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring"), 
-  lnRR = 
-  ci.lb = 
-  ci.ub = 
+  lnRR = c(0.0884,0.1380,0.1387,-0.1090,-0.1369, -0.0477, 0.3472,0.3470,-0.1987,0.2238, 0.2234),
+  ci.lb = c( -0.3550,-0.3466,0.0605,-0.1892,-0.2129,-0.3526,-0.0119,-0.0130,-0.9161,-0.4941,-0.4945),
+  ci.ub = c(0.5317,0.6225, 0.2170,-0.0287,-0.0608, 0.2571,0.7063,0.7071,0.5187,0.9416,0.9412)
 )
+
+Body_Weight_Mods_lnRR
+
+plot_lnRR_BW_mods_exp <- ggplot(Body_Weight_Mods_lnRR, aes(x=ID, y=lnRR, colour=Experiment_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Difference between treatment and control in body weight means, overall mods", x = "ID", y = "lnRR") +
+  coord_flip()
+ 
+plot_lnRR_BW_mods_exp
 ```
 
