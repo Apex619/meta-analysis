@@ -49,6 +49,10 @@ OF_ALL_lnCVR <- read.csv("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Ext
 
 Overall_MG_OF_lnCVR <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall_MG_OF_lnCVR.xlsx")
 
+Overall_effects_not_split_lnCVR <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall_effects_not_split_lnCVR.xlsx")
+
+Table_results_overall_lnCVR <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Table_results_overall_lnCVR.xlsx")
+
 ```
 
 ## Meta-analysis overall results (lnRR)
@@ -89,6 +93,8 @@ I conducted meta-analysis, first on the complete dataset, and then on subsetted 
 All_Traits_Analysis_0mods <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Traits_Analysis_0mods)
+
+funnel(All_Traits_Analysis_0mods)
 
 # Modelling all traits with no mods MG (lnRR)
 All_Traits_Analysis_0mods_MG <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
@@ -154,11 +160,6 @@ All_Data_Analysis_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(
 
 summary(All_Data_Analysis_f0)
 
-All_Data_Analysis_rodents <- rma.mv(yi, vi, mods = ~Rodent_type, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-summary(All_Data_Analysis_rodents)
-
-
 All_Data_Analysis_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Data_Analysis_sex)
@@ -194,14 +195,6 @@ summary(All_Traits_Analysis_0mods_MG_f0)
 All_Traits_Analysis_0mods_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_f0)
-
-All_Traits_Analysis_0mods_MG_rodent <- rma.mv(yi, vi, mods = ~Rodent_type, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
-
-summary(All_Traits_Analysis_0mods_MG_rodent)
-
-All_Traits_Analysis_0mods_OF_rodent <- rma.mv(yi, vi, mods = ~Rodent_type, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
-
-summary(All_Traits_Analysis_0mods_OF_rodent)
 
 All_Traits_Analysis_0mods_MG_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
 
@@ -285,4 +278,99 @@ plot_lnCVR_overall <- ggplot(Overall_lnCVR, aes(x=ID, y=Effect_Size_lnCVR, colou
   labs(title ="Difference between treatment and control in means, overall lnCVR", x = "ID", y = "lnCVR", subtitle = "k=341") +
   coord_flip()
 plot_lnCVR_overall
+```
+
+### Plotting overall results when split by multigenerational and one off exposure (lnCVR)
+```{r, echo = FALSE}
+
+
+
+plot_lnCVR_overall_exposure <- ggplot(Overall_MG_OF_lnCVR, aes(x=ID, y=Effect_Size_lnCVR, colour=Experiment_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = Effect_Size_lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Difference between treatment and control in means, overall, exp type", x = "ID", y = "lnCVR") +
+  coord_flip()
+ 
+plot_lnCVR_overall_exposure
+
+```
+
+
+
+
+#### Running meta-analysis lnCVR (Overall with moderators, and then overall split by exposure type with moderators)
+
+```{r, include=FALSE}
+#Adding moderators
+All_Data_Analysis_f0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+
+summary(All_Data_Analysis_f0_lnCVR)
+
+
+
+All_Data_Analysis_sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+
+summary(All_Data_Analysis_sex_lnCVR)
+```
+
+### Plotting overall results with moderators
+```{r, echo=FALSE}
+
+
+
+plot_lnCVR_overall_mods <- ggplot(Overall_effects_not_split_lnCVR, aes(x=ID, y=Effect_Size_lnCVR, colour=Experiment_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = Effect_Size_lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Difference between treatment and control in means, overall, lnCVR", x = "ID", y = "lnCVR") +
+  coord_flip()
+ 
+plot_lnCVR_overall_mods
+
+```
+
+```{r, include=FALSE}
+
+#Split by exposure type and with moderators
+
+
+#Adding moderators
+All_Traits_Analysis_lnCVR_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_lnCVR_MG_f0)
+
+
+All_Traits_Analysis_lnCVR_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_lnCVR_OF_f0)
+
+All_Traits_Analysis_lnCVR_MG_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_lnCVR_MG_sex)
+
+
+All_Traits_Analysis_lnCVR_OF_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_lnCVR_OF_sex)
+
+
+```
+
+
+### Plotting Overall results with moderators (split by exposure type)
+```{r, echo = FALSE}
+
+
+
+plot_lnCVR_overall_mods_exp <- ggplot(Table_results_overall_lnCVR, aes(x=ID, y=Effect_Size_lnCVR, colour=Experiment_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = Effect_Size_lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Difference between treatment and control in means, overall mods, lnCVR", x = "ID", y = "lnCVR") +
+  coord_flip()
+ 
+plot_lnCVR_overall_mods_exp
+
+
 ```

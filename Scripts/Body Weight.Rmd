@@ -1,0 +1,145 @@
+---
+title: "Body Weight"
+author: "Hamza"
+date: "1 October 2019"
+output: html_document
+---
+
+## Meta-regression Body Weight
+
+```{r}
+Body_Weight_lnRR <- read.csv("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Body_Weight_lnRR.csv")
+
+```
+```{r}
+
+#Subetting
+
+Body_Weight_lnRR_MG <- subset(Body_Weight_lnRR, Body_Weight_lnRR$Exposure_Type == "Multigenerational")
+
+Body_Weight_lnRR_OF <- subset(Body_Weight_lnRR, Body_Weight_lnRR$Exposure_Type == "One off")
+```
+
+```{r}
+
+#Overall analysis, not split
+
+Body_Weight_overall <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
+
+summary(Body_Weight_overall)
+
+#Tibble of overall results
+
+Body_Weight_overall_lnRR <- tibble(
+  ID = "Overall", 
+  lnRR = 0.1028,
+  ci.lb = 0.0103,
+  ci.ub = 0.1953
+)
+
+plot_BW_overall <- ggplot(Body_Weight_overall_lnRR, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Body Weight differences, overall", x = "ID", y = "lnRR") +
+  coord_flip()
+plot_BW_overall
+```
+
+
+```{r}
+
+#MG then OF
+
+Body_Weight_MG <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_MG, method = 'REML')
+
+summary(Body_Weight_MG)
+
+Body_Weight_OF <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_OF, method = 'REML')
+
+summary(Body_Weight_OF)
+
+
+#Tibble of results
+
+Body_Weight_Exp_lnRR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnRR = c(0.2042, 0.0246),
+  ci.lb = c(0.0307, 0.0015),
+  ci.ub = c(0.3777, 0.0477)
+)
+
+Body_Weight_Exp_lnRR
+
+
+
+#Plotting when split by exp type
+
+plot_BW_exp_type <- ggplot(Body_Weight_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Body Weight differences, exp type", x = "Exp_Type", y = "lnRR") +
+  coord_flip()
+plot_BW_exp_type
+```
+#### Running meta-analysis (Overall with moderators, and then overall split by exposure type with moderators)
+
+```{r, include=FALSE}
+#Adding moderators
+BW_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
+
+summary(BW_F0)
+
+BW_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
+
+summary(BW_Sex)
+
+#Tibble of results
+
+Body_Weight_Mods_lnRR <- tibble(
+  ID = c("Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
+  lnRR = c(0.1707, -0.0587,-0.1239,-0.0488,0.1745,0.1775),
+  ci.lb = c(0.0120, -0.1985, -0.2406, -0.2940,-0.0907, -0.0875),
+  ci.ub = c(0.3294, 0.0812, -0.0073,0.1965,0.4397,0.4425)
+)
+
+plot_BW_mods <- ggplot(Body_Weight_Mods_lnRR, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Body Weight differences, mods", x = "Exp_Type", y = "lnRR") +
+  coord_flip()
+plot_BW_mods
+
+#splitting by exposure type
+
+Body_Weight_MG_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_MG, method = 'REML')
+
+summary(Body_Weight_MG_F0)
+
+
+Body_Weight_OF_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_OF, method = 'REML')
+
+summary(Body_Weight_OF_F0)
+
+Body_Weight_MG_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_MG, method = 'REML')
+
+summary(Body_Weight_MG_Sex)
+
+
+Body_Weight_OF_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_OF, method = 'REML')
+
+summary(Body_Weight_OF_Sex)
+
+#Tibble of results
+
+Body_Weight_Mods_lnRR <- tibble(
+  Experiment_Type = c("Multigenerational","Multigenerational", "One off","One off","One off","Multigenerational","Multigenerational","Multigenerational", "One off","One off","One off"),
+  ID = c("F0 Male", "F0 Female", "F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring"), 
+  lnRR = 
+  ci.lb = 
+  ci.ub = 
+)
+```
+
