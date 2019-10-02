@@ -5,7 +5,7 @@ date: "2 October 2019"
 output: html_document
 ---
 
-## Meta-regression Body Weight
+## Meta-regression Glucose
 
 ```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -50,6 +50,10 @@ Glucose_overall_lnRR <- tibble(
   ci.lb = 0.0138,
   ci.ub = 0.1911
 )
+```
+
+
+```{r}
 
 plot_Glucose_overall <- ggplot(Glucose_overall_lnRR, aes(x=ID, y=lnRR)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
