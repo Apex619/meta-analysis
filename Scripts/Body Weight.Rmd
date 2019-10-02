@@ -17,8 +17,9 @@ library(readxl)
 ## Meta-regression Body Weight
 
 ```{r}
-Body_Weight_lnRR <- read.csv("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Body_Weight_lnRR.csv")
+Body_Weight_lnRR <- read.csv("../data/Body_Weight_lnRR.csv")
 
+ALL_TRAITS <- read.xlsx("../data/ALL_TRAITS.xlsx")
 ```
 ```{r}
 
@@ -121,6 +122,9 @@ plot_BW_mods <- ggplot(Body_Weight_Mods_lnRR, aes(x=ID, y=lnRR)) +
   coord_flip()
 plot_BW_mods
 
+```
+```{r}
+
 #splitting by exposure type
 
 Body_Weight_MG_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_MG, method = 'REML')
@@ -161,5 +165,191 @@ plot_lnRR_BW_mods_exp <- ggplot(Body_Weight_Mods_lnRR, aes(x=ID, y=lnRR, colour=
   coord_flip()
  
 plot_lnRR_BW_mods_exp
+```
+
+## Meta-analysis overall results (lnCVR)
+
+### 4. Calculating effect sizes (Done)
+
+We calculated our effect sizes (lnCVR) for our complete data set (all traits).
+```{r, include = FALSE}
+
+Effect_Size_All_Traits_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
+
+#Converting into factors
+
+Effect_Size_All_Traits_lnCVR$Trait <- factor(Effect_Size_All_Traits_lnCVR$Trait)
+Effect_Size_All_Traits_lnCVR$Exposure_Type <- factor(Effect_Size_All_Traits_lnCVR$Exposure_Type)
+Effect_Size_All_Traits_lnCVR$Sex <- factor(Effect_Size_All_Traits_lnCVR$Sex)
+Effect_Size_All_Traits_lnCVR$Generation <- factor(Effect_Size_All_Traits_lnCVR$Generation)
+Effect_Size_All_Traits_lnCVR$Cohort_ID <- factor(Effect_Size_All_Traits_lnCVR$Cohort_ID)
+Effect_Size_All_Traits_lnCVR$Paper_ID <- factor(Effect_Size_All_Traits_lnCVR$Paper_ID)
+Effect_Size_All_Traits_lnCVR$Rodent_type <- factor(Effect_Size_All_Traits_lnCVR$Rodent_type)
+Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement <- factor(Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement)
+Effect_Size_All_Traits_lnCVR$Strain <- factor(Effect_Size_All_Traits_lnCVR$Strain)
+Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed <- factor(Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed)
+
+#Subset into Body Weight
+
+#Subetting
+
+Body_Weight_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Body_Weight")
+
+Body_Weight_lnCVR_MG <- subset(Body_Weight_lnCVR, Body_Weight_lnCVR$Exposure_Type == "Multigenerational")
+
+Body_Weight_lnCVR_OF <- subset(Body_Weight_lnCVR, Body_Weight_lnCVR$Exposure_Type == "One off")
+
+```
+
+#### 5. Running meta-analysis for body weight lnCVR (overall, and then overall split by exposure type)
+I conducted meta-analysis using lnCVR, first on the complete BW dataset, and then on subsetted data (split by one off and multigenerational exposure)
+
+```{r, include = FALSE}
+#ALL OF and MG
+
+Body_Weight_lnCVR_0mods <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR, method = 'REML')
+
+summary(Body_Weight_lnCVR_0mods)
+
+#Tibble of overall results
+
+Body_Weight_overall_lnCVR <- tibble(
+  ID = "Overall", 
+  lnCVR = 0.0817,
+  ci.lb = -0.0331,
+  ci.ub = 0.1964
+)
+
+plot_BW_overall_lnCVR <- ggplot(Body_Weight_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Body Weight differences, overall lnCVR", x = "ID", y = "lnCVR") +
+  coord_flip()
+plot_BW_overall_lnCVR
+
+```
+
+
+```{r}
+
+# Modelling all traits with no mods MG (lnCVR)
+Body_Weight_lnCVR_0mods_MG <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_MG, method = 'REML')
+
+
+summary(Body_Weight_lnCVR_0mods_MG)
+
+#Heterogeneity I2 (adapt for all models)
+W <- diag(1/Body_Weight_lnCVR_MG$vi)
+X <- model.matrix(Body_Weight_lnCVR_0mods_MG)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_MG_lnCVR_BW <- 100 * sum(Body_Weight_lnCVR_0mods_MG$sigma2) / (sum(Body_Weight_lnCVR_0mods_MG$sigma2) + (Body_Weight_lnCVR_0mods_MG$k-Body_Weight_lnCVR_0mods_MG$p)/sum(diag(P)))
+I2_MG_lnCVR_BW
+
+# Modelling all traits with no mods OF (lnCVR)
+Body_Weight_lnCVR_0mods_OF <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_OF, method = 'REML')
+
+summary(Body_Weight_lnCVR_0mods_OF)
+
+#Tibble of results
+
+Body_Weight_Exp_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnCVR = c(0.1642,0.0175 ),
+  ci.lb = c(0.0292,-0.1256 ),
+  ci.ub = c(0.2993,0.1605 )
+)
+
+Body_Weight_Exp_lnCVR
+
+
+
+#Plotting when split by exp type
+
+plot_BW_exp_type_lnCVR <- ggplot(Body_Weight_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Body Weight differences, exp type_lnCVR", x = "Exp_Type", y = "lnCVR") +
+  coord_flip()
+plot_BW_exp_type_lnCVR
+
+
+```
+#### Running meta-analysis (Overall with moderators, and then overall split by exposure type with moderators)
+
+```{r, echo=FALSE}
+#Adding moderators
+BW_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR, method = 'REML')
+
+summary(BW_F0_lnCVR)
+
+BW_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR, method = 'REML')
+
+summary(BW_Sex_lnCVR)
+
+#Tibble of results
+
+Body_Weight_Mods_lnCVR <- tibble(
+  ID = c("Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
+  lnCVR = c(BW_F0_lnCVR$b[1], BW_F0_lnCVR$b[2],BW_F0_lnCVR$b[3],BW_Sex_lnCVR$b[1],BW_Sex_lnCVR$b[2],BW_Sex_lnCVR$b[3]),
+  ci.lb = c(BW_F0_lnCVR$ci.lb[1], BW_F0_lnCVR$ci.lb[2],BW_F0_lnCVR$ci.lb[3],BW_Sex_lnCVR$ci.lb[1],BW_Sex_lnCVR$ci.lb[2],BW_Sex_lnCVR$ci.lb[3]),
+  ci.ub = c(BW_F0_lnCVR$ci.ub[1], BW_F0_lnCVR$ci.ub[2],BW_F0_lnCVR$ci.ub[3],BW_Sex_lnCVR$ci.ub[1],BW_Sex_lnCVR$ci.ub[2],BW_Sex_lnCVR$ci.ub[3])
+)
+
+Body_Weight_Mods_lnCVR
+
+plot_BW_mods_lnCVR <- ggplot(Body_Weight_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Body Weight differences, mods", x = "Exp_Type", y = "lnCVR") +
+  coord_flip()
+plot_BW_mods_lnCVR
+```
+
+```{r}
+
+#splitting by exposure type
+
+Body_Weight_MG_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_MG, method = 'REML')
+
+summary(Body_Weight_MG_F0_lnCVR)
+
+
+Body_Weight_OF_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_OF, method = 'REML')
+
+summary(Body_Weight_OF_F0_lnCVR)
+
+Body_Weight_MG_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_MG, method = 'REML')
+
+summary(Body_Weight_MG_Sex_lnCVR)
+
+
+Body_Weight_OF_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_OF, method = 'REML')
+
+summary(Body_Weight_OF_Sex_lnCVR)
+
+#Tibble of results
+
+Body_Weight_Mods_lnCVR_Exp <- tibble(
+  Experiment_Type = c("Multigenerational","Multigenerational", "One off","One off","One off","Multigenerational","Multigenerational","Multigenerational", "One off","One off","One off"),
+  ID = c("F0 Male", "F0 Female", "F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring"), 
+  lnCVR = c(0.1843,-0.0949,-0.1641,0.1931,0.1742,0.1849,0.0849,-0.1482,-0.2760,0.2824,0.3166),
+  ci.lb = c(0.0267,-0.4551,-0.6830,-0.3353,-0.3313,-0.1008,-0.2681,-0.5084,-1.3553,-0.8091,-0.7747),
+  ci.ub = c(0.3420,0.2654,0.3548,0.7216,0.6798,0.4706,0.4380,0.2120,0.8032,1.3739,1.4079)
+)
+
+Body_Weight_Mods_lnCVR_Exp
+
+
+plot_lnCVR_BW_mods_exp <- ggplot(Body_Weight_Mods_lnCVR_Exp, aes(x=ID, y=lnCVR, colour=Experiment_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Difference between treatment and control in body weight lnCVR, overall mods", x = "ID", y = "lnCVR") +
+  coord_flip()
+ 
+plot_lnCVR_BW_mods_exp
 ```
 

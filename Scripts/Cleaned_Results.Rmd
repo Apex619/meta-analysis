@@ -27,31 +27,31 @@ Here, we calculated our effect sizes (log response ratio lnRR) for our complete 
 
 
 #Import data
-ALL_TRAITS <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\ALL_TRAITS.xlsx")
+ALL_TRAITS <- read_excel("../data/ALL_TRAITS.xlsx")
 
-MG_ALL <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\MG_ALL.xlsx")
+MG_ALL <- read_excel("../data/MG_ALL.xlsx")
 
-OF_ALL <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\OF_ALL.xlsx")
+OF_ALL <- read_excel("../data/OF_ALL.xlsx")
 
-Overall_effect_size <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall effect size.xlsx")
+Overall_effect_size <- read_excel("../data/Overall effect size.xlsx")
 
-Overall_MG_OF <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall_MG_OF.xlsx")
+Overall_MG_OF <- read_excel("../data/Overall_MG_OF.xlsx")
 
-Overall_effects_not_split <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall_effects_not_split.xlsx")
+Overall_effects_not_split <- read_excel("../data/Overall_effects_not_split.xlsx")
 
-Table_results_overall <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Table results.xlsx")
+Table_results_overall <- read_excel("../data/Table results.xlsx")
 
-Overall_lnCVR <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall_lnCVR.xlsx")
+Overall_lnCVR <- read_excel("../data/Overall_lnCVR.xlsx")
 
-MG_ALL_lnCVR <- read.csv("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\MG_ALL_lnCVR.csv")
+MG_ALL_lnCVR <- read.csv("../data/MG_ALL_lnCVR.csv")
 
-OF_ALL_lnCVR <- read.csv("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\OF_ALL_lnCVR.csv")
+OF_ALL_lnCVR <- read.csv("../data/OF_ALL_lnCVR.csv")
 
-Overall_MG_OF_lnCVR <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall_MG_OF_lnCVR.xlsx")
+Overall_MG_OF_lnCVR <- read_excel("../data/Overall_MG_OF_lnCVR.xlsx")
 
-Overall_effects_not_split_lnCVR <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Overall_effects_not_split_lnCVR.xlsx")
+Overall_effects_not_split_lnCVR <- read_excel("../data/Overall_effects_not_split_lnCVR.xlsx")
 
-Table_results_overall_lnCVR <- read_excel("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\R\\data\\Table_results_overall_lnCVR.xlsx")
+Table_results_overall_lnCVR <- read_excel("../data/Table_results_overall_lnCVR.xlsx")
 
 ```
 
@@ -127,7 +127,7 @@ I2_OF
 ```{r,echo=FALSE}
 
 
-plot_lnRR_overall <- ggplot(Overall_effect_size, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
+plot_lnRR_overall <- ggplot(Overall_effect_size, aes(x=ID, y=Effect_Size_lnRR)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
@@ -234,6 +234,19 @@ We calculated our effect sizes (lnCVR) for our complete data set (all traits).
 ```{r, include = FALSE}
 
 Effect_Size_All_Traits_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
+
+#Converting into factors
+
+Effect_Size_All_Traits_lnCVR$Trait <- factor(Effect_Size_All_Traits_lnCVR$Trait)
+Effect_Size_All_Traits_lnCVR$Exposure_Type <- factor(Effect_Size_All_Traits_lnCVR$Exposure_Type)
+Effect_Size_All_Traits_lnCVR$Sex <- factor(Effect_Size_All_Traits_lnCVR$Sex)
+Effect_Size_All_Traits_lnCVR$Generation <- factor(Effect_Size_All_Traits_lnCVR$Generation)
+Effect_Size_All_Traits_lnCVR$Cohort_ID <- factor(Effect_Size_All_Traits_lnCVR$Cohort_ID)
+Effect_Size_All_Traits_lnCVR$Paper_ID <- factor(Effect_Size_All_Traits_lnCVR$Paper_ID)
+Effect_Size_All_Traits_lnCVR$Rodent_type <- factor(Effect_Size_All_Traits_lnCVR$Rodent_type)
+Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement <- factor(Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement)
+Effect_Size_All_Traits_lnCVR$Strain <- factor(Effect_Size_All_Traits_lnCVR$Strain)
+Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed <- factor(Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed)
 ```
 
 #### 5. Running meta-analysis for lnCVR (overall, and then overall split by exposure type)
@@ -371,6 +384,20 @@ plot_lnCVR_overall_mods_exp <- ggplot(Table_results_overall_lnCVR, aes(x=ID, y=E
   coord_flip()
  
 plot_lnCVR_overall_mods_exp
+
+
+```
+
+### Placing results togeter
+
+```{r}
+figure <- ggarrange(plot_lnRR_overall, plot_lnCVR_overall,
+                    labels = c("A", "B"),
+                    ncol = 1, nrow = 2)
+figure
+
+
+
 
 
 ```
