@@ -176,3 +176,55 @@ plot_lnRR_insulin_mods_exp <- ggplot(Insulin_Mods_lnRR_exp, aes(x=ID, y=lnRR, co
  
 plot_lnRR_insulin_mods_exp
 ```
+
+## Meta-analysis overall results (lnCVR)
+
+### 4. Calculating effect sizes (Done)
+
+```{r}
+#Subset Insulin Data
+Insulin_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Insulin")
+
+
+
+#Errors with spaces and converting back to factor
+Glucose_lnCVR$Sex <- gsub("Both ", "Both", Glucose_lnCVR$Sex) 
+Glucose_lnCVR$Sex <- as.factor(Glucose_lnCVR$Sex)
+
+
+
+#Subetting into MG and OF
+
+
+
+Insulin_lnCVR_MG <- subset(Insulin_lnCVR, Insulin_lnCVR$Exposure_Type == "Multigenerational")
+
+Insulin_lnCVR_OF <- subset(Insulin_lnCVR, Insulin_lnCVR$Exposure_Type == "One off")
+
+```
+
+```{r}
+
+#Overall analysis, not split
+
+Insulin_overall_lnCVR_0mods <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
+
+summary(Insulin_overall_lnCVR_0mods)
+
+#Tibble of overall results
+
+Insulin_overall_lnCVR <- tibble(
+  ID = "Overall", 
+  lnCVR = -0.1232,
+  ci.lb = -0.4539,
+  ci.ub = 0.2075
+)
+
+plot_insulin_overall_lnCVR <- ggplot(Insulin_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="insulin variance, overall", x = "ID", y = "lnCVR") +
+  coord_flip()
+plot_insulin_overall_lnCVR
+```
