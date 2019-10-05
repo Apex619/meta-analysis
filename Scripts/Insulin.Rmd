@@ -4,7 +4,7 @@ author: "Hamza"
 date: "2 October 2019"
 output: html_document
 ---
-## Meta-regression Body Weight
+## Meta-regression Insulin
 
 ```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -30,9 +30,11 @@ Insulin_OF <- subset(Insulin_lnRR, Insulin_lnRR$Exposure_Type == "One off")
 
 #Overall analysis, not split
 
-Insulin_overall_lnRR_0mods <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
+Insulin_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
 
 summary(Insulin_overall_lnRR_0mods)
+
+
 
 #Tibble of overall results
 
@@ -204,7 +206,7 @@ Insulin_lnCVR_MG <- subset(Insulin_lnCVR, Insulin_lnCVR$Exposure_Type == "Multig
 Insulin_lnCVR_OF <- subset(Insulin_lnCVR, Insulin_lnCVR$Exposure_Type == "One off")
 
 ```
-
+#### 5. Running meta-analysis for Insulin lnCVR (overall, and then overall split by exposure type)
 ```{r}
 
 #Overall analysis, not split
@@ -229,4 +231,80 @@ plot_insulin_overall_lnCVR <- ggplot(Insulin_overall_lnCVR, aes(x=ID, y=lnCVR)) 
   labs(title ="insulin variance, overall", x = "ID", y = "lnCVR") +
   coord_flip()
 plot_insulin_overall_lnCVR
+```
+
+
+
+```{r}
+
+# Modelling all traits with no mods MG (lnCVR)
+Insulin_lnCVR_0mods_MG <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR_MG, method = 'REML')
+
+
+summary(Insulin_lnCVR_0mods_MG)
+
+# Modelling all traits with no mods OF (lnCVR)
+Insulin_lnCVR_0mods_OF <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR_OF, method = 'REML')
+
+summary(Insulin_lnCVR_0mods_OF)
+
+#Tibble of results
+
+Insulin_Exp_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnCVR = c(0.1050,-0.2690),
+  ci.lb = c(-0.4717,-0.6517),
+  ci.ub = c(0.6816,0.1137)
+)
+
+Insulin_Exp_lnCVR
+
+
+
+#Plotting when split by exp type
+
+plot_insulin_exp_type_lnCVR <- ggplot(Insulin_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="insulin variance, exp type", x = "Exp_Type", y = "lnCVR") +
+  coord_flip()
+plot_insulin_exp_type_lnCVR
+
+
+```
+
+#### Running meta-analysis (Overall with moderators, and then overall split by exposure type with moderators)
+
+```{r, echo=FALSE}
+#Adding moderators
+Insulin_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
+
+summary(Insulin_F0_lnCVR)
+
+Insulin_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
+
+summary(Insulin_Sex_lnCVR)
+
+Insulin_Test_Type_lnCVR <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
+
+Insulin_Test_Type_lnCVR
+
+#Tibble of results
+
+Insulin_Mods_lnCVR <- tibble(
+  ID = c("F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FI", "ITT"),
+  lnCVR = c(0.0946,-0.1832,-0.3537,0.1732,-0.1528,-0.4194,-0.3968,0.5941),
+  ci.lb = c(-0.5591,-0.8069,-0.8886,-0.9596,-1.3508,-1.6080,-0.7505,0.1508),
+  ci.ub = c(0.7484,0.4404,0.1812,1.3060,1.0452,0.7692,-0.0432,1.0373)
+)
+
+plot_insulin_mods_lnCVR <- ggplot(Insulin_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Insulin variance, mods", x = "ID", y = "lnCVR") +
+  coord_flip()
+plot_insulin_mods_lnCVR
+
 ```

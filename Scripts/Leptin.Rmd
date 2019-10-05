@@ -1,0 +1,48 @@
+---
+title: "Leptin"
+output: html_document
+---
+
+## Meta-regression Insulin
+
+```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+library(readxl)
+```
+
+```{r}
+Leptin_lnRR <- read.csv("../data/Leptin_lnRR.csv") 
+
+```
+
+```{r}
+
+#Overall analysis, not split
+
+Leptin_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Leptin_lnRR, method = 'REML')
+
+summary(Leptin_overall_lnRR_0mods)
+
+
+
+#Tibble of overall results
+
+Leptin_overall_lnRR <- tibble(
+  ID = "Overall", 
+  lnRR = 1.4741,
+  ci.lb = 0.0364,
+  ci.ub = 2.9119
+)
+
+plot_leptin_overall <- ggplot(Leptin_overall_lnRR, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="leptin differences, overall", x = "ID", y = "lnRR") +
+  coord_flip()
+plot_leptin_overall
+```
