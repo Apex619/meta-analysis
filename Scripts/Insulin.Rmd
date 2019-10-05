@@ -188,8 +188,10 @@ Insulin_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnC
 
 
 #Errors with spaces and converting back to factor
-Glucose_lnCVR$Sex <- gsub("Both ", "Both", Glucose_lnCVR$Sex) 
-Glucose_lnCVR$Sex <- as.factor(Glucose_lnCVR$Sex)
+Insulin_lnCVR$Sex <- gsub("Both ", "Both", Insulin_lnCVR$Sex) 
+Insulin_lnCVR$Sex <- as.factor(Insulin_lnCVR$Sex)
+
+#Convert trait info into factor ?
 
 
 
