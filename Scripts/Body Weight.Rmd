@@ -23,7 +23,7 @@ ALL_TRAITS <- read.xlsx("../data/ALL_TRAITS.xlsx")
 ```
 ```{r}
 
-#Subetting
+#Subetting (removing BOTH)
 
 Body_Weight_lnRR_MG <- subset(Body_Weight_lnRR, Body_Weight_lnRR$Exposure_Type == "Multigenerational")
 
@@ -54,6 +54,8 @@ plot_BW_overall <- ggplot(Body_Weight_overall_lnRR, aes(x=ID, y=lnRR)) +
   labs(title ="Body Weight differences, overall", x = "ID", y = "lnRR") +
   coord_flip()
 plot_BW_overall
+
+
 ```
 
 
@@ -74,6 +76,7 @@ summary(Body_Weight_OF)
 
 Body_Weight_Exp_lnRR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
+  k = c(52,94),
   lnRR = c(0.2042, 0.0246),
   ci.lb = c(0.0307, 0.0015),
   ci.ub = c(0.3777, 0.0477)
@@ -97,22 +100,34 @@ plot_BW_exp_type
 
 ```{r, echo=FALSE}
 #Adding moderators
-BW_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
+BW_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
+
+BW_Exp_Type
+
+BW_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
 
 summary(BW_F0)
 
-BW_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
+vars <- names(Body_Weight_lnRR) %in% c("v1", "v2", "v3")
+
+BW_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
 
 summary(BW_Sex)
+
+BW_Sex_Exp <- rma.mv(yi, vi, mods = ~Sex*Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR, method = 'REML')
+
+summary(BW_Sex_Exp)
 
 #Tibble of results
 
 Body_Weight_Mods_lnRR <- tibble(
-  ID = c("Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
-  lnRR = c(0.1707, -0.0587,-0.1239,-0.0488,0.1745,0.1775),
-  ci.lb = c(0.0120, -0.1985, -0.2406, -0.2940,-0.0907, -0.0875),
-  ci.ub = c(0.3294, 0.0812, -0.0073,0.1965,0.4397,0.4425)
+  ID = c("Multigenerational", "One off", "Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
+  lnRR = c(BW_Exp_Type$b[1],BW_Exp_Type$b[2],BW_F0$b[1],BW_F0$b[2],BW_F0$b[3],BW_Sex$b[1],BW_Sex$b[2],BW_Sex$b[3]),
+  ci.lb = c(BW_Exp_Type$ci.lb[1],BW_Exp_Type$ci.lb[2],BW_F0$ci.lb[1],BW_F0$ci.lb[2],BW_F0$ci.lb[3],BW_Sex$ci.lb[1],BW_Sex$ci.lb[2],BW_Sex$ci.lb[3]),
+  ci.ub = c(BW_Exp_Type$ci.ub[1],BW_Exp_Type$ci.ub[2],BW_F0$ci.ub[1],BW_F0$ci.ub[2],BW_F0$ci.ub[3],BW_Sex$ci.ub[1],BW_Sex$ci.ub[2],BW_Sex$ci.ub[3])
 )
+
+Body_Weight_Mods_lnRR
 
 plot_BW_mods <- ggplot(Body_Weight_Mods_lnRR, aes(x=ID, y=lnRR)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
@@ -124,47 +139,25 @@ plot_BW_mods
 
 ```
 ```{r}
-
 #splitting by exposure type
 
-Body_Weight_MG_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_MG, method = 'REML')
+Body_Weight_MG_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_MG, method = 'REML')
 
-summary(Body_Weight_MG_F0)
+Body_Weight_MG_F0
 
+Body_Weight_OF_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_OF, method = 'REML')
 
-Body_Weight_OF_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_OF, method = 'REML')
-
-summary(Body_Weight_OF_F0)
-
-Body_Weight_MG_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_MG, method = 'REML')
-
-summary(Body_Weight_MG_Sex)
+Body_Weight_OF_F0
 
 
-Body_Weight_OF_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_OF, method = 'REML')
+Body_Weight_MG_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_MG, method = 'REML')
 
-summary(Body_Weight_OF_Sex)
+Body_Weight_MG_Sex
 
-#Tibble of results
+Body_Weight_OF_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnRR_OF, method = 'REML')
 
-Body_Weight_Mods_lnRR <- tibble(
-  Experiment_Type = c("Multigenerational","Multigenerational", "One off","One off","One off","Multigenerational","Multigenerational","Multigenerational", "One off","One off","One off"),
-  ID = c("F0 Male", "F0 Female", "F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring"), 
-  lnRR = c(0.0884,0.1380,0.1387,-0.1090,-0.1369, -0.0477, 0.3472,0.3470,-0.1987,0.2238, 0.2234),
-  ci.lb = c( -0.3550,-0.3466,0.0605,-0.1892,-0.2129,-0.3526,-0.0119,-0.0130,-0.9161,-0.4941,-0.4945),
-  ci.ub = c(0.5317,0.6225, 0.2170,-0.0287,-0.0608, 0.2571,0.7063,0.7071,0.5187,0.9416,0.9412)
-)
+Body_Weight_OF_Sex
 
-Body_Weight_Mods_lnRR
-
-plot_lnRR_BW_mods_exp <- ggplot(Body_Weight_Mods_lnRR, aes(x=ID, y=lnRR, colour=Experiment_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in body weight means, overall mods", x = "ID", y = "lnRR") +
-  coord_flip()
- 
-plot_lnRR_BW_mods_exp
 ```
 
 ## Meta-analysis overall results (lnCVR)
@@ -276,25 +269,29 @@ plot_BW_exp_type_lnCVR
 
 
 ```
-#### Running meta-analysis (Overall with moderators, and then overall split by exposure type with moderators)
+#### Running meta-analysis (Overall with moderators)
 
 ```{r, echo=FALSE}
 #Adding moderators
-BW_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR, method = 'REML')
+BW_Exp_lnCVR <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR, method = 'REML')
+
+summary(BW_Exp_lnCVR)
+
+BW_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR, method = 'REML')
 
 summary(BW_F0_lnCVR)
 
-BW_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR, method = 'REML')
+BW_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR, method = 'REML')
 
 summary(BW_Sex_lnCVR)
 
 #Tibble of results
 
 Body_Weight_Mods_lnCVR <- tibble(
-  ID = c("Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
-  lnCVR = c(BW_F0_lnCVR$b[1], BW_F0_lnCVR$b[2],BW_F0_lnCVR$b[3],BW_Sex_lnCVR$b[1],BW_Sex_lnCVR$b[2],BW_Sex_lnCVR$b[3]),
-  ci.lb = c(BW_F0_lnCVR$ci.lb[1], BW_F0_lnCVR$ci.lb[2],BW_F0_lnCVR$ci.lb[3],BW_Sex_lnCVR$ci.lb[1],BW_Sex_lnCVR$ci.lb[2],BW_Sex_lnCVR$ci.lb[3]),
-  ci.ub = c(BW_F0_lnCVR$ci.ub[1], BW_F0_lnCVR$ci.ub[2],BW_F0_lnCVR$ci.ub[3],BW_Sex_lnCVR$ci.ub[1],BW_Sex_lnCVR$ci.ub[2],BW_Sex_lnCVR$ci.ub[3])
+  ID = c("Multigenerational", "One off", "Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
+  lnCVR = c(BW_Exp_lnCVR$b[1], BW_Exp_lnCVR$b[2], BW_F0_lnCVR$b[1], BW_F0_lnCVR$b[2],BW_F0_lnCVR$b[3],BW_Sex_lnCVR$b[1],BW_Sex_lnCVR$b[2],BW_Sex_lnCVR$b[3]),
+  ci.lb = c(BW_Exp_lnCVR$ci.lb[1], BW_Exp_lnCVR$ci.lb[2],BW_F0_lnCVR$ci.lb[1], BW_F0_lnCVR$ci.lb[2],BW_F0_lnCVR$ci.lb[3],BW_Sex_lnCVR$ci.lb[1],BW_Sex_lnCVR$ci.lb[2],BW_Sex_lnCVR$ci.lb[3]),
+  ci.ub = c(BW_Exp_lnCVR$ci.ub[1], BW_Exp_lnCVR$ci.ub[2],BW_F0_lnCVR$ci.ub[1], BW_F0_lnCVR$ci.ub[2],BW_F0_lnCVR$ci.ub[3],BW_Sex_lnCVR$ci.ub[1],BW_Sex_lnCVR$ci.ub[2],BW_Sex_lnCVR$ci.ub[3])
 )
 
 Body_Weight_Mods_lnCVR
@@ -306,50 +303,5 @@ plot_BW_mods_lnCVR <- ggplot(Body_Weight_Mods_lnCVR, aes(x=ID, y=lnCVR)) +
   labs(title ="Body Weight differences, mods", x = "Exp_Type", y = "lnCVR") +
   coord_flip()
 plot_BW_mods_lnCVR
-```
-
-```{r}
-
-#splitting by exposure type
-
-Body_Weight_MG_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_MG, method = 'REML')
-
-summary(Body_Weight_MG_F0_lnCVR)
-
-
-Body_Weight_OF_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_OF, method = 'REML')
-
-summary(Body_Weight_OF_F0_lnCVR)
-
-Body_Weight_MG_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_MG, method = 'REML')
-
-summary(Body_Weight_MG_Sex_lnCVR)
-
-
-Body_Weight_OF_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Body_Weight_lnCVR_OF, method = 'REML')
-
-summary(Body_Weight_OF_Sex_lnCVR)
-
-#Tibble of results
-
-Body_Weight_Mods_lnCVR_Exp <- tibble(
-  Experiment_Type = c("Multigenerational","Multigenerational", "One off","One off","One off","Multigenerational","Multigenerational","Multigenerational", "One off","One off","One off"),
-  ID = c("F0 Male", "F0 Female", "F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring", "Both Sexes Grand Offspring", "Female Grandoffspring", "Male Grand Offspring"), 
-  lnCVR = c(0.1843,-0.0949,-0.1641,0.1931,0.1742,0.1849,0.0849,-0.1482,-0.2760,0.2824,0.3166),
-  ci.lb = c(0.0267,-0.4551,-0.6830,-0.3353,-0.3313,-0.1008,-0.2681,-0.5084,-1.3553,-0.8091,-0.7747),
-  ci.ub = c(0.3420,0.2654,0.3548,0.7216,0.6798,0.4706,0.4380,0.2120,0.8032,1.3739,1.4079)
-)
-
-Body_Weight_Mods_lnCVR_Exp
-
-
-plot_lnCVR_BW_mods_exp <- ggplot(Body_Weight_Mods_lnCVR_Exp, aes(x=ID, y=lnCVR, colour=Experiment_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in body weight lnCVR, overall mods", x = "ID", y = "lnCVR") +
-  coord_flip()
- 
-plot_lnCVR_BW_mods_exp
 ```
 

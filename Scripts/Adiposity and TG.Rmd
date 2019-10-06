@@ -1,0 +1,138 @@
+---
+title: "Adiposity and TG"
+author: "Hamza"
+date: "6 October 2019"
+output: html_document
+---
+
+```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+library(readxl)
+```
+
+```{r}
+Adiposity_lnRR <- read.csv("../data/Adiposity_lnRR.csv") 
+
+TG_lnRR <- read.csv("../data/TG_lnRR.csv") 
+```
+
+```{r}
+
+#Overall analysis, not split
+
+Adiposity_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnRR, method = 'REML')
+
+summary(Adiposity_overall_lnRR_0mods)
+
+TG_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=TG_lnRR, method = 'REML')
+
+summary(TG_overall_lnRR_0mods)
+
+
+
+#Tibble of overall results
+
+Adiposity_overall_lnRR <- tibble(
+  ID = "Overall", 
+  lnRR = 0.7124,
+  ci.lb = 0.1827,
+  ci.ub = 1.2421
+)
+
+TG_overall_lnRR <- tibble(
+  ID = "Overall", 
+  lnRR = 0.2003,
+  ci.lb = -0.0948,
+  ci.ub = 0.4955
+)
+
+plot_adiposity_overall <- ggplot(Adiposity_overall_lnRR, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Adiposity differences, overall", x = "ID", y = "lnRR") +
+  coord_flip()
+plot_adiposity_overall
+
+plot_tg_overall <- ggplot(TG_overall_lnRR, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="TG differences, overall", x = "ID", y = "lnRR") +
+  coord_flip()
+plot_tg_overall
+```
+
+#Adiposity
+```{r, echo=FALSE}
+#Adding moderators
+Adiposity_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnRR, method = 'REML')
+
+summary(Adiposity_F0)
+
+Adiposity_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnRR, method = 'REML')
+
+summary(Adiposity_Sex)
+
+Adiposity_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnRR, method = 'REML')
+
+Adiposity_Exp_Type
+
+#Tibble of results
+
+Adiposity_Mods_lnRR <- tibble(
+  ID = c("F0 Female", "F0 Male", "Female Grandoffspring", "Male Grand Offspring", "Multigenerational", "One off"),
+  lnRR = c(Adiposity_F0$b[1],Adiposity_F0$b[2],Adiposity_Sex$b[1],Adiposity_Sex$b[2], Adiposity_Exp_Type$b[1],Adiposity_Exp_Type$b[2]),
+  ci.lb = c(Adiposity_F0$ci.lb[1],Adiposity_F0$ci.lb[2],Adiposity_Sex$ci.lb[1],Adiposity_Sex$ci.lb[2], Adiposity_Exp_Type$ci.lb[1],Adiposity_Exp_Type$ci.lb[2]),
+  ci.ub = c(Adiposity_F0$ci.ub[1],Adiposity_F0$ci.ub[2],Adiposity_Sex$ci.ub[1],Adiposity_Sex$ci.ub[2], Adiposity_Exp_Type$ci.ub[1],Adiposity_Exp_Type$ci.ub[2])
+)
+
+plot_adiposity_mods <- ggplot(Adiposity_Mods_lnRR, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Adiposity differences, mods", x = "ID", y = "lnRR") +
+  coord_flip()
+plot_adiposity_mods
+
+```
+
+#TG
+```{r, echo=FALSE}
+#Adding moderators
+TG_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=TG_lnRR, method = 'REML')
+
+summary(TG_F0)
+
+TG_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=TG_lnRR, method = 'REML')
+
+summary(TG_Sex)
+
+TG_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=TG_lnRR, method = 'REML')
+
+TG_Exp_Type
+
+#Tibble of results
+
+TG_Mods_lnRR <- tibble(
+  ID = c("F0 Female", "F0 Male", "Female Grandoffspring", "Male Grand Offspring", "Multigenerational", "One off"),
+  lnRR = c(TG_F0$b[1],TG_F0$b[2],TG_Sex$b[1],TG_Sex$b[2], TG_Exp_Type$b[1],TG_Exp_Type$b[2]),
+  ci.lb = c(TG_F0$ci.lb[1],TG_F0$ci.lb[2],TG_Sex$ci.lb[1],TG_Sex$ci.lb[2], TG_Exp_Type$ci.lb[1],TG_Exp_Type$ci.lb[2]),
+  ci.ub = c(TG_F0$ci.ub[1],TG_F0$ci.ub[2],TG_Sex$ci.ub[1],TG_Sex$ci.ub[2], TG_Exp_Type$ci.ub[1],TG_Exp_Type$ci.ub[2])
+)
+
+plot_TG_mods <- ggplot(TG_Mods_lnRR, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="TG differences, mods", x = "ID", y = "lnRR") +
+  coord_flip()
+plot_TG_mods
+```
+
+
+
