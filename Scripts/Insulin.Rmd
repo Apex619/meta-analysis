@@ -91,29 +91,33 @@ plot_insulin_exp_type <- ggplot(Insulin_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, c
 plot_insulin_exp_type
 ```
 
-#### Running meta-analysis (Overall with moderators, and then overall split by exposure type with moderators)
+#### Running meta-analysis (Overall with moderators)
 
 ```{r, echo=FALSE}
 #Adding moderators
-Insulin_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
+Insulin_Exp <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
+
+summary(Insulin_Exp)
+
+Insulin_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
 
 summary(Insulin_F0)
 
-Insulin_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
+Insulin_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
 
 summary(Insulin_Sex)
 
-Insulin_Test_Type <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
+Insulin_Test_Type <- rma.mv(yi, vi, mods = ~Trait_Info-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
 
 Insulin_Test_Type
 
 #Tibble of results
 
 Insulin_Mods_lnRR <- tibble(
-  ID = c("FO Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FI", "ITT"),
-  lnRR = c(0.2931,-0.0093,-0.1422,-0.5329,0.7995,0.8744,0.5011,-0.4922),
-  ci.lb = c(-0.1495,-0.3894,-0.4742,-1.3740,-0.0845,-0.0054,0.1935,-0.7691),
-  ci.ub = c(0.7357,0.3708,0.1898,0.3082,1.6836,1.7543,0.8088,-0.2152)
+  ID = c("Multigenerational", "One off", "FO Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FI", "ITT"),
+  lnRR = c(Insulin_Exp$b[1],Insulin_Exp$b[2],Insulin_F0$b[1],Insulin_F0$b[2],Insulin_F0$b[3],Insulin_Sex$b[1],Insulin_Sex$b[2],Insulin_Sex$b[3],Insulin_Test_Type$b[1],Insulin_Test_Type$b[2]),
+  ci.lb = c(Insulin_Exp$ci.lb[1],Insulin_Exp$ci.lb[2],Insulin_F0$ci.lb[1],Insulin_F0$ci.lb[2],Insulin_F0$ci.lb[3],Insulin_Sex$ci.lb[1],Insulin_Sex$ci.lb[2],Insulin_Sex$ci.lb[3],Insulin_Test_Type$ci.lb[1],Insulin_Test_Type$ci.lb[2]),
+  ci.ub = c(Insulin_Exp$ci.ub[1],Insulin_Exp$ci.ub[2],Insulin_F0$ci.ub[1],Insulin_F0$ci.ub[2],Insulin_F0$ci.ub[3],Insulin_Sex$ci.ub[1],Insulin_Sex$ci.ub[2],Insulin_Sex$ci.ub[3],Insulin_Test_Type$ci.ub[1],Insulin_Test_Type$ci.ub[2])
 )
 
 plot_insulin_mods <- ggplot(Insulin_Mods_lnRR, aes(x=ID, y=lnRR)) + 
@@ -127,57 +131,7 @@ plot_insulin_mods
 ```
 
 
-```{r}
 
-#splitting by exposure type
-
-Insulin_MG_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_MG, method = 'REML')
-
-summary(Insulin_MG_F0)
-
-
-Insulin_OF_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_OF, method = 'REML')
-
-summary(Insulin_OF_F0)
-
-Insulin_MG_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_MG, method = 'REML')
-
-summary(Insulin_MG_Sex)
-
-
-Insulin_OF_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_OF, method = 'REML')
-
-summary(Insulin_OF_Sex)
-
-Insulin_Test_type_MG <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_MG, method = 'REML')
-
-Insulin_Test_type_MG
-
-Insulin_Test_type_OF <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_OF, method = 'REML')
-
-Insulin_Test_type_OF
-
-#Tibble of results
-
-Insulin_Mods_lnRR_exp <- tibble(
-  Experiment_Type = c("Multigenerational","Multigenerational", "One off","One off","One off", "Multigenerational","Multigenerational","Multigenerational", "One off","One off","One off", "Multigenerational","Multigenerational", "One off","One off"),
-  ID = c("F0 Male", "F0 Female", "F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FI", "ITT", "FI", "ITT"), 
-  lnRR = c(0.4261,0.0522,0.1168,-0.0658,-0.2588,-1.0460,1.9148,1.4942,-0.4329,0.4431,0.5554,1.5366,-1.8927,0.1554,-0.3326),
-  ci.lb = c(-0.8399,-1.4525,-0.2329,-0.4042,-0.5794,-2.2723,0.5403,0.1729,-0.8318,0.0169,0.1344,0.6465,-2.8107,-0.0357,-0.5693),
-  ci.ub = c(1.6920,1.5569,0.4665,0.2725,0.0618,0.1803,3.2894,2.8155,-0.0340,0.8694,0.9764,2.4266,-0.9748,0.3464,-0.0960)
-)
-
-Insulin_Mods_lnRR_exp
-
-plot_lnRR_insulin_mods_exp <- ggplot(Insulin_Mods_lnRR_exp, aes(x=ID, y=lnRR, colour=Experiment_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Insulin lnRR mods, exp", x = "ID", y = "lnRR") +
-  coord_flip()
- 
-plot_lnRR_insulin_mods_exp
-```
 
 ## Meta-analysis overall results (lnCVR)
 
@@ -274,29 +228,33 @@ plot_insulin_exp_type_lnCVR
 
 ```
 
-#### Running meta-analysis (Overall with moderators, and then overall split by exposure type with moderators)
+#### Running meta-analysis (Overall with moderators)
 
 ```{r, echo=FALSE}
 #Adding moderators
-Insulin_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
+Insulin_Exp_lnCVR <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
+
+summary(Insulin_Exp_lnCVR)
+
+Insulin_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
 
 summary(Insulin_F0_lnCVR)
 
-Insulin_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
+Insulin_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
 
 summary(Insulin_Sex_lnCVR)
 
-Insulin_Test_Type_lnCVR <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
+Insulin_Test_Type_lnCVR <- rma.mv(yi, vi, mods = ~Trait_Info-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
 
 Insulin_Test_Type_lnCVR
 
 #Tibble of results
 
 Insulin_Mods_lnCVR <- tibble(
-  ID = c("F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FI", "ITT"),
-  lnCVR = c(0.0946,-0.1832,-0.3537,0.1732,-0.1528,-0.4194,-0.3968,0.5941),
-  ci.lb = c(-0.5591,-0.8069,-0.8886,-0.9596,-1.3508,-1.6080,-0.7505,0.1508),
-  ci.ub = c(0.7484,0.4404,0.1812,1.3060,1.0452,0.7692,-0.0432,1.0373)
+  ID = c("Multigenerational", "One off","F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FI", "ITT"),
+  lnCVR = c(Insulin_Exp_lnCVR$b[1],Insulin_Exp_lnCVR$b[2],Insulin_F0_lnCVR$b[1],Insulin_F0_lnCVR$b[2],Insulin_F0_lnCVR$b[3],Insulin_Sex_lnCVR$b[1],Insulin_Sex_lnCVR$b[2],Insulin_Sex_lnCVR$b[3],Insulin_Test_Type_lnCVR$b[1],Insulin_Test_Type_lnCVR$b[2]),
+  ci.lb = c(Insulin_Exp_lnCVR$ci.lb[1],Insulin_Exp_lnCVR$ci.lb[2],Insulin_F0_lnCVR$ci.lb[1],Insulin_F0_lnCVR$ci.lb[2],Insulin_F0_lnCVR$ci.lb[3],Insulin_Sex_lnCVR$ci.lb[1],Insulin_Sex_lnCVR$ci.lb[2],Insulin_Sex_lnCVR$ci.lb[3],Insulin_Test_Type_lnCVR$ci.lb[1],Insulin_Test_Type_lnCVR$ci.lb[2]),
+  ci.ub = c(Insulin_Exp_lnCVR$ci.ub[1],Insulin_Exp_lnCVR$ci.ub[2],Insulin_F0_lnCVR$ci.ub[1],Insulin_F0_lnCVR$ci.ub[2],Insulin_F0_lnCVR$ci.ub[3],Insulin_Sex_lnCVR$ci.ub[1],Insulin_Sex_lnCVR$ci.ub[2],Insulin_Sex_lnCVR$ci.ub[3],Insulin_Test_Type_lnCVR$ci.ub[1],Insulin_Test_Type_lnCVR$ci.ub[2])
 )
 
 plot_insulin_mods_lnCVR <- ggplot(Insulin_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 

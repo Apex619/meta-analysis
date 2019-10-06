@@ -105,25 +105,29 @@ plot_glucose_exp_type
 
 ```{r, echo=FALSE}
 #Adding moderators
-Glucose_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
+Glucose_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
+
+summary(Glucose_Exp_Type)
+
+Glucose_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
 
 summary(Glucose_F0)
 
-Glucose_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
+Glucose_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
 
 summary(Glucose_Sex)
 
-Glucose_Test_Type <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
+Glucose_Test_Type <- rma.mv(yi, vi, mods = ~Trait_Info-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
 
 Glucose_Test_Type
 
 #Tibble of results
 
 Glucose_Mods_lnRR <- tibble(
-  ID = c("F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FBG", "GTT"),
-  lnRR = c(0.1018,0.0143,0.1546,-0.0632,-0.0543,0.0015,0.1627),
-  ci.lb = c(-0.0000,-0.2457,-0.1047,-0.3426,-0.3335,-0.1494,0.0028),
-  ci.ub = c(0.2037,0.2742,0.4139,0.2163,0.2249,0.1523,0.3225)
+  ID = c("Multigenerational", "One off", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FBG", "GTT"),
+  lnRR = c(Glucose_Exp_Type$b[1],Glucose_Exp_Type$b[2],Glucose_F0$b[1],Glucose_F0$b[2],Glucose_Sex$b[1],Glucose_Sex$b[2],Glucose_Sex$b[3],Glucose_Test_Type$b[1],Glucose_Test_Type$b[2]),
+  ci.lb = c(Glucose_Exp_Type$ci.lb[1],Glucose_Exp_Type$ci.lb[2],Glucose_F0$ci.lb[1],Glucose_F0$ci.lb[2],Glucose_Sex$ci.lb[1],Glucose_Sex$ci.lb[2],Glucose_Sex$ci.lb[3],Glucose_Test_Type$ci.lb[1],Glucose_Test_Type$ci.lb[2]),
+  ci.ub = c(Glucose_Exp_Type$ci.ub[1],Glucose_Exp_Type$ci.ub[2],Glucose_F0$ci.ub[1],Glucose_F0$ci.ub[2],Glucose_Sex$ci.ub[1],Glucose_Sex$ci.ub[2],Glucose_Sex$ci.ub[3],Glucose_Test_Type$ci.ub[1],Glucose_Test_Type$ci.ub[2])
 )
 
 plot_glucose_mods <- ggplot(Glucose_Mods_lnRR, aes(x=ID, y=lnRR)) + 
@@ -136,57 +140,7 @@ plot_glucose_mods
 
 ```
 
-```{r}
 
-#splitting by exposure type
-
-Glucose_MG_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_MG, method = 'REML')
-
-summary(Glucose_MG_F0)
-
-
-Glucose_OF_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_OF, method = 'REML')
-
-summary(Glucose_OF_F0)
-
-Glucose_MG_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_MG, method = 'REML')
-
-summary(Glucose_MG_Sex)
-
-
-Glucose_OF_Sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_OF, method = 'REML')
-
-summary(Glucose_OF_Sex)
-
-Glucose_Test_type_MG <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_MG, method = 'REML')
-
-Glucose_Test_type_MG
-
-Glucose_Test_type_OF <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_OF, method = 'REML')
-
-Glucose_Test_type_OF
-
-#Tibble of results
-
-Glucose_Mods_lnRR <- tibble(
-  Experiment_Type = c("Multigenerational","Multigenerational", "One off","One off","Multigenerational","Multigenerational","Multigenerational", "One off","One off","Multigenerational","Multigenerational", "One off","One off"),
-  ID = c("F0 Female", "F0 Male", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "Male Grand Offspring", "Female Grand Offspring", "FBG", "GTT", "FBG", "GTT"), 
-  lnRR = c(0.2665,-0.1772,0.0017,0.1493,0.1543,0.1373,0.0828,0.0471,-0.0413,0.0651,0.4119,0.0498,-0.0261),
-  ci.lb = c(0.0791,-0.6411,-0.0667,-0.0266,-0.1845,-0.2650,-0.3238,-0.0316,-0.1032,-0.1415,0.1804,-0.1522,-0.2445),
-  ci.ub = c(0.4538,0.2868,0.0701,0.3252,0.4932,0.5396,0.4894,0.1258,0.0206,0.2717,0.6435,0.2518,0.1922)
-)
-
-Glucose_Mods_lnRR
-
-plot_lnRR_glucose_mods_exp <- ggplot(Glucose_Mods_lnRR, aes(x=ID, y=lnRR, colour=Experiment_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Glucose lnRR", x = "ID", y = "lnRR") +
-  coord_flip()
- 
-plot_lnRR_glucose_mods_exp
-```
 
 ## Meta-analysis overall results (lnCVR)
 
@@ -299,29 +253,32 @@ plot_glucose_exp_type_lnCVR
 
 
 ```
-#### Running meta-analysis (Overall with moderators, and then overall split by exposure type with moderators)
-
+#### Running meta-analysis (Overall with moderators)
 ```{r, echo=FALSE}
 #Adding moderators
-Glucose_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
+Glucose_Exp_lnCVR <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
+
+summary(Glucose_Exp_lnCVR)
+
+Glucose_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
 
 summary(Glucose_F0_lnCVR)
 
-Glucose_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
+Glucose_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
 
 summary(Glucose_Sex_lnCVR)
 
-Glucose_Test_Type_lnCVR <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
+Glucose_Test_Type_lnCVR <- rma.mv(yi, vi, mods = ~Trait_Info-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
 
 Glucose_Test_Type_lnCVR
 
 #Tibble of results
 
 Glucose_Mods_lnCVR <- tibble(
-  ID = c("F0 Male", "F0 Female", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FBG", "GTT"),
-  lnCVR = c(-0.1702,0.2100,-0.2005,0.1290,0.3412,-0.1233,0.1935),
-  ci.lb = c(-0.5203,-0.1844,-0.6087,-0.3326,-0.1224,-0.3809,-0.1301),
-  ci.ub = c(0.1799,0.6044,0.2076,0.5906,0.8049,0.1343,0.5170)
+  ID = c("Multigenerational", "One off", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FBG", "GTT"),
+  lnCVR = c(Glucose_Exp_lnCVR$b[1],Glucose_Exp_lnCVR$b[2],Glucose_F0_lnCVR$b[1],Glucose_F0_lnCVR$b[2],Glucose_Sex_lnCVR$b[1],Glucose_Sex_lnCVR$b[2],Glucose_Sex_lnCVR$b[3],Glucose_Test_Type_lnCVR$b[1],Glucose_Test_Type_lnCVR$b[2]),
+  ci.lb = c(Glucose_Exp_lnCVR$ci.lb[1],Glucose_Exp_lnCVR$ci.lb[2],Glucose_F0_lnCVR$ci.lb[1],Glucose_F0_lnCVR$ci.lb[2],Glucose_Sex_lnCVR$ci.lb[1],Glucose_Sex_lnCVR$ci.lb[2],Glucose_Sex_lnCVR$ci.lb[3],Glucose_Test_Type_lnCVR$ci.lb[1],Glucose_Test_Type_lnCVR$ci.lb[2]),
+  ci.ub = c(Glucose_Exp_lnCVR$ci.ub[1],Glucose_Exp_lnCVR$ci.ub[2],Glucose_F0_lnCVR$ci.ub[1],Glucose_F0_lnCVR$ci.ub[2],Glucose_Sex_lnCVR$ci.ub[1],Glucose_Sex_lnCVR$ci.ub[2],Glucose_Sex_lnCVR$ci.ub[3],Glucose_Test_Type_lnCVR$ci.ub[1],Glucose_Test_Type_lnCVR$ci.ub[2])
 )
 
 plot_glucose_mods_lnCVR <- ggplot(Glucose_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
@@ -332,57 +289,4 @@ plot_glucose_mods_lnCVR <- ggplot(Glucose_Mods_lnCVR, aes(x=ID, y=lnCVR)) +
   coord_flip()
 plot_glucose_mods_lnCVR
 
-```
-
-```{r}
-
-#splitting by exposure type
-
-Glucose_MG_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR_MG, method = 'REML')
-
-summary(Glucose_MG_F0_lnCVR)
-
-
-Glucose_OF_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR_OF, method = 'REML')
-
-summary(Glucose_OF_F0)
-
-
-
-Glucose_MG_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR_MG, method = 'REML')
-
-summary(Glucose_MG_Sex_lnCVR)
-
-Glucose_lnCVR_OF$Sex <- as.factor(Glucose_lnCVR_OF$Sex)
-
-#One-off analysis for lncvr glucose sex not working ???
-
-Glucose_Test_type_MG_lnCVR <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR_MG, method = 'REML')
-
-Glucose_Test_type_MG_lnCVR
-
-Glucose_Test_type_OF <- rma.mv(yi, vi, mods = ~Trait_Info, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR_OF, method = 'REML')
-
-Glucose_Test_type_OF
-
-#Tibble of results
-
-Glucose_Mods_lnCVR <- tibble(
-  Experiment_Type = c("Multigenerational","Multigenerational", "One off","One off","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational", "One off","One off"),
-  ID = c("F0 Male", "F0 Female", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FBG", "GTT", "FBG", "GTT"), 
-  lnCVR = c(-0.1917,-0.0294,0.0017,0.1493,-0.2005,-0.1140,0.1106,-0.2477,0.2379,0.3524,-0.2389),
-  ci.lb = c(-0.7059,-0.6245,-0.0667,-0.0266,-0.6032,-0.6506,-0.4278,-0.4446,-0.1311,-0.0042,-0.6427),
-  ci.ub = c(0.3225,0.5657,0.0701,0.3252,0.2022,0.4225,0.6490,-0.0508,0.6069,0.7090,0.1650)
-)
-
-Glucose_Mods_lnCVR
-
-plot_lnCVR_glucose_mods_exp <- ggplot(Glucose_Mods_lnCVR, aes(x=ID, y=lnCVR, colour=Experiment_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Glucose lnCVR", x = "ID", y = "lnCVR") +
-  coord_flip()
- 
-plot_lnCVR_glucose_mods_exp
 ```
