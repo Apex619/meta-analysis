@@ -53,6 +53,8 @@ Overall_effects_not_split_lnCVR <- read_excel("../data/Overall_effects_not_split
 
 Table_results_overall_lnCVR <- read_excel("../data/Table_results_overall_lnCVR.xlsx")
 
+
+Effect_Size_All_Traits_lnCVR$Sex <- gsub("Both ", "Both", Effect_Size_All_Traits_lnCVR$Sex)
 ```
 
 ## Meta-analysis overall results (lnRR)
@@ -156,23 +158,32 @@ plot_lnRR_overall_exposure
 
 ```{r, include=FALSE}
 #Adding moderators
-All_Data_Analysis_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+All_Data_Analysis_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+All_Data_Analysis_Exp_Type
+
+All_Data_Analysis_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Data_Analysis_f0)
 
-All_Data_Analysis_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
+All_Data_Analysis_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Data_Analysis_sex)
 ```
 
 ### Plotting overall results with moderators
 ```{r, echo=FALSE}
+Overall_effects_not_split <- tibble(
+  ID = c("Multigenerational", "One off", "Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
+  lnRR = c(All_Data_Analysis_Exp_Type$b[1],All_Data_Analysis_Exp_Type$b[2],All_Data_Analysis_f0$b[1],All_Data_Analysis_f0$b[2],All_Data_Analysis_f0$b[3],All_Data_Analysis_sex$b[1],All_Data_Analysis_sex$b[2],All_Data_Analysis_sex$b[3]),
+  ci.lb = c(All_Data_Analysis_Exp_Type$ci.lb[1],All_Data_Analysis_Exp_Type$ci.lb[2],All_Data_Analysis_f0$ci.lb[1],All_Data_Analysis_f0$ci.lb[2],All_Data_Analysis_f0$ci.lb[3],All_Data_Analysis_sex$ci.lb[1],All_Data_Analysis_sex$ci.lb[2],All_Data_Analysis_sex$ci.lb[3]),
+  ci.ub = c(All_Data_Analysis_Exp_Type$ci.ub[1],All_Data_Analysis_Exp_Type$ci.ub[2],All_Data_Analysis_f0$ci.ub[1],All_Data_Analysis_f0$ci.ub[2],All_Data_Analysis_f0$ci.ub[3],All_Data_Analysis_sex$ci.ub[1],All_Data_Analysis_sex$ci.ub[2],All_Data_Analysis_sex$ci.ub[3])
+)
 
 
-
-plot_lnRR_overall_mods <- ggplot(Overall_effects_not_split, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
+plot_lnRR_overall_mods <- ggplot(Overall_effects_not_split, aes(x=ID, y=lnRR))+ 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR") +
   coord_flip()
@@ -187,21 +198,21 @@ plot_lnRR_overall_mods
 
 
 #Adding moderators
-All_Traits_Analysis_0mods_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
+All_Traits_Analysis_0mods_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG_f0)
 
 
-All_Traits_Analysis_0mods_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
+All_Traits_Analysis_0mods_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_f0)
 
-All_Traits_Analysis_0mods_MG_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
+All_Traits_Analysis_0mods_MG_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG_sex)
 
 
-All_Traits_Analysis_0mods_OF_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
+All_Traits_Analysis_0mods_OF_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_sex)
 
@@ -211,12 +222,20 @@ summary(All_Traits_Analysis_0mods_OF_sex)
 
 ### Plotting Overall results with moderators (split by exposure type)
 ```{r, echo = FALSE}
+Table_results_overall <- tibble(
+  ID = c("F0 Female", "F0 Male","F0 Both","F0 Female","F0 Male","Both Sex Grand Offspring", "Female Grand Offspring", "Male Grand Offspring","Both Sex Grand Offspring", "Female Grand Offspring", "Male Grand Offspring" ),
+  Experiment_Type = c("Multigenerational", "Multigenerational","One off","One off","One off", "Multigenerational", "Multigenerational", "Multigenerational","One off","One off", "One off") ,
+  lnRR = c(0.4173,0.3025,0.1873,0.0747,0.0491,1.0519,0.1172,0.1246,-0.3802,0.0729,0.0790),
+  ci.lb = c(0.0521,-0.3288,0.0930,0.0237,-0.0134,0.4842,-0.3928,-0.3865,-0.6536,0.0235,0.0306),
+  ci.ub = c(0.7826,0.9337,0.2816,0.1257,0.1116,1.6196,0.6271,0.6358,-0.1068,0.1222,0.1274)
+)
 
 
+Table_results_overall
 
-plot_lnRR_overall_mods_exp <- ggplot(Table_results_overall, aes(x=ID, y=Effect_Size_lnRR, colour=Experiment_Type)) + 
+plot_lnRR_overall_mods_exp <- ggplot(Table_results_overall, aes(x=ID, y=lnRR, colour=Experiment_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(title ="Difference between treatment and control in means, overall mods", x = "ID", y = "lnRR") +
   coord_flip()
@@ -316,13 +335,13 @@ plot_lnCVR_overall_exposure
 
 ```{r, include=FALSE}
 #Adding moderators
-All_Data_Analysis_f0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+All_Data_Analysis_f0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
 
 summary(All_Data_Analysis_f0_lnCVR)
 
 
 
-All_Data_Analysis_sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+All_Data_Analysis_sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
 
 summary(All_Data_Analysis_sex_lnCVR)
 ```
@@ -349,21 +368,21 @@ plot_lnCVR_overall_mods
 
 
 #Adding moderators
-All_Traits_Analysis_lnCVR_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_lnCVR_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_lnCVR_MG_f0)
 
 
-All_Traits_Analysis_lnCVR_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_lnCVR_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_lnCVR_OF_f0)
 
-All_Traits_Analysis_lnCVR_MG_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_lnCVR_MG_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_lnCVR_MG_sex)
 
 
-All_Traits_Analysis_lnCVR_OF_sex <- rma.mv(yi, vi, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_lnCVR_OF_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=OF_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_lnCVR_OF_sex)
 
