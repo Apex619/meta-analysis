@@ -28,6 +28,22 @@ Adiposity_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohor
 
 summary(Adiposity_overall_lnRR_0mods)
 
+#Subset Adiposity lnCVR Data
+Adiposity_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Adiposity")
+
+Adiposity_overall_lnCVR_0mods <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnCVR, method = 'REML')
+
+summary(Adiposity_overall_lnCVR_0mods)
+
+#Tibble of overall results
+
+Insulin_overall_lnCVR <- tibble(
+  ID = "Overall", 
+  lnCVR = -0.1232,
+  ci.lb = -0.4539,
+  ci.ub = 0.2075
+)
+
 TG_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=TG_lnRR, method = 'REML')
 
 summary(TG_overall_lnRR_0mods)
@@ -42,6 +58,21 @@ Adiposity_overall_lnRR <- tibble(
   ci.lb = 0.1827,
   ci.ub = 1.2421
 )
+
+Adiposity_overall_lnCVR <- tibble(
+  ID = "Overall", 
+  lnCVR = -0.0529,
+  ci.lb = -0.2818,
+  ci.ub = 0.1759
+)
+
+plot_adiposity_overall_lnCVR <- ggplot(Adiposity_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Adiposity differences, overall", x = "ID", y = "lnCVR") +
+  coord_flip()
+plot_adiposity_overall_lnCVR
 
 TG_overall_lnRR <- tibble(
   ID = "Overall", 
@@ -98,6 +129,36 @@ plot_adiposity_mods <- ggplot(Adiposity_Mods_lnRR, aes(x=ID, y=lnRR)) +
   labs(title ="Adiposity differences, mods", x = "ID", y = "lnRR") +
   coord_flip()
 plot_adiposity_mods
+
+#lnCVR
+Adiposity_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnCVR, method = 'REML')
+
+summary(Adiposity_F0_lnCVR)
+
+Adiposity_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnCVR, method = 'REML')
+
+summary(Adiposity_Sex_lnCVR)
+
+Adiposity_Exp_Type_lnCVR <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnCVR, method = 'REML')
+
+Adiposity_Exp_Type_lnCVR
+
+#Tibble of results
+
+Adiposity_Mods_lnCVR <- tibble(
+  ID = c("F0 Female", "F0 Male", "Female Grandoffspring", "Male Grand Offspring", "Multigenerational", "One off"),
+  lnCVR = c(Adiposity_F0_lnCVR$b[1],Adiposity_F0_lnCVR$b[2],Adiposity_Sex_lnCVR$b[1],Adiposity_Sex_lnCVR$b[2], Adiposity_Exp_Type_lnCVR$b[1],Adiposity_Exp_Type_lnCVR$b[2]),
+  ci.lb = c(Adiposity_F0_lnCVR$ci.lb[1],Adiposity_F0_lnCVR$ci.lb[2],Adiposity_Sex_lnCVR$ci.lb[1],Adiposity_Sex_lnCVR$ci.lb[2], Adiposity_Exp_Type_lnCVR$ci.lb[1],Adiposity_Exp_Type_lnCVR$ci.lb[2]),
+  ci.ub = c(Adiposity_F0_lnCVR$ci.ub[1],Adiposity_F0_lnCVR$ci.ub[2],Adiposity_Sex_lnCVR$ci.ub[1],Adiposity_Sex_lnCVR$ci.ub[2], Adiposity_Exp_Type_lnCVR$ci.ub[1],Adiposity_Exp_Type_lnCVR$ci.ub[2])
+)
+
+plot_adiposity_mods_lnCVR <- ggplot(Adiposity_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(title ="Adiposity differences, mods", x = "ID", y = "lnCVR") +
+  coord_flip()
+plot_adiposity_mods_lnCVR
 
 ```
 

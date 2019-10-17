@@ -179,7 +179,7 @@ Insulin_overall_lnCVR <- tibble(
 )
 
 plot_insulin_overall_lnCVR <- ggplot(Insulin_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(title ="insulin variance, overall", x = "ID", y = "lnCVR") +
@@ -258,7 +258,7 @@ Insulin_Mods_lnCVR <- tibble(
 )
 
 plot_insulin_mods_lnCVR <- ggplot(Insulin_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(title ="Insulin variance, mods", x = "ID", y = "lnCVR") +

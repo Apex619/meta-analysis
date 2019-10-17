@@ -1,10 +1,10 @@
 ---
-title: "Cleaned Results"
+title: "Overall Results"
 author: "Hamza"
 date: "30 September 2019"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
   word_document: default
 ---
 
@@ -15,6 +15,10 @@ library(knitr)
 library(metafor)
 library(ggplot2)
 library(readxl)
+
+#Install miktex and then run this to knit a pdf file
+#install.packages('tinytex')
+#tinytex::install_tinytex()
 ```
 
 ## Meta-analysis
@@ -54,7 +58,7 @@ Overall_effects_not_split_lnCVR <- read_excel("../data/Overall_effects_not_split
 Table_results_overall_lnCVR <- read_excel("../data/Table_results_overall_lnCVR.xlsx")
 
 
-Effect_Size_All_Traits_lnCVR$Sex <- gsub("Both ", "Both", Effect_Size_All_Traits_lnCVR$Sex)
+
 ```
 
 ## Meta-analysis overall results (lnRR)
@@ -90,13 +94,41 @@ anova(meta0study, metastudy_best)
 I conducted meta-analysis, first on the complete dataset, and then on subsetted data (split by one off and multigenerational exposure)
 
 ```{r, include = FALSE}
-#ALL OF and MG
+#ALL DATA
 
 All_Traits_Analysis_0mods <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
 
-summary(All_Traits_Analysis_0mods)
+All_Traits_Analysis_traits <- rma.mv(yi, vi, mods= ~Trait-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
 
+summary(All_Traits_Analysis_traits)
+
+Traits_overall_lnRR <- tibble(
+  Trait = c("Adiposity", "Body Weight","Glucose", "Insulin", "Leptin", "Triglycerides"), 
+  lnRR = c(0.5139,0.1103,0.0861,0.1724,0.1228,0.2360),
+  ci.lb = c(0.3838,-0.0141,-0.0404,0.0424,-0.0116,0.1056),
+  ci.ub = c(0.6439,0.2346,0.2127,0.3024,0.2572,0.3664)
+)
+Traits_overall_lnRR
+
+k_traits <- Effect_Size_All_Traits %>% group_by(Trait) %>% count()
+k_traits
+
+plot_lnRR_overall_traits <- ggplot(Traits_overall_lnRR, aes(x=Trait, y=lnRR, colour = Trait)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Trait, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Trait", y = "lnRR") +
+  coord_flip()
+plot_lnRR_overall_traits
+
+summary(All_Traits_Analysis_0mods)
 funnel(All_Traits_Analysis_0mods)
+
+W <- diag(1/Effect_Size_All_Traits$vi)
+X <- model.matrix(All_Traits_Analysis_0mods)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_overall <- 100 * sum(All_Traits_Analysis_0mods$sigma2) / (sum(All_Traits_Analysis_0mods$sigma2) + (All_Traits_Analysis_0mods$k-All_Traits_Analysis_0mods$p)/sum(diag(P)))
+I2_overall
 
 # Modelling all traits with no mods MG (lnRR)
 All_Traits_Analysis_0mods_MG <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL, method = 'REML')
@@ -133,7 +165,7 @@ plot_lnRR_overall <- ggplot(Overall_effect_size, aes(x=ID, y=Effect_Size_lnRR)) 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR", subtitle = "k=341") +
+  labs(x = "ID", y = "lnRR", subtitle = "k=341") +
   coord_flip()
 plot_lnRR_overall
 ```
@@ -147,7 +179,7 @@ plot_lnRR_overall_exposure <- ggplot(Overall_MG_OF, aes(x=ID, y=Effect_Size_lnRR
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means, overall, exp type", x = "ID", y = "lnRR") +
+  labs(x = "ID", y = "lnRR") +
   coord_flip()
  
 plot_lnRR_overall_exposure
@@ -162,9 +194,14 @@ All_Data_Analysis_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = l
 
 All_Data_Analysis_Exp_Type
 
+
+
 All_Data_Analysis_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Data_Analysis_f0)
+
+k_All_Data_Analysis_f0 <- Effect_Size_All_Traits %>% group_by(F0_Parent_Exposed) %>% count()
+k_All_Data_Analysis_f0
 
 All_Data_Analysis_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'REML')
 
@@ -174,10 +211,10 @@ summary(All_Data_Analysis_sex)
 ### Plotting overall results with moderators
 ```{r, echo=FALSE}
 Overall_effects_not_split <- tibble(
-  ID = c("Multigenerational", "One off", "Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
-  lnRR = c(All_Data_Analysis_Exp_Type$b[1],All_Data_Analysis_Exp_Type$b[2],All_Data_Analysis_f0$b[1],All_Data_Analysis_f0$b[2],All_Data_Analysis_f0$b[3],All_Data_Analysis_sex$b[1],All_Data_Analysis_sex$b[2],All_Data_Analysis_sex$b[3]),
-  ci.lb = c(All_Data_Analysis_Exp_Type$ci.lb[1],All_Data_Analysis_Exp_Type$ci.lb[2],All_Data_Analysis_f0$ci.lb[1],All_Data_Analysis_f0$ci.lb[2],All_Data_Analysis_f0$ci.lb[3],All_Data_Analysis_sex$ci.lb[1],All_Data_Analysis_sex$ci.lb[2],All_Data_Analysis_sex$ci.lb[3]),
-  ci.ub = c(All_Data_Analysis_Exp_Type$ci.ub[1],All_Data_Analysis_Exp_Type$ci.ub[2],All_Data_Analysis_f0$ci.ub[1],All_Data_Analysis_f0$ci.ub[2],All_Data_Analysis_f0$ci.ub[3],All_Data_Analysis_sex$ci.ub[1],All_Data_Analysis_sex$ci.ub[2],All_Data_Analysis_sex$ci.ub[3])
+  ID = c("Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
+  lnRR = c(All_Data_Analysis_f0$b[1],All_Data_Analysis_f0$b[2],All_Data_Analysis_f0$b[3],All_Data_Analysis_sex$b[1],All_Data_Analysis_sex$b[2],All_Data_Analysis_sex$b[3]),
+  ci.lb = c(All_Data_Analysis_f0$ci.lb[1],All_Data_Analysis_f0$ci.lb[2],All_Data_Analysis_f0$ci.lb[3],All_Data_Analysis_sex$ci.lb[1],All_Data_Analysis_sex$ci.lb[2],All_Data_Analysis_sex$ci.lb[3]),
+  ci.ub = c(All_Data_Analysis_f0$ci.ub[1],All_Data_Analysis_f0$ci.ub[2],All_Data_Analysis_f0$ci.ub[3],All_Data_Analysis_sex$ci.ub[1],All_Data_Analysis_sex$ci.ub[2],All_Data_Analysis_sex$ci.ub[3])
 )
 
 
@@ -185,7 +222,7 @@ plot_lnRR_overall_mods <- ggplot(Overall_effects_not_split, aes(x=ID, y=lnRR))+
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means, overall", x = "ID", y = "lnRR") +
+  labs(x = "ID", y = "lnRR") +
   coord_flip()
  
 plot_lnRR_overall_mods
@@ -266,6 +303,8 @@ Effect_Size_All_Traits_lnCVR$Rodent_type <- factor(Effect_Size_All_Traits_lnCVR$
 Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement <- factor(Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement)
 Effect_Size_All_Traits_lnCVR$Strain <- factor(Effect_Size_All_Traits_lnCVR$Strain)
 Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed <- factor(Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed)
+
+Effect_Size_All_Traits_lnCVR$Sex <- gsub("Both ", "Both", Effect_Size_All_Traits_lnCVR$Sex)
 ```
 
 #### 5. Running meta-analysis for lnCVR (overall, and then overall split by exposure type)
@@ -277,6 +316,13 @@ I conducted meta-analysis using lnCVR, first on the complete dataset, and then o
 All_Traits_Analysis_0mods_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_lnCVR)
+funnel(All_Traits_Analysis_0mods_lnCVR)
+
+W <- diag(1/Effect_Size_All_Traits_lnCVR$vi)
+X <- model.matrix(All_Traits_Analysis_0mods_lnCVR)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_overall_lnCVR <- 100 * sum(All_Traits_Analysis_0mods_lnCVR$sigma2) / (sum(All_Traits_Analysis_0mods_lnCVR$sigma2) + (All_Traits_Analysis_0mods_lnCVR$k-All_Traits_Analysis_0mods_lnCVR$p)/sum(diag(P)))
+I2_overall_lnCVR
 
 # Modelling all traits with no mods MG (lnCVR)
 All_Traits_Analysis_0mods_MG_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID), data=MG_ALL_lnCVR, method = 'REML')
@@ -296,6 +342,26 @@ All_Traits_Analysis_0mods_OF_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|
 
 summary(All_Traits_Analysis_0mods_OF_lnCVR)
 
+All_Traits_Analysis_traits_lnCVR <- rma.mv(yi, vi, mods= ~Trait-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_traits_lnCVR)
+
+Traits_overall_lnCVR <- tibble(
+  Trait = c("Adiposity", "Body Weight","Glucose", "Insulin", "Leptin", "Triglycerides"), 
+  lnCVR = c(-0.0107,0.0261,0.0143,-0.1468,0.0245,-0.0817),
+  ci.lb = c(-0.1557,-0.0742,-0.1343,-0.3042,-0.2159,-0.2524),
+  ci.ub = c(0.1343,0.1264,0.1629,0.0106,0.2648,0.0891)
+)
+Traits_overall_lnCVR
+
+plot_lnRR_overall_traits_lnCVR <- ggplot(Traits_overall_lnCVR, aes(x=Trait, y=lnCVR, colour = Trait)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Trait, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Trait", y = "lnCVR") +
+  coord_flip()
+plot_lnRR_overall_traits_lnCVR
+
 #Dataframe was created using results from above meta-analysis models
 ```
 
@@ -307,7 +373,7 @@ plot_lnCVR_overall <- ggplot(Overall_lnCVR, aes(x=ID, y=Effect_Size_lnCVR, colou
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means, overall lnCVR", x = "ID", y = "lnCVR", subtitle = "k=341") +
+  labs(x = "ID", y = "lnCVR", subtitle = "k=341") +
   coord_flip()
 plot_lnCVR_overall
 ```
@@ -321,7 +387,7 @@ plot_lnCVR_overall_exposure <- ggplot(Overall_MG_OF_lnCVR, aes(x=ID, y=Effect_Si
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means, overall, exp type", x = "ID", y = "lnCVR") +
+  labs(x = "ID", y = "lnCVR") +
   coord_flip()
  
 plot_lnCVR_overall_exposure
@@ -355,7 +421,7 @@ plot_lnCVR_overall_mods <- ggplot(Overall_effects_not_split_lnCVR, aes(x=ID, y=E
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = Effect_Size_lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Difference between treatment and control in means, overall, lnCVR", x = "ID", y = "lnCVR") +
+  labs(x = "ID", y = "lnCVR") +
   coord_flip()
  
 plot_lnCVR_overall_mods
@@ -407,19 +473,7 @@ plot_lnCVR_overall_mods_exp
 
 ```
 
-### Placing results togeter
 
-```{r}
-figure <- ggarrange(plot_lnRR_overall, plot_lnCVR_overall,
-                    labels = c("A", "B"),
-                    ncol = 1, nrow = 2)
-figure
-
-
-
-
-
-```
 
 
 

@@ -55,7 +55,11 @@ plot_BW_overall <- ggplot(Body_Weight_overall_lnRR, aes(x=ID, y=lnRR)) +
   coord_flip()
 plot_BW_overall
 
-
+W <- diag(1/Body_Weight_lnRR$vi)
+X <- model.matrix(Body_Weight_overall)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_overall_BW <- 100 * sum(Body_Weight_overall$sigma2) / (sum(Body_Weight_overall$sigma2) + (Body_Weight_overall$k-Body_Weight_overall$p)/sum(diag(P)))
+I2_overall_BW
 ```
 
 
@@ -133,7 +137,7 @@ plot_BW_mods <- ggplot(Body_Weight_Mods_lnRR, aes(x=ID, y=lnRR)) +
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Body Weight differences, mods", x = "Exp_Type", y = "lnRR") +
+  labs(x = "Exp_Type", y = "lnRR") +
   coord_flip()
 plot_BW_mods
 
@@ -213,13 +217,19 @@ Body_Weight_overall_lnCVR <- tibble(
   ci.ub = 0.1964
 )
 
-plot_BW_overall_lnCVR <- ggplot(Body_Weight_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
+plot_BW_overall_lnCVR <- ggplot(Body_Weight_overall_lnCVR, aes(x=ID, y=lnCVR, colour=ID)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(title ="Body Weight differences, overall lnCVR", x = "ID", y = "lnCVR") +
   coord_flip()
 plot_BW_overall_lnCVR
+
+W <- diag(1/Body_Weight_overall_lnCVR$vi)
+X <- model.matrix(Body_Weight_lnCVR_0mods)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_BW <- 100 * sum(Body_Weight_lnCVR_0mods$sigma2) / (sum(Body_Weight_lnCVR_0mods$sigma2) + (Body_Weight_lnCVR_0mods$k-Body_Weight_lnCVR_0mods$p)/sum(diag(P)))
+I2_BW
 
 ```
 
@@ -296,11 +306,11 @@ Body_Weight_Mods_lnCVR <- tibble(
 
 Body_Weight_Mods_lnCVR
 
-plot_BW_mods_lnCVR <- ggplot(Body_Weight_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+plot_BW_mods_lnCVR <- ggplot(Body_Weight_Mods_lnCVR, aes(x=ID, y=lnCVR )) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Body Weight differences, mods", x = "Exp_Type", y = "lnCVR") +
+  labs(x = "ID", y = "lnCVR") +
   coord_flip()
 plot_BW_mods_lnCVR
 ```

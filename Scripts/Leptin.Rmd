@@ -28,7 +28,6 @@ Leptin_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_I
 summary(Leptin_overall_lnRR_0mods)
 
 
-
 #Tibble of overall results
 
 Leptin_overall_lnRR <- tibble(

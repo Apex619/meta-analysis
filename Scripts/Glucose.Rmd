@@ -109,6 +109,9 @@ Glucose_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Pap
 
 summary(Glucose_Exp_Type)
 
+k_exp <- Glucose_lnRR %>% group_by(Exposure_Type) %>% count()
+k_exp
+
 Glucose_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
 
 summary(Glucose_F0)
@@ -121,6 +124,10 @@ Glucose_Test_Type <- rma.mv(yi, vi, mods = ~Trait_Info-1, random = list(~1|Paper
 
 Glucose_Test_Type
 
+k_test <- Glucose_lnRR %>% group_by(Trait_Info) %>% count()
+k_test
+
+
 #Tibble of results
 
 Glucose_Mods_lnRR <- tibble(
@@ -128,7 +135,8 @@ Glucose_Mods_lnRR <- tibble(
   lnRR = c(Glucose_Exp_Type$b[1],Glucose_Exp_Type$b[2],Glucose_F0$b[1],Glucose_F0$b[2],Glucose_Sex$b[1],Glucose_Sex$b[2],Glucose_Sex$b[3],Glucose_Test_Type$b[1],Glucose_Test_Type$b[2]),
   ci.lb = c(Glucose_Exp_Type$ci.lb[1],Glucose_Exp_Type$ci.lb[2],Glucose_F0$ci.lb[1],Glucose_F0$ci.lb[2],Glucose_Sex$ci.lb[1],Glucose_Sex$ci.lb[2],Glucose_Sex$ci.lb[3],Glucose_Test_Type$ci.lb[1],Glucose_Test_Type$ci.lb[2]),
   ci.ub = c(Glucose_Exp_Type$ci.ub[1],Glucose_Exp_Type$ci.ub[2],Glucose_F0$ci.ub[1],Glucose_F0$ci.ub[2],Glucose_Sex$ci.ub[1],Glucose_Sex$ci.ub[2],Glucose_Sex$ci.ub[3],Glucose_Test_Type$ci.ub[1],Glucose_Test_Type$ci.ub[2])
-)
+),
+k= c(k_exp)
 
 plot_glucose_mods <- ggplot(Glucose_Mods_lnRR, aes(x=ID, y=lnRR)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
@@ -137,6 +145,8 @@ plot_glucose_mods <- ggplot(Glucose_Mods_lnRR, aes(x=ID, y=lnRR)) +
   labs(title ="Glucose differences, mods", x = "ID", y = "lnRR") +
   coord_flip()
 plot_glucose_mods
+
+k_exp$n[2]
 
 ```
 
@@ -205,7 +215,7 @@ Glucose_overall_lnCVR <- tibble(
 )
 
 plot_glucose_overall_lnCVR <- ggplot(Glucose_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(title ="Glucose variance, overall lnCVR", x = "ID", y = "lnCVR") +
@@ -282,7 +292,7 @@ Glucose_Mods_lnCVR <- tibble(
 )
 
 plot_glucose_mods_lnCVR <- ggplot(Glucose_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(title ="Glucose differences, mods", x = "ID", y = "lnCVR") +
