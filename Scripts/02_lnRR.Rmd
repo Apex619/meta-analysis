@@ -289,6 +289,7 @@ lnRR_MA_results <- unite(lnRR_MA_results, "labels", c("Experiment_type", "trait"
 
 lnRR_MA_results
 
+
 #Plotting
 
 plot_lnRR <- ggplot(lnRR_MA_results, aes(x=trait, y=mean, colour=Experiment_type)) + 

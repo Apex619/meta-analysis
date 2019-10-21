@@ -25,6 +25,8 @@ Leptin_lnRR <- read.csv("../data/Leptin_lnRR.csv")
 
 Leptin_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Leptin_lnRR, method = 'REML')
 
+#Random factors account for no independence and Cohort ID is more biologically meaningful. Can use only Cohort ID for small datasets like this
+
 summary(Leptin_overall_lnRR_0mods)
 
 
