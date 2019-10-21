@@ -2,7 +2,9 @@
 title: "Adiposity and TG"
 author: "Hamza"
 date: "6 October 2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
@@ -223,37 +225,37 @@ plot_Adiposity_lnCVR_mods_exp
 
 
 ```
-#Triglycerides
+#Triglycerides lnRR
+```{r}
+#Subsetting Data for lnRR
+Triglycerides_lnRR <- subset(Effect_Size_All_Traits, Effect_Size_All_Traits$Trait == "Triglycerides")
+
+Triglycerides_lnRR_MG <- subset(Triglycerides_lnRR, Triglycerides_lnRR$Exposure_Type == "Multigenerational")
+Triglycerides_lnRR_OF <- subset(Triglycerides_lnRR, Triglycerides_lnRR$Exposure_Type == "One off")
+
+#Subsetting Data for lmCVR
+Triglycerides_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Triglycerides")
+
+Triglycerides_lnCVR_MG <- subset(Triglycerides_lnCVR, Triglycerides_lnCVR$Exposure_Type == "Multigenerational")
+Triglycerides_lnCVR_OF <- subset(Triglycerides_lnCVR, Triglycerides_lnCVR$Exposure_Type == "One off")
+```
+
+
+#Overall Triglycerides analysis
 ```{r}
 
-TG_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=TG_lnRR, method = 'REML')
+
+
+
+TG_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Cohort_ID,~1|ES_ID), data=Triglycerides_lnRR, method = 'REML')
 
 summary(TG_overall_lnRR_0mods)
 
-
-
-
-
-Adiposity_overall_lnCVR <- tibble(
-  ID = "Overall", 
-  lnCVR = -0.0529,
-  ci.lb = -0.2818,
-  ci.ub = 0.1759
-)
-
-plot_adiposity_overall_lnCVR <- ggplot(Adiposity_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
-  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Adiposity differences, overall", x = "ID", y = "lnCVR") +
-  coord_flip()
-plot_adiposity_overall_lnCVR
-
 TG_overall_lnRR <- tibble(
   ID = "Overall", 
-  lnRR = 0.2003,
-  ci.lb = -0.0948,
-  ci.ub = 0.4955
+  lnRR = 0.1894,
+  ci.lb = 0.0168,
+  ci.ub = 0.3621
 )
 
 
@@ -266,103 +268,106 @@ plot_tg_overall <- ggplot(TG_overall_lnRR, aes(x=ID, y=lnRR)) +
   coord_flip()
 plot_tg_overall
 ```
+#Triglycerides analysis (split by exposure type)
+```{r}
+Triglycerides_overall_lnRR_MG <- rma.mv(yi, vi,random = list(~1|Cohort_ID,~1|ES_ID), data=Triglycerides_lnRR_MG, method = 'REML')
 
-#Adiposity
-```{r, echo=FALSE}
-#Adding moderators
-Adiposity_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnRR, method = 'REML')
+summary(Triglycerides_overall_lnRR_MG)
+funnel (Triglycerides_overall_lnRR_MG)
 
-summary(Adiposity_F0)
+Triglycerides_overall_lnRR_OF <- rma.mv(yi, vi,random = list(~1|Cohort_ID,~1|ES_ID), data=Triglycerides_lnRR_OF, method = 'REML')
 
-Adiposity_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnRR, method = 'REML')
+summary(Triglycerides_overall_lnRR_OF)
+funnel (Triglycerides_overall_lnRR_OF)
 
-summary(Adiposity_Sex)
-
-Adiposity_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnRR, method = 'REML')
-
-Adiposity_Exp_Type
-
-#Tibble of results
-
-Adiposity_Mods_lnRR <- tibble(
-  ID = c("F0 Female", "F0 Male", "Female Grandoffspring", "Male Grand Offspring", "Multigenerational", "One off"),
-  lnRR = c(Adiposity_F0$b[1],Adiposity_F0$b[2],Adiposity_Sex$b[1],Adiposity_Sex$b[2], Adiposity_Exp_Type$b[1],Adiposity_Exp_Type$b[2]),
-  ci.lb = c(Adiposity_F0$ci.lb[1],Adiposity_F0$ci.lb[2],Adiposity_Sex$ci.lb[1],Adiposity_Sex$ci.lb[2], Adiposity_Exp_Type$ci.lb[1],Adiposity_Exp_Type$ci.lb[2]),
-  ci.ub = c(Adiposity_F0$ci.ub[1],Adiposity_F0$ci.ub[2],Adiposity_Sex$ci.ub[1],Adiposity_Sex$ci.ub[2], Adiposity_Exp_Type$ci.ub[1],Adiposity_Exp_Type$ci.ub[2])
+Triglycerides_Exp_lnRR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnRR = c(0.4658,0.1077),
+  ci.lb = c(-0.2411,-0.0109),
+  ci.ub = c(1.1727,0.2262)
 )
 
-plot_adiposity_mods <- ggplot(Adiposity_Mods_lnRR, aes(x=ID, y=lnRR)) + 
+Triglycerides_Exp_lnRR
+
+
+
+#Plotting when split by exp type
+
+plot_Triglycerides_exp_type <- ggplot(Triglycerides_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Adiposity differences, mods", x = "ID", y = "lnRR") +
+  labs(x = "Exp_Type", y = "lnRR") +
   coord_flip()
-plot_adiposity_mods
+plot_Triglycerides_exp_type
+```
 
-#lnCVR
-Adiposity_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnCVR, method = 'REML')
+#Triglycerides lnCVR
 
-summary(Adiposity_F0_lnCVR)
+#Overall Triglycerides analysis
+```{r}
 
-Adiposity_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnCVR, method = 'REML')
 
-summary(Adiposity_Sex_lnCVR)
 
-Adiposity_Exp_Type_lnCVR <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Adiposity_lnCVR, method = 'REML')
 
-Adiposity_Exp_Type_lnCVR
+TG_overall_lnCVR_0mods <- rma.mv(yi, vi,random = list(~1|Cohort_ID,~1|ES_ID), data=Triglycerides_lnCVR, method = 'REML')
 
-#Tibble of results
+summary(TG_overall_lnCVR_0mods)
 
-Adiposity_Mods_lnCVR <- tibble(
-  ID = c("F0 Female", "F0 Male", "Female Grandoffspring", "Male Grand Offspring", "Multigenerational", "One off"),
-  lnCVR = c(Adiposity_F0_lnCVR$b[1],Adiposity_F0_lnCVR$b[2],Adiposity_Sex_lnCVR$b[1],Adiposity_Sex_lnCVR$b[2], Adiposity_Exp_Type_lnCVR$b[1],Adiposity_Exp_Type_lnCVR$b[2]),
-  ci.lb = c(Adiposity_F0_lnCVR$ci.lb[1],Adiposity_F0_lnCVR$ci.lb[2],Adiposity_Sex_lnCVR$ci.lb[1],Adiposity_Sex_lnCVR$ci.lb[2], Adiposity_Exp_Type_lnCVR$ci.lb[1],Adiposity_Exp_Type_lnCVR$ci.lb[2]),
-  ci.ub = c(Adiposity_F0_lnCVR$ci.ub[1],Adiposity_F0_lnCVR$ci.ub[2],Adiposity_Sex_lnCVR$ci.ub[1],Adiposity_Sex_lnCVR$ci.ub[2], Adiposity_Exp_Type_lnCVR$ci.ub[1],Adiposity_Exp_Type_lnCVR$ci.ub[2])
+TG_overall_lnCVR <- tibble(
+  ID = "Overall", 
+  lnCVR = -0.1844,
+  ci.lb = -0.3993,
+  ci.ub =0.0305 
 )
 
-plot_adiposity_mods_lnCVR <- ggplot(Adiposity_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
+
+
+plot_tg_overall_lnCVR <- ggplot(TG_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Adiposity differences, mods", x = "ID", y = "lnCVR") +
+  labs(title ="TG differences, overall", x = "ID", y = "lnCVR") +
   coord_flip()
-plot_adiposity_mods_lnCVR
-
+plot_tg_overall_lnCVR
 ```
+#Triglycerides analysis (split by exposure type)
+```{r}
+Triglycerides_overall_lnCVR_MG <- rma.mv(yi, vi,random = list(~1|Cohort_ID,~1|ES_ID), data=Triglycerides_lnCVR_MG, method = 'REML')
 
-#TG
-```{r, echo=FALSE}
-#Adding moderators
-TG_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=TG_lnRR, method = 'REML')
+summary(Triglycerides_overall_lnCVR_MG)
+funnel (Triglycerides_overall_lnCVR_MG)
 
-summary(TG_F0)
+Triglycerides_overall_lnCVR_OF <- rma.mv(yi, vi,random = list(~1|Cohort_ID,~1|ES_ID), data=Triglycerides_lnCVR_OF, method = 'REML')
 
-TG_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=TG_lnRR, method = 'REML')
+summary(Triglycerides_overall_lnCVR_OF)
+funnel (Triglycerides_overall_lnCVR_OF)
 
-summary(TG_Sex)
-
-TG_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=TG_lnRR, method = 'REML')
-
-TG_Exp_Type
-
-#Tibble of results
-
-TG_Mods_lnRR <- tibble(
-  ID = c("F0 Female", "F0 Male", "Female Grandoffspring", "Male Grand Offspring", "Multigenerational", "One off"),
-  lnRR = c(TG_F0$b[1],TG_F0$b[2],TG_Sex$b[1],TG_Sex$b[2], TG_Exp_Type$b[1],TG_Exp_Type$b[2]),
-  ci.lb = c(TG_F0$ci.lb[1],TG_F0$ci.lb[2],TG_Sex$ci.lb[1],TG_Sex$ci.lb[2], TG_Exp_Type$ci.lb[1],TG_Exp_Type$ci.lb[2]),
-  ci.ub = c(TG_F0$ci.ub[1],TG_F0$ci.ub[2],TG_Sex$ci.ub[1],TG_Sex$ci.ub[2], TG_Exp_Type$ci.ub[1],TG_Exp_Type$ci.ub[2])
+Triglycerides_Exp_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnCVR = c(-0.5575,-0.0900),
+  ci.lb = c(-1.2913,-0.2972),
+  ci.ub = c(0.1763,0.1171)
 )
 
-plot_TG_mods <- ggplot(TG_Mods_lnRR, aes(x=ID, y=lnRR)) + 
+Triglycerides_Exp_lnCVR
+
+
+
+#Plotting when split by exp type
+
+plot_Triglycerides_exp_type <- ggplot(Triglycerides_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="TG differences, mods", x = "ID", y = "lnRR") +
+  labs(x = "Exp_Type", y = "lnCVR") +
   coord_flip()
-plot_TG_mods
+plot_Triglycerides_exp_type
 ```
+
+
+
+
 
 
 
