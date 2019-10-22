@@ -16,253 +16,262 @@ library(readxl)
 ```
 
 ```{r}
-Insulin_lnRR <- read.csv("../data/Insulin_lnRR.csv") 
+load(file="Effect_Size_All_Traits.RData")
+load(file="Effect_Size_All_Traits_lnCVR.RData")
+#lnRR
+Insulin_FI_lnRR <- subset(Effect_Size_All_Traits, Effect_Size_All_Traits$Trait == "Insulin_FI")
+Insulin_TT_lnRR<- subset(Effect_Size_All_Traits, Effect_Size_All_Traits$Trait == "Insulin_TT")
 
-#Subsetting
+Insulin_FI_lnRR_MG <- subset(Insulin_FI_lnRR, Insulin_FI_lnRR$Exposure_Type == "Multigenerational")
+Insulin_TT_lnRR_MG <- subset(Insulin_TT_lnRR, Insulin_TT_lnRR$Exposure_Type == "Multigenerational")
 
-Insulin_MG <- subset(Insulin_lnRR, Insulin_lnRR$Exposure_Type == "Multigenerational")
+Insulin_FI_lnRR_OF <- subset(Insulin_FI_lnRR, Insulin_FI_lnRR$Exposure_Type == "One off")
+Insulin_TT_lnRR_OF <- subset(Insulin_TT_lnRR, Insulin_TT_lnRR$Exposure_Type == "One off")
 
-Insulin_OF <- subset(Insulin_lnRR, Insulin_lnRR$Exposure_Type == "One off")
+#lnCVR
+Insulin_FI_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Insulin_FI")
+Insulin_TT_lnCVR<- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Insulin_TT")
+
+Insulin_FI_lnCVR_MG <- subset(Insulin_FI_lnCVR, Insulin_FI_lnCVR$Exposure_Type == "Multigenerational")
+Insulin_TT_lnCVR_MG <- subset(Insulin_TT_lnCVR, Insulin_TT_lnCVR$Exposure_Type == "Multigenerational")
+
+Insulin_FI_lnCVR_OF <- subset(Insulin_FI_lnCVR, Insulin_FI_lnCVR$Exposure_Type == "One off")
+Insulin_TT_lnCVR_OF <- subset(Insulin_TT_lnCVR, Insulin_TT_lnCVR$Exposure_Type == "One off")
 
 ```
 
+#FI Analysis
 ```{r}
+Insulin_lnRR_FI <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_FI_lnRR, method = 'REML')
 
-#Overall analysis, not split
-
-Insulin_overall_lnRR_0mods <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
-
-summary(Insulin_overall_lnRR_0mods)
-
-
+summary(Insulin_lnRR_FI)
+funnel(Insulin_lnRR_FI)
 
 #Tibble of overall results
 
-Insulin_overall_lnRR <- tibble(
+Insulin_overall_lnRR_FI <- tibble(
   ID = "Overall", 
-  lnRR = 0.2571,
-  ci.lb = -0.0238,
-  ci.ub = 0.5381
+  lnRR = 0.3258,
+  ci.lb = 0.1253,
+  ci.ub = 0.5263
 )
 
-plot_insulin_overall <- ggplot(Insulin_overall_lnRR, aes(x=ID, y=lnRR)) + 
+plot_Insulin_overall_FI <- ggplot(Insulin_overall_lnRR_FI, aes(x=ID, y=lnRR)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="insulin differences, overall", x = "ID", y = "lnRR") +
+  labs(x = "ID", y = "lnRR") +
   coord_flip()
-plot_insulin_overall
-```
+plot_Insulin_overall_FI
 
-```{r}
+#Split by exposure type
 
-#MG then OF
+Insulin_overall_lnRR_FI_MG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_FI_lnRR_MG, method = 'REML')
 
-Insulin_overall_MG <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_MG, method = 'REML')
+summary(Insulin_overall_lnRR_FI_MG)
+funnel(Insulin_overall_lnRR_FI_MG)
 
-summary(Insulin_overall_MG)
+Insulin_overall_lnRR_FI_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_FI_lnRR_OF, method = 'REML')
 
-Insulin_overall_OF <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_OF, method = 'REML')
+summary(Insulin_overall_lnRR_FI_OF)
+funnel(Insulin_overall_lnRR_FI_OF)
 
-summary(Insulin_overall_OF)
-
-
-#Tibble of results
-
-Insulin_Exp_lnRR <- tibble(
+Insulin_FI_Exp_lnRR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnRR = c(0.4624,0.0118),
-  ci.lb = c(-0.1455, -0.1559),
-  ci.ub = c(1.0703, 0.1795)
+  lnRR = c(1.1817,0.1346),
+  ci.lb = c(0.1612,0.0389),
+  ci.ub = c(2.2022,0.2303)
 )
 
-Insulin_Exp_lnRR
+Insulin_FI_Exp_lnRR
 
 
 
 #Plotting when split by exp type
 
-plot_insulin_exp_type <- ggplot(Insulin_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
+plot_Insulin_FI_exp_type <- ggplot(Insulin_FI_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Insulin differences, exp type", x = "Exp_Type", y = "lnRR") +
+  labs(x = "Exp_Type", y = "lnRR") +
   coord_flip()
-plot_insulin_exp_type
+plot_Insulin_FI_exp_type
 ```
 
-#### Running meta-analysis (Overall with moderators)
-
-```{r, echo=FALSE}
-#Adding moderators
-Insulin_Exp <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
-
-summary(Insulin_Exp)
-
-Insulin_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
-
-summary(Insulin_F0)
-
-Insulin_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
-
-summary(Insulin_Sex)
-
-Insulin_Test_Type <- rma.mv(yi, vi, mods = ~Trait_Info-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnRR, method = 'REML')
-
-Insulin_Test_Type
-
-#Tibble of results
-
-Insulin_Mods_lnRR <- tibble(
-  ID = c("Multigenerational", "One off", "FO Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FI", "ITT"),
-  lnRR = c(Insulin_Exp$b[1],Insulin_Exp$b[2],Insulin_F0$b[1],Insulin_F0$b[2],Insulin_F0$b[3],Insulin_Sex$b[1],Insulin_Sex$b[2],Insulin_Sex$b[3],Insulin_Test_Type$b[1],Insulin_Test_Type$b[2]),
-  ci.lb = c(Insulin_Exp$ci.lb[1],Insulin_Exp$ci.lb[2],Insulin_F0$ci.lb[1],Insulin_F0$ci.lb[2],Insulin_F0$ci.lb[3],Insulin_Sex$ci.lb[1],Insulin_Sex$ci.lb[2],Insulin_Sex$ci.lb[3],Insulin_Test_Type$ci.lb[1],Insulin_Test_Type$ci.lb[2]),
-  ci.ub = c(Insulin_Exp$ci.ub[1],Insulin_Exp$ci.ub[2],Insulin_F0$ci.ub[1],Insulin_F0$ci.ub[2],Insulin_F0$ci.ub[3],Insulin_Sex$ci.ub[1],Insulin_Sex$ci.ub[2],Insulin_Sex$ci.ub[3],Insulin_Test_Type$ci.ub[1],Insulin_Test_Type$ci.ub[2])
-)
-
-plot_insulin_mods <- ggplot(Insulin_Mods_lnRR, aes(x=ID, y=lnRR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Insulin differences, mods", x = "ID", y = "lnRR") +
-  coord_flip()
-plot_insulin_mods
-
-```
-
-
-
-
-## Meta-analysis overall results (lnCVR)
-
-### 4. Calculating effect sizes (Done)
+#Insulin Tolerance test results
 
 ```{r}
-#Subset Insulin Data
-Insulin_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Insulin")
+Insulin_lnRR_TT <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_TT_lnRR, method = 'REML')
 
-
-
-#Errors with spaces and converting back to factor
-Insulin_lnCVR$Sex <- gsub("Both ", "Both", Insulin_lnCVR$Sex) 
-Insulin_lnCVR$Sex <- as.factor(Insulin_lnCVR$Sex)
-
-#Convert trait info into factor ?
-
-
-
-#Subetting into MG and OF
-
-
-
-Insulin_lnCVR_MG <- subset(Insulin_lnCVR, Insulin_lnCVR$Exposure_Type == "Multigenerational")
-
-Insulin_lnCVR_OF <- subset(Insulin_lnCVR, Insulin_lnCVR$Exposure_Type == "One off")
-
-```
-#### 5. Running meta-analysis for Insulin lnCVR (overall, and then overall split by exposure type)
-```{r}
-
-#Overall analysis, not split
-
-Insulin_overall_lnCVR_0mods <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
-
-summary(Insulin_overall_lnCVR_0mods)
+summary(Insulin_lnRR_TT)
+funnel(Insulin_lnRR_TT)
 
 #Tibble of overall results
 
-Insulin_overall_lnCVR <- tibble(
+Insulin_overall_lnRR_TT <- tibble(
   ID = "Overall", 
-  lnCVR = -0.1232,
-  ci.lb = -0.4539,
-  ci.ub = 0.2075
+  lnRR = 0.0288,
+  ci.lb = -0.1999,
+  ci.ub = 0.2575
 )
 
-plot_insulin_overall_lnCVR <- ggplot(Insulin_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
-  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+plot_Insulin_overall_TT <- ggplot(Insulin_overall_lnRR_TT, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="insulin variance, overall", x = "ID", y = "lnCVR") +
+  labs(x = "ID", y = "lnRR") +
   coord_flip()
-plot_insulin_overall_lnCVR
-```
+plot_Insulin_overall_TT
 
+#Split by exposure type
 
+Insulin_overall_lnRR_TT_MG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_TT_lnRR_MG, method = 'REML')
 
-```{r}
+summary(Insulin_overall_lnRR_TT_MG)
+funnel(Insulin_overall_lnRR_TT_MG)
 
-# Modelling all traits with no mods MG (lnCVR)
-Insulin_lnCVR_0mods_MG <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR_MG, method = 'REML')
+Insulin_overall_lnRR_TT_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_TT_lnRR_OF, method = 'REML')
 
+summary(Insulin_overall_lnRR_TT_OF)
+funnel(Insulin_overall_lnRR_TT_OF)
 
-summary(Insulin_lnCVR_0mods_MG)
-
-# Modelling all traits with no mods OF (lnCVR)
-Insulin_lnCVR_0mods_OF <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR_OF, method = 'REML')
-
-summary(Insulin_lnCVR_0mods_OF)
-
-#Tibble of results
-
-Insulin_Exp_lnCVR <- tibble(
+Insulin_TT_Exp_lnRR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnCVR = c(0.1050,-0.2690),
-  ci.lb = c(-0.4717,-0.6517),
-  ci.ub = c(0.6816,0.1137)
+  lnRR = c(0.1149,-0.0470),
+  ci.lb = c(-0.5066,-0.2566),
+  ci.ub = c(0.7365,0.1625)
 )
 
-Insulin_Exp_lnCVR
+Insulin_TT_Exp_lnRR
 
 
 
 #Plotting when split by exp type
 
-plot_insulin_exp_type_lnCVR <- ggplot(Insulin_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
+plot_Insulin_TT_exp_type <- ggplot(Insulin_TT_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Exp_Type", y = "lnRR") +
+  coord_flip()
+plot_Insulin_TT_exp_type
+```
+
+#Fasting Insulin analysis (lnCVR)
+```{r}
+Insulin_lnCVR_FI <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_FI_lnCVR, method = 'REML')
+
+summary(Insulin_lnCVR_FI)
+funnel(Insulin_lnCVR_FI)
+
+#Tibble of overall results
+
+Insulin_overall_lnCVR_FI <- tibble(
+  ID = "Overall", 
+  lnCVR = -0.3878,
+  ci.lb = -0.6348,
+  ci.ub = -0.1409
+)
+
+plot_Insulin_overall_FI_lnCVR <- ggplot(Insulin_overall_lnCVR_FI, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "ID", y = "lnCVR") +
+  coord_flip()
+plot_Insulin_overall_FI_lnCVR
+
+#Split by exposure type
+
+Insulin_overall_lnCVR_FI_MG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_FI_lnCVR_MG, method = 'REML')
+
+summary(Insulin_overall_lnCVR_FI_MG)
+funnel(Insulin_overall_lnCVR_FI_MG)
+
+Insulin_overall_lnCVR_FI_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_FI_lnCVR_OF, method = 'REML')
+
+summary(Insulin_overall_lnCVR_FI_OF)
+funnel(Insulin_overall_lnCVR_FI_OF)
+
+Insulin_FI_Exp_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnCVR = c(-0.3591,-0.3908),
+  ci.lb = c(-1.0858,-0.6345),
+  ci.ub = c(0.3675,-0.1470)
+)
+
+Insulin_FI_Exp_lnCVR
+
+
+
+#Plotting when split by exp type
+
+plot_Insulin_FI_exp_type_lnCVR <- ggplot(Insulin_FI_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="insulin variance, exp type", x = "Exp_Type", y = "lnCVR") +
+  labs(x = "Exp_Type", y = "lnCVR") +
   coord_flip()
-plot_insulin_exp_type_lnCVR
-
-
+plot_Insulin_FI_exp_type_lnCVR
 ```
 
-#### Running meta-analysis (Overall with moderators)
+#Insulin tolerance test analysis (lnCVR)
+```{r}
+Insulin_lnCVR_TT <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_TT_lnCVR, method = 'REML')
 
-```{r, echo=FALSE}
-#Adding moderators
-Insulin_Exp_lnCVR <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
+summary(Insulin_lnCVR_TT)
+funnel(Insulin_lnCVR_TT)
 
-summary(Insulin_Exp_lnCVR)
+#Tibble of overall results
 
-Insulin_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
-
-summary(Insulin_F0_lnCVR)
-
-Insulin_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
-
-summary(Insulin_Sex_lnCVR)
-
-Insulin_Test_Type_lnCVR <- rma.mv(yi, vi, mods = ~Trait_Info-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Insulin_lnCVR, method = 'REML')
-
-Insulin_Test_Type_lnCVR
-
-#Tibble of results
-
-Insulin_Mods_lnCVR <- tibble(
-  ID = c("Multigenerational", "One off","F0 Both", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FI", "ITT"),
-  lnCVR = c(Insulin_Exp_lnCVR$b[1],Insulin_Exp_lnCVR$b[2],Insulin_F0_lnCVR$b[1],Insulin_F0_lnCVR$b[2],Insulin_F0_lnCVR$b[3],Insulin_Sex_lnCVR$b[1],Insulin_Sex_lnCVR$b[2],Insulin_Sex_lnCVR$b[3],Insulin_Test_Type_lnCVR$b[1],Insulin_Test_Type_lnCVR$b[2]),
-  ci.lb = c(Insulin_Exp_lnCVR$ci.lb[1],Insulin_Exp_lnCVR$ci.lb[2],Insulin_F0_lnCVR$ci.lb[1],Insulin_F0_lnCVR$ci.lb[2],Insulin_F0_lnCVR$ci.lb[3],Insulin_Sex_lnCVR$ci.lb[1],Insulin_Sex_lnCVR$ci.lb[2],Insulin_Sex_lnCVR$ci.lb[3],Insulin_Test_Type_lnCVR$ci.lb[1],Insulin_Test_Type_lnCVR$ci.lb[2]),
-  ci.ub = c(Insulin_Exp_lnCVR$ci.ub[1],Insulin_Exp_lnCVR$ci.ub[2],Insulin_F0_lnCVR$ci.ub[1],Insulin_F0_lnCVR$ci.ub[2],Insulin_F0_lnCVR$ci.ub[3],Insulin_Sex_lnCVR$ci.ub[1],Insulin_Sex_lnCVR$ci.ub[2],Insulin_Sex_lnCVR$ci.ub[3],Insulin_Test_Type_lnCVR$ci.ub[1],Insulin_Test_Type_lnCVR$ci.ub[2])
+Insulin_overall_lnCVR_TT <- tibble(
+  ID = "Overall", 
+  lnCVR = 0.1278,
+  ci.lb = -0.0796,
+  ci.ub = 0.3351
 )
 
-plot_insulin_mods_lnCVR <- ggplot(Insulin_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
+plot_Insulin_overall_TT_lnCVR <- ggplot(Insulin_overall_lnCVR_TT, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Insulin variance, mods", x = "ID", y = "lnCVR") +
+  labs(x = "ID", y = "lnCVR") +
   coord_flip()
-plot_insulin_mods_lnCVR
+plot_Insulin_overall_TT_lnCVR
 
+#Split by exposure type
+
+Insulin_overall_lnCVR_TT_MG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_TT_lnCVR_MG, method = 'REML')
+
+summary(Insulin_overall_lnCVR_TT_MG)
+funnel(Insulin_overall_lnCVR_TT_MG)
+
+Insulin_overall_lnCVR_TT_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_TT_lnCVR_OF, method = 'REML')
+
+summary(Insulin_overall_lnCVR_TT_OF)
+funnel(Insulin_overall_lnCVR_TT_OF)
+
+Insulin_TT_Exp_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnCVR = c(0.3872,0.0385),
+  ci.lb = c(-0.1210,-0.2365),
+  ci.ub = c(0.8954,0.3134)
+)
+
+Insulin_TT_Exp_lnCVR
+
+
+
+#Plotting when split by exp type
+
+plot_Insulin_TT_exp_type_lnCVR <- ggplot(Insulin_TT_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Exp_Type", y = "lnCVR") +
+  coord_flip()
+plot_Insulin_TT_exp_type_lnCVR
 ```
+
+
+
