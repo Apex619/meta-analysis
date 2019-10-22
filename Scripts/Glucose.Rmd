@@ -2,7 +2,9 @@
 title: "Glucose_Analysis"
 author: "Hamza"
 date: "2 October 2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ## Meta-regression Glucose
@@ -17,286 +19,264 @@ library(readxl)
 ```
 
 ```{r}
-Glucose_lnRR <- read.csv("../data/Glucose_lnRR.csv")
+load(file="Effect_Size_All_Traits.RData")
+load(file="Effect_Size_All_Traits_lnCVR.RData")
+#lnRR
+Glucose_FBG_lnRR <- subset(Effect_Size_All_Traits, Effect_Size_All_Traits$Trait == "Glucose_FBG")
+Glucose_TT_lnRR<- subset(Effect_Size_All_Traits, Effect_Size_All_Traits$Trait == "Glucose_TT")
 
-ALL_TRAITS <- read.xlsx("../data/ALL_TRAITS.xlsx") 
+Glucose_FBG_lnRR_MG <- subset(Glucose_FBG_lnRR, Glucose_FBG_lnRR$Exposure_Type == "Multigenerational")
+Glucose_TT_lnRR_MG <- subset(Glucose_TT_lnRR, Glucose_TT_lnRR$Exposure_Type == "Multigenerational")
 
+Glucose_FBG_lnRR_OF <- subset(Glucose_FBG_lnRR, Glucose_FBG_lnRR$Exposure_Type == "One off")
+Glucose_TT_lnRR_OF <- subset(Glucose_TT_lnRR, Glucose_TT_lnRR$Exposure_Type == "One off")
+
+#lnCVR
+Glucose_FBG_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Glucose_FBG")
+Glucose_TT_lnCVR<- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Glucose_TT")
+
+Glucose_FBG_lnCVR_MG <- subset(Glucose_FBG_lnCVR, Glucose_FBG_lnCVR$Exposure_Type == "Multigenerational")
+Glucose_TT_lnCVR_MG <- subset(Glucose_TT_lnCVR, Glucose_TT_lnCVR$Exposure_Type == "Multigenerational")
+
+Glucose_FBG_lnCVR_OF <- subset(Glucose_FBG_lnCVR, Glucose_FBG_lnCVR$Exposure_Type == "One off")
+Glucose_TT_lnCVR_OF <- subset(Glucose_TT_lnCVR, Glucose_TT_lnCVR$Exposure_Type == "One off")
  
 ```
 
-
+#FBG Analysis (Overall and then split by exposure type)
 ```{r}
 
-#Subetting
+Glucose_overall_lnRR_FBG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_FBG_lnRR, method = 'REML')
 
-Glucose_MG <- subset(Glucose_lnRR, Glucose_lnRR$Exposure_Type == "Multigenerational")
-
-Glucose_OF <- subset(Glucose_lnRR, Glucose_lnRR$Exposure_Type == "One off")
-```
-
-```{r}
-
-#Overall analysis, not split
-
-Glucose_overall_lnRR <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
-
-summary(Glucose_overall_lnRR)
+summary(Glucose_overall_lnRR_FBG)
+funnel(Glucose_overall_lnRR_FBG)
 
 #Tibble of overall results
 
-Glucose_overall_lnRR <- tibble(
+Glucose_overall_lnRR_FBG <- tibble(
   ID = "Overall", 
-  lnRR = 0.1025,
-  ci.lb = 0.0138,
-  ci.ub = 0.1911
+  lnRR = 0.0875,
+  ci.lb = 0.0362,
+  ci.ub = 0.1388
 )
-```
 
-
-```{r}
-
-plot_Glucose_overall <- ggplot(Glucose_overall_lnRR, aes(x=ID, y=lnRR)) + 
+plot_Glucose_overall_FBG <- ggplot(Glucose_overall_lnRR_FBG, aes(x=ID, y=lnRR)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Glucose differences, overall", x = "ID", y = "lnRR") +
+  labs(x = "ID", y = "lnRR") +
   coord_flip()
-plot_Glucose_overall
-```
+plot_Glucose_overall_FBG
 
-```{r}
+#Split by exposure type
 
-#MG then OF
+Glucose_overall_lnRR_FBG_MG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_FBG_lnRR_MG, method = 'REML')
 
-Glucose_overall_MG <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_MG, method = 'REML')
+summary(Glucose_overall_lnRR_FBG_MG)
+funnel(Glucose_overall_lnRR_FBG_MG)
 
-summary(Glucose_overall_MG)
+Glucose_overall_lnRR_FBG_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_FBG_lnRR_OF, method = 'REML')
 
-Glucose_overall_OF <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_OF, method = 'REML')
+summary(Glucose_overall_lnRR_FBG_OF)
+funnel(Glucose_overall_lnRR_FBG_OF)
 
-summary(Glucose_overall_OF)
-
-
-#Tibble of results
-
-Glucose_Exp_lnRR <- tibble(
+Glucose_FBG_Exp_lnRR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnRR = c(0.2351, 0.0259),
-  ci.lb = c(0.0738, -0.0440),
-  ci.ub = c(0.3965, 0.0958)
+  lnRR = c(0.1189,0.0499),
+  ci.lb = c(0.0434,-0.0172),
+  ci.ub = c(0.1945,0.1171)
 )
 
-Glucose_Exp_lnRR
+Glucose_FBG_Exp_lnRR
 
 
 
 #Plotting when split by exp type
 
-plot_glucose_exp_type <- ggplot(Glucose_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
+plot_Glucose_FBG_exp_type <- ggplot(Glucose_FBG_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Glucose differences, exp type", x = "Exp_Type", y = "lnRR") +
+  labs(x = "Exp_Type", y = "lnRR") +
   coord_flip()
-plot_glucose_exp_type
+plot_Glucose_FBG_exp_type
 ```
 
-#### Running meta-analysis (Overall with moderators, and then overall split by exposure type with moderators)
-
-```{r, echo=FALSE}
-#Adding moderators
-Glucose_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
-
-summary(Glucose_Exp_Type)
-
-k_exp <- Glucose_lnRR %>% group_by(Exposure_Type) %>% count()
-k_exp
-
-Glucose_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
-
-summary(Glucose_F0)
-
-Glucose_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
-
-summary(Glucose_Sex)
-
-Glucose_Test_Type <- rma.mv(yi, vi, mods = ~Trait_Info-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnRR, method = 'REML')
-
-Glucose_Test_Type
-
-k_test <- Glucose_lnRR %>% group_by(Trait_Info) %>% count()
-k_test
-
-
-#Tibble of results
-
-Glucose_Mods_lnRR <- tibble(
-  ID = c("Multigenerational", "One off", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FBG", "GTT"),
-  lnRR = c(Glucose_Exp_Type$b[1],Glucose_Exp_Type$b[2],Glucose_F0$b[1],Glucose_F0$b[2],Glucose_Sex$b[1],Glucose_Sex$b[2],Glucose_Sex$b[3],Glucose_Test_Type$b[1],Glucose_Test_Type$b[2]),
-  ci.lb = c(Glucose_Exp_Type$ci.lb[1],Glucose_Exp_Type$ci.lb[2],Glucose_F0$ci.lb[1],Glucose_F0$ci.lb[2],Glucose_Sex$ci.lb[1],Glucose_Sex$ci.lb[2],Glucose_Sex$ci.lb[3],Glucose_Test_Type$ci.lb[1],Glucose_Test_Type$ci.lb[2]),
-  ci.ub = c(Glucose_Exp_Type$ci.ub[1],Glucose_Exp_Type$ci.ub[2],Glucose_F0$ci.ub[1],Glucose_F0$ci.ub[2],Glucose_Sex$ci.ub[1],Glucose_Sex$ci.ub[2],Glucose_Sex$ci.ub[3],Glucose_Test_Type$ci.ub[1],Glucose_Test_Type$ci.ub[2])
-),
-k= c(k_exp)
-
-plot_glucose_mods <- ggplot(Glucose_Mods_lnRR, aes(x=ID, y=lnRR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Glucose differences, mods", x = "ID", y = "lnRR") +
-  coord_flip()
-plot_glucose_mods
-
-k_exp$n[2]
-
-```
-
-
-
-## Meta-analysis overall results (lnCVR)
-
-### 4. Calculating effect sizes (Done)
-
-We calculated our effect sizes (lnCVR) for our complete data set (all traits).
-```{r, include = FALSE}
-
-Effect_Size_All_Traits_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
-
-#Converting into factors
-
-Effect_Size_All_Traits_lnCVR$Trait <- factor(Effect_Size_All_Traits_lnCVR$Trait)
-Effect_Size_All_Traits_lnCVR$Exposure_Type <- factor(Effect_Size_All_Traits_lnCVR$Exposure_Type)
-Effect_Size_All_Traits_lnCVR$Sex <- factor(Effect_Size_All_Traits_lnCVR$Sex)
-Effect_Size_All_Traits_lnCVR$Generation <- factor(Effect_Size_All_Traits_lnCVR$Generation)
-Effect_Size_All_Traits_lnCVR$Cohort_ID <- factor(Effect_Size_All_Traits_lnCVR$Cohort_ID)
-Effect_Size_All_Traits_lnCVR$Paper_ID <- factor(Effect_Size_All_Traits_lnCVR$Paper_ID)
-Effect_Size_All_Traits_lnCVR$Rodent_type <- factor(Effect_Size_All_Traits_lnCVR$Rodent_type)
-Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement <- factor(Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement)
-Effect_Size_All_Traits_lnCVR$Strain <- factor(Effect_Size_All_Traits_lnCVR$Strain)
-Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed <- factor(Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed)
-
-#Subset Glucose Data
-Glucose_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Trait == "Glucose")
-
-
-
-#Errors with spaces and converting back to factor
-Glucose_lnCVR$Sex <- gsub("Both ", "Both", Glucose_lnCVR$Sex) 
-Glucose_lnCVR$Sex <- as.factor(Glucose_lnCVR$Sex)
-
-
-
-#Subetting into MG and OF
-
-
-
-Glucose_lnCVR_MG <- subset(Glucose_lnCVR, Glucose_lnCVR$Exposure_Type == "Multigenerational")
-
-Glucose_lnCVR_OF <- subset(Glucose_lnCVR, Glucose_lnCVR$Exposure_Type == "One off")
-
-```
-
-#### 5. Running meta-analysis for glucose lnCVR (overall, and then overall split by exposure type)
-I conducted meta-analysis using lnCVR, first on the complete BW dataset, and then on subsetted data (split by one off and multigenerational exposure)
-
-```{r, echo = FALSE}
-#ALL OF and MG
-
-Glucose_lnCVR_0mods <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
-
-summary(Glucose_lnCVR_0mods)
-
-#Tibble of overall results
-
-Glucose_overall_lnCVR <- tibble(
-  ID = "Overall", 
-  lnCVR = -0.0064,
-  ci.lb = -0.1732,
-  ci.ub = 0.1604
-)
-
-plot_glucose_overall_lnCVR <- ggplot(Glucose_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
-  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Glucose variance, overall lnCVR", x = "ID", y = "lnCVR") +
-  coord_flip()
-plot_glucose_overall_lnCVR
-
-```
-
+#Tolerance test analysis (Overall and then split by exposure type)
 
 ```{r}
 
-# Modelling all traits with no mods MG (lnCVR)
-Glucose_lnCVR_0mods_MG <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR_MG, method = 'REML')
+Glucose_overall_lnRR_TT <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_TT_lnRR, method = 'REML')
 
+summary(Glucose_overall_lnRR_TT)
+funnel(Glucose_overall_lnRR_TT)
 
-summary(Glucose_lnCVR_0mods_MG)
+#Tibble of overall results
 
-# Modelling all traits with no mods OF (lnCVR)
-Glucose_lnCVR_0mods_OF <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR_OF, method = 'REML')
-
-summary(Glucose_lnCVR_0mods_OF)
-
-#Tibble of results
-
-Glucose_Exp_lnCVR <- tibble(
-  Exposure_Type = c("Multigenerational", "One off"),
-  lnCVR = c(-0.1799,0.1658 ),
-  ci.lb = c(-0.3465,-0.0024 ),
-  ci.ub = c(-0.0134,0.3340 )
+Glucose_overall_lnRR_TT <- tibble(
+  ID = "Overall", 
+  lnRR = 0.0541,
+  ci.lb = -0.0200,
+  ci.ub = 0.1283
 )
 
-Glucose_Exp_lnCVR
+plot_Glucose_overall_TT <- ggplot(Glucose_overall_lnRR_TT, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "ID", y = "lnRR") +
+  coord_flip()
+plot_Glucose_overall_TT
+
+#Split by exposure type
+
+Glucose_overall_lnRR_TT_MG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_TT_lnRR_MG, method = 'REML')
+
+summary(Glucose_overall_lnRR_TT_MG)
+funnel(Glucose_overall_lnRR_TT_MG)
+
+Glucose_overall_lnRR_TT_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_TT_lnRR_OF, method = 'REML')
+
+summary(Glucose_overall_lnRR_TT_OF)
+funnel(Glucose_overall_lnRR_TT_OF)
+
+Glucose_TT_Exp_lnRR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnRR = c(0.1949,-0.0012),
+  ci.lb = c(0.0124,-0.0552),
+  ci.ub = c(0.3774,0.0528)
+)
+
+Glucose_TT_Exp_lnRR
 
 
 
 #Plotting when split by exp type
 
-plot_glucose_exp_type_lnCVR <- ggplot(Glucose_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
+plot_Glucose_TT_exp_type <- ggplot(Glucose_TT_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Exp_Type", y = "lnRR") +
+  coord_flip()
+plot_Glucose_TT_exp_type
+```
+
+#FBG Analysis (lnCVR)
+```{r}
+Glucose_overall_lnCVR_FBG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_FBG_lnCVR, method = 'REML')
+
+summary(Glucose_overall_lnCVR_FBG)
+funnel(Glucose_overall_lnCVR_FBG)
+
+#Tibble of overall results
+
+Glucose_overall_lnCVR_FBG <- tibble(
+  ID = "Overall", 
+  lnCVR = -0.0725,
+  ci.lb = -0.3003,
+  ci.ub = 0.1552
+)
+
+plot_Glucose_overall_FBG_lnCVR <- ggplot(Glucose_overall_lnCVR_FBG, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "ID", y = "lnCVR") +
+  coord_flip()
+plot_Glucose_overall_FBG_lnCVR
+
+#Split by exposure type
+
+Glucose_overall_lnCVR_FBG_MG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_FBG_lnCVR_MG, method = 'REML')
+
+summary(Glucose_overall_lnCVR_FBG_MG)
+funnel(Glucose_overall_lnCVR_FBG_MG)
+
+Glucose_overall_lnCVR_FBG_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_FBG_lnCVR_OF, method = 'REML')
+
+summary(Glucose_overall_lnCVR_FBG_OF)
+funnel(Glucose_overall_lnCVR_FBG_OF)
+
+Glucose_FBG_Exp_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnCVR = c(-0.2477,0.3524),
+  ci.lb = c(-0.4446,0.0207),
+  ci.ub = c(-0.0508,0.6842)
+)
+
+Glucose_FBG_Exp_lnCVR
+
+
+
+#Plotting when split by exp type
+
+plot_Glucose_FBG_exp_type_lnCVR <- ggplot(Glucose_FBG_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="glucose variance, exp type", x = "Exp_Type", y = "lnCVR") +
+  labs(x = "Exp_Type", y = "lnCVR") +
   coord_flip()
-plot_glucose_exp_type_lnCVR
-
-
+plot_Glucose_FBG_exp_type_lnCVR
 ```
-#### Running meta-analysis (Overall with moderators)
-```{r, echo=FALSE}
-#Adding moderators
-Glucose_Exp_lnCVR <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
 
-summary(Glucose_Exp_lnCVR)
+#Tolerance test analysis (lnCVR)
+```{r}
 
-Glucose_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
+Glucose_overall_lnCVR_TT <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_TT_lnCVR, method = 'REML')
 
-summary(Glucose_F0_lnCVR)
+summary(Glucose_overall_lnCVR_TT)
+funnel(Glucose_overall_lnCVR_TT)
 
-Glucose_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
+#Tibble of overall results
 
-summary(Glucose_Sex_lnCVR)
-
-Glucose_Test_Type_lnCVR <- rma.mv(yi, vi, mods = ~Trait_Info-1, random = list(~1|Paper_ID,~1|Cohort_ID), data=Glucose_lnCVR, method = 'REML')
-
-Glucose_Test_Type_lnCVR
-
-#Tibble of results
-
-Glucose_Mods_lnCVR <- tibble(
-  ID = c("Multigenerational", "One off", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring", "FBG", "GTT"),
-  lnCVR = c(Glucose_Exp_lnCVR$b[1],Glucose_Exp_lnCVR$b[2],Glucose_F0_lnCVR$b[1],Glucose_F0_lnCVR$b[2],Glucose_Sex_lnCVR$b[1],Glucose_Sex_lnCVR$b[2],Glucose_Sex_lnCVR$b[3],Glucose_Test_Type_lnCVR$b[1],Glucose_Test_Type_lnCVR$b[2]),
-  ci.lb = c(Glucose_Exp_lnCVR$ci.lb[1],Glucose_Exp_lnCVR$ci.lb[2],Glucose_F0_lnCVR$ci.lb[1],Glucose_F0_lnCVR$ci.lb[2],Glucose_Sex_lnCVR$ci.lb[1],Glucose_Sex_lnCVR$ci.lb[2],Glucose_Sex_lnCVR$ci.lb[3],Glucose_Test_Type_lnCVR$ci.lb[1],Glucose_Test_Type_lnCVR$ci.lb[2]),
-  ci.ub = c(Glucose_Exp_lnCVR$ci.ub[1],Glucose_Exp_lnCVR$ci.ub[2],Glucose_F0_lnCVR$ci.ub[1],Glucose_F0_lnCVR$ci.ub[2],Glucose_Sex_lnCVR$ci.ub[1],Glucose_Sex_lnCVR$ci.ub[2],Glucose_Sex_lnCVR$ci.ub[3],Glucose_Test_Type_lnCVR$ci.ub[1],Glucose_Test_Type_lnCVR$ci.ub[2])
+Glucose_overall_lnCVR_TT <- tibble(
+  ID = "Overall", 
+  lnCVR = 0.0859,
+  ci.lb =-0.0699 ,
+  ci.ub =0.2416 
 )
 
-plot_glucose_mods_lnCVR <- ggplot(Glucose_Mods_lnCVR, aes(x=ID, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
+plot_Glucose_overall_TT_lnCVR <- ggplot(Glucose_overall_lnCVR_TT, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Glucose differences, mods", x = "ID", y = "lnCVR") +
+  labs(x = "ID", y = "lnCVR") +
   coord_flip()
-plot_glucose_mods_lnCVR
+plot_Glucose_overall_TT_lnCVR
 
+#Split by exposure type
+
+Glucose_overall_lnCVR_TT_MG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_TT_lnCVR_MG, method = 'REML')
+
+summary(Glucose_overall_lnCVR_TT_MG)
+funnel(Glucose_overall_lnCVR_TT_MG)
+
+Glucose_overall_lnCVR_TT_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_TT_lnCVR_OF, method = 'REML')
+
+summary(Glucose_overall_lnCVR_TT_OF)
+funnel(Glucose_overall_lnCVR_TT_OF)
+
+Glucose_TT_Exp_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"),
+  lnCVR = c(-0.0098,0.1176),
+  ci.lb = c(-0.3219,-0.0621),
+  ci.ub = c(0.3023,0.2973)
+)
+
+Glucose_TT_Exp_lnCVR
+
+
+
+#Plotting when split by exp type
+
+plot_Glucose_TT_exp_type_lnCVR <- ggplot(Glucose_TT_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Exp_Type", y = "lnCVR") +
+  coord_flip()
+plot_Glucose_TT_exp_type_lnCVR
 ```
+
+

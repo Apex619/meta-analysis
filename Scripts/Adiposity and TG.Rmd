@@ -11,7 +11,8 @@ output:
 library(tidyverse)
 library(openxlsx)  
 library(knitr)
-library(metafor)
+library(met
+        afor)
 library(ggplot2)
 library(readxl)
 ```

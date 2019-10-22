@@ -70,6 +70,8 @@ Effect_Size_All_Traits$Sex <- gsub("Both ", "Both", Effect_Size_All_Traits$Sex)
 MG_ALL <- subset(Effect_Size_All_Traits, Effect_Size_All_Traits$Exposure_Type == "Multigenerational")
 
 OF_ALL <- subset(Effect_Size_All_Traits, Effect_Size_All_Traits$Exposure_Type == "One off")
+
+write.csv(Effect_Size_All_Traits, file ="Effect_Size_All_Traits.csv")
 ```
 
 ### 2. Deciding random effects (Done)
