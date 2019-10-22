@@ -2,7 +2,9 @@
 title: "Insulin"
 author: "Hamza"
 date: "2 October 2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 ## Meta-regression Insulin
 
