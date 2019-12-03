@@ -53,9 +53,9 @@ funnel(Insulin_lnRR_FI)
 
 Insulin_overall_lnRR_FI <- tibble(
   ID = "Overall", 
-  lnRR = 0.3258,
-  ci.lb = 0.1253,
-  ci.ub = 0.5263
+  lnRR = Insulin_lnRR_FI$b[1],
+  ci.lb = Insulin_lnRR_FI$ci.lb[1],
+  ci.ub = Insulin_lnRR_FI$ci.ub[1]
 )
 
 plot_Insulin_overall_FI <- ggplot(Insulin_overall_lnRR_FI, aes(x=ID, y=lnRR)) + 
@@ -76,13 +76,17 @@ funnel(Insulin_overall_lnRR_FI_MG)
 Insulin_overall_lnRR_FI_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_FI_lnRR_OF, method = 'REML')
 
 summary(Insulin_overall_lnRR_FI_OF)
+k_exp <- Insulin_FI_lnRR_OF %>% group_by(Exposure_Type) %>% count()
+k_exp
+
+
 funnel(Insulin_overall_lnRR_FI_OF)
 
 Insulin_FI_Exp_lnRR <- tibble(
-  Exposure_Type = c("Multigenerational", "One off"),
-  lnRR = c(1.1817,0.1346),
-  ci.lb = c(0.1612,0.0389),
-  ci.ub = c(2.2022,0.2303)
+  Exposure_Type = c("Multigenerational","One off"),
+  lnRR = c(Insulin_overall_lnRR_FI_MG$b[1],Insulin_overall_lnRR_FI_OF$b[1]),
+  ci.lb = c(Insulin_overall_lnRR_FI_MG$ci.lb[1],Insulin_overall_lnRR_FI_OF$ci.lb[1]),
+  ci.ub = c(Insulin_overall_lnRR_FI_MG$ci.ub[1],Insulin_overall_lnRR_FI_OF$ci.ub[1])
 )
 
 Insulin_FI_Exp_lnRR
@@ -92,7 +96,7 @@ Insulin_FI_Exp_lnRR
 #Plotting when split by exp type
 
 plot_Insulin_FI_exp_type <- ggplot(Insulin_FI_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "Exp_Type", y = "lnRR") +
@@ -112,9 +116,9 @@ funnel(Insulin_lnRR_TT)
 
 Insulin_overall_lnRR_TT <- tibble(
   ID = "Overall", 
-  lnRR = 0.0288,
-  ci.lb = -0.1999,
-  ci.ub = 0.2575
+  lnRR = Insulin_lnRR_TT$b[1],
+  ci.lb = Insulin_lnRR_TT$ci.lb[1],
+  ci.ub = Insulin_lnRR_TT$ci.ub[1]
 )
 
 plot_Insulin_overall_TT <- ggplot(Insulin_overall_lnRR_TT, aes(x=ID, y=lnRR)) + 
@@ -135,13 +139,16 @@ funnel(Insulin_overall_lnRR_TT_MG)
 Insulin_overall_lnRR_TT_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Insulin_TT_lnRR_OF, method = 'REML')
 
 summary(Insulin_overall_lnRR_TT_OF)
+k_exp <- Insulin_TT_lnRR_OF %>% group_by(Exposure_Type) %>% count()
+k_exp
+
 funnel(Insulin_overall_lnRR_TT_OF)
 
 Insulin_TT_Exp_lnRR <- tibble(
-  Exposure_Type = c("Multigenerational", "One off"),
-  lnRR = c(0.1149,-0.0470),
-  ci.lb = c(-0.5066,-0.2566),
-  ci.ub = c(0.7365,0.1625)
+  Exposure_Type = c("Multigenerational","One off"),
+  lnRR = c(Insulin_overall_lnRR_TT_MG$b[1],Insulin_overall_lnRR_TT_OF$b[1]),
+  ci.lb = c(Insulin_overall_lnRR_TT_MG$ci.lb[1],Insulin_overall_lnRR_TT_OF$ci.lb[1]),
+  ci.ub = c(Insulin_overall_lnRR_TT_MG$ci.ub[1],Insulin_overall_lnRR_TT_OF$ci.ub[1])
 )
 
 Insulin_TT_Exp_lnRR
@@ -151,7 +158,7 @@ Insulin_TT_Exp_lnRR
 #Plotting when split by exp type
 
 plot_Insulin_TT_exp_type <- ggplot(Insulin_TT_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "Exp_Type", y = "lnRR") +
@@ -170,9 +177,9 @@ funnel(Insulin_lnCVR_FI)
 
 Insulin_overall_lnCVR_FI <- tibble(
   ID = "Overall", 
-  lnCVR = -0.3878,
-  ci.lb = -0.6348,
-  ci.ub = -0.1409
+  lnCVR = Insulin_lnCVR_FI$b[1],
+  ci.lb = Insulin_lnCVR_FI$ci.lb[1],
+  ci.ub = Insulin_lnCVR_FI$ci.ub[1]
 )
 
 plot_Insulin_overall_FI_lnCVR <- ggplot(Insulin_overall_lnCVR_FI, aes(x=ID, y=lnCVR)) + 
@@ -197,9 +204,9 @@ funnel(Insulin_overall_lnCVR_FI_OF)
 
 Insulin_FI_Exp_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnCVR = c(-0.3591,-0.3908),
-  ci.lb = c(-1.0858,-0.6345),
-  ci.ub = c(0.3675,-0.1470)
+  lnCVR = c(Insulin_overall_lnCVR_FI_MG$b[1],Insulin_overall_lnCVR_FI_OF$b[1]),
+  ci.lb = c(Insulin_overall_lnCVR_FI_MG$ci.lb[1],Insulin_overall_lnCVR_FI_OF$ci.lb[1]),
+  ci.ub = c(Insulin_overall_lnCVR_FI_MG$ci.ub[1],Insulin_overall_lnCVR_FI_OF$ci.ub[1])
 )
 
 Insulin_FI_Exp_lnCVR
@@ -228,9 +235,9 @@ funnel(Insulin_lnCVR_TT)
 
 Insulin_overall_lnCVR_TT <- tibble(
   ID = "Overall", 
-  lnCVR = 0.1278,
-  ci.lb = -0.0796,
-  ci.ub = 0.3351
+  lnCVR = Insulin_lnCVR_TT$b[1],
+  ci.lb = Insulin_lnCVR_TT$ci.lb[1],
+  ci.ub = Insulin_lnCVR_TT$ci.ub[1]
 )
 
 plot_Insulin_overall_TT_lnCVR <- ggplot(Insulin_overall_lnCVR_TT, aes(x=ID, y=lnCVR)) + 
@@ -255,9 +262,9 @@ funnel(Insulin_overall_lnCVR_TT_OF)
 
 Insulin_TT_Exp_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnCVR = c(0.3872,0.0385),
-  ci.lb = c(-0.1210,-0.2365),
-  ci.ub = c(0.8954,0.3134)
+  lnCVR = c(Insulin_overall_lnCVR_TT_MG$b[1],Insulin_overall_lnCVR_TT_OF$b[1]),
+  ci.lb = c(Insulin_overall_lnCVR_TT_MG$ci.lb[1],Insulin_overall_lnCVR_TT_OF$ci.lb[1]),
+  ci.ub = c(Insulin_overall_lnCVR_TT_MG$ci.ub[1],Insulin_overall_lnCVR_TT_OF$ci.ub[1])
 )
 
 Insulin_TT_Exp_lnCVR
@@ -267,7 +274,7 @@ Insulin_TT_Exp_lnCVR
 #Plotting when split by exp type
 
 plot_Insulin_TT_exp_type_lnCVR <- ggplot(Insulin_TT_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "Exp_Type", y = "lnCVR") +

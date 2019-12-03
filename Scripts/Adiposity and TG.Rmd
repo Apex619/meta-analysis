@@ -11,8 +11,7 @@ output:
 library(tidyverse)
 library(openxlsx)  
 library(knitr)
-library(met
-        afor)
+library(metafor)
 library(ggplot2)
 library(readxl)
 ```
@@ -40,9 +39,9 @@ funnel(Adiposity_overall_lnRR_0mods)
 
 Adiposity_overall_lnRR <- tibble(
   ID = "Overall", 
-  lnRR = 0.7172,
-  ci.lb = 0.1899,
-  ci.ub = 1.2445
+  lnRR = Adiposity_overall_lnRR_0mods$b[1],
+  ci.lb = Adiposity_overall_lnRR_0mods$ci.lb[1],
+  ci.ub = Adiposity_overall_lnRR_0mods$ci.ub[1]
 )
 
 plot_adiposity_overall <- ggplot(Adiposity_overall_lnRR, aes(x=ID, y=lnRR)) + 
@@ -68,10 +67,10 @@ summary(Adiposity_overall_lnRR_OF)
 funnel (Adiposity_overall_lnRR_OF)
 
 Adiposity_Exp_lnRR <- tibble(
-  Exposure_Type = c("Multigenerational", "One off"),
-  lnRR = c(1.2407,0.1194),
-  ci.lb = c(0.5792,-0.0079),
-  ci.ub = c(1.9022,0.2466)
+  Exposure_Type = c("Multigenerational","One off"),
+  lnRR = c(Adiposity_overall_lnRR_MG$b[1],Adiposity_overall_lnRR_OF$b[1]),
+  ci.lb = c(Adiposity_overall_lnRR_MG$ci.lb[1],Adiposity_overall_lnRR_OF$ci.lb[1]),
+  ci.ub = c(Adiposity_overall_lnRR_MG$ci.ub[1],Adiposity_overall_lnRR_OF$ci.ub[1])
 )
 
 Adiposity_Exp_lnRR
@@ -81,7 +80,7 @@ Adiposity_Exp_lnRR
 #Plotting when split by exp type
 
 plot_Adiposity_exp_type <- ggplot(Adiposity_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "Exp_Type", y = "lnRR") +
@@ -99,7 +98,6 @@ Adiposity_OF_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|
 
 Adiposity_OF_F0
 
-
 Adiposity_MG_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Adiposity_lnRR_MG, method = 'REML')
 
 Adiposity_MG_Sex
@@ -108,25 +106,28 @@ Adiposity_OF_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|C
 
 Adiposity_OF_Sex
 
+
 Adiposity_Exp_mods_lnRR <- tibble(
   Exposure_Type = c("Multigenerational","Multigenerational", "One off", "One off", "Multigenerational", "Multigenerational", "One off","One off"),
-  mod = c("F0 Female","F0 Male", "F0 Female", "F0 Male","Female Offspring", "Male Offspring","Female Offspring", "Male Offspring"),
-  lnRR = c(1.3709,0.6531,0.1384,-0.0011,1.1890,1.2919,0.0423,0.1976),
-  ci.lb = c(0.6043,-0.9971,-0.0080,-0.4012,0.5005,0.6033,-0.1069,0.0513),
-  ci.ub = c(2.1375,2.3034,0.2849,0.3990,1.8774,1.9805,0.1914,0.3438)
+  Sex = c("Female","Male", "Female", "Male","Female", "Male","Female", "Male"),
+  Mod = c("F0 Exposed","F0 Exposed","F0 Exposed","F0 Exposed","Grand-offspring","Grand-offspring","Grand-offspring","Grand-offspring"),
+  lnRR = c(Adiposity_MG_F0$b[1],Adiposity_MG_F0$b[2],Adiposity_OF_F0$b[1],Adiposity_OF_F0$b[2],Adiposity_MG_Sex$b[1],Adiposity_MG_Sex$b[2],Adiposity_OF_Sex$b[1],Adiposity_OF_Sex$b[2]),
+  ci.lb = c(Adiposity_MG_F0$ci.lb[1],Adiposity_MG_F0$ci.lb[2],Adiposity_OF_F0$ci.lb[1],Adiposity_OF_F0$ci.lb[2],Adiposity_MG_Sex$ci.lb[1],Adiposity_MG_Sex$ci.lb[2],Adiposity_OF_Sex$ci.lb[1],Adiposity_OF_Sex$ci.lb[2]),
+  ci.ub = c(Adiposity_MG_F0$ci.ub[1],Adiposity_MG_F0$ci.ub[2],Adiposity_OF_F0$ci.ub[1],Adiposity_OF_F0$ci.ub[2],Adiposity_MG_Sex$ci.ub[1],Adiposity_MG_Sex$ci.ub[2],Adiposity_OF_Sex$ci.ub[1],Adiposity_OF_Sex$ci.ub[2])
 )
 
-plot_Adiposity_lnRR_mods_exp <- ggplot(Adiposity_Exp_mods_lnRR, aes(x=mod, y=lnRR, colour=Exposure_Type))+ 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = mod, y = lnRR), position = position_dodge(0.3))+
+plot_Adiposity_lnRR_mods_exp <- ggplot(Adiposity_Exp_mods_lnRR, aes(x=Sex, y=lnRR, colour=Exposure_Type))+ 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
+  geom_point(aes(x = Sex, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(x = "mod", y = "lnRR") +
-  coord_flip()
+  labs(x = "Sex", y = "lnRR") +
+  coord_flip()+
+  facet_grid(~Mod)
  
 plot_Adiposity_lnRR_mods_exp
 ```
 
-#ADiposity lnCVR
+#Adiposity lnCVR
 ```{r}
 
 #Subset Adiposity lnCVR Data
@@ -143,12 +144,20 @@ summary(Adiposity_overall_lnCVR_0mods)
 
 #Tibble of overall results
 
-Insulin_overall_lnCVR <- tibble(
+Adiposity_overall_lnCVR <- tibble(
   ID = "Overall", 
-  lnCVR = -0.0529,
-  ci.lb = -0.2818,
-  ci.ub = 0.175
+  lnCVR = Adiposity_overall_lnCVR_0mods$b[1],
+  ci.lb = Adiposity_overall_lnCVR_0mods$ci.lb[1],
+  ci.ub = Adiposity_overall_lnCVR_0mods$ci.ub[1]
 )
+
+plot_adiposity_overall_lnCVR <- ggplot(Adiposity_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "ID", y = "lnRR") +
+  coord_flip()
+plot_adiposity_overall_lnCVR
 
 ```
 #Adiposity lnCVR (split by exposure type)
@@ -165,9 +174,9 @@ funnel (Adiposity_overall_lnCVR_OF)
 
 Adiposity_Exp_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnCVR = c(0.0018,-0.0857),
-  ci.lb = c(-0.3380,-0.3660),
-  ci.ub = c(0.3415,0.1946)
+  lnCVR = c(Adiposity_overall_lnCVR_MG$b[1],Adiposity_overall_lnCVR_OF$b[1]),
+  ci.lb = c(Adiposity_overall_lnCVR_MG$ci.lb[1],Adiposity_overall_lnCVR_OF$ci.lb[1]),
+  ci.ub = c(Adiposity_overall_lnCVR_MG$ci.ub[1],Adiposity_overall_lnCVR_OF$ci.ub[1])
 )
 
 Adiposity_Exp_lnCVR
@@ -206,18 +215,20 @@ Adiposity_OF_Sex_lnCVR
 
 Adiposity_Exp_mods_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational","Multigenerational", "One off", "One off", "Multigenerational", "Multigenerational", "One off","One off"),
-  mod = c("F0 Female","F0 Male", "F0 Female", "F0 Male","Female Offspring", "Male Offspring","Female Offspring", "Male Offspring"),
-  lnCVR = c(0.0503,-0.0858,-0.1104,0.0600,0.0267,-0.0252,0.0154,-0.1752),
-  ci.lb = c(-0.3711,-0.9736,-0.4445,-0.6657,-0.4326,-0.4377,-0.3060,-0.4899),
-  ci.ub = c(0.4717,0.8020,0.2237,0.7857,0.4860,0.3873,0.3368,0.1394)
+  Sex = c("Female","Male", "Female", "Male","Female", "Male","Female", "Male"),
+  Mod = c("F0 Exposed","F0 Exposed","F0 Exposed","F0 Exposed","Grand-offspring","Grand-offspring","Grand-offspring","Grand-offspring"),
+  lnCVR = c(Adiposity_MG_F0_lnCVR$b[1],Adiposity_MG_F0_lnCVR$b[2],Adiposity_OF_F0_lnCVR$b[1],Adiposity_OF_F0_lnCVR$b[2],Adiposity_MG_Sex_lnCVR$b[1],Adiposity_MG_Sex_lnCVR$b[2],Adiposity_OF_Sex_lnCVR$b[1],Adiposity_OF_Sex_lnCVR$b[2]),
+  ci.lb = c(Adiposity_MG_F0_lnCVR$ci.lb[1],Adiposity_MG_F0_lnCVR$ci.lb[2],Adiposity_OF_F0_lnCVR$ci.lb[1],Adiposity_OF_F0_lnCVR$ci.lb[2],Adiposity_MG_Sex_lnCVR$ci.lb[1],Adiposity_MG_Sex_lnCVR$ci.lb[2],Adiposity_OF_Sex_lnCVR$ci.lb[1],Adiposity_OF_Sex_lnCVR$ci.lb[2]),
+  ci.ub = c(Adiposity_MG_F0_lnCVR$ci.ub[1],Adiposity_MG_F0_lnCVR$ci.ub[2],Adiposity_OF_F0_lnCVR$ci.ub[1],Adiposity_OF_F0_lnCVR$ci.ub[2],Adiposity_MG_Sex_lnCVR$ci.ub[1],Adiposity_MG_Sex_lnCVR$ci.ub[2],Adiposity_OF_Sex_lnCVR$ci.ub[1],Adiposity_OF_Sex_lnCVR$ci.ub[2])
 )
 
-plot_Adiposity_lnCVR_mods_exp <- ggplot(Adiposity_Exp_mods_lnCVR, aes(x=mod, y=lnCVR, colour=Exposure_Type))+ 
+plot_Adiposity_lnCVR_mods_exp <- ggplot(Adiposity_Exp_mods_lnCVR, aes(x=Sex, y=lnCVR, colour=Exposure_Type))+ 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = mod, y = lnCVR), position = position_dodge(0.3))+
+  geom_point(aes(x = Sex, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(x = "mod", y = "lnCVR") +
-  coord_flip()
+  labs(x = "Sex", y = "lnCVR") +
+  coord_flip()+
+  facet_grid(~Mod)
  
 plot_Adiposity_lnCVR_mods_exp
 

@@ -49,19 +49,19 @@ Glucose_TT_lnCVR_OF <- subset(Glucose_TT_lnCVR, Glucose_TT_lnCVR$Exposure_Type =
 Glucose_overall_lnRR_FBG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_FBG_lnRR, method = 'REML')
 
 summary(Glucose_overall_lnRR_FBG)
-funnel(Glucose_overall_lnRR_FBG)
+funnel(Glucose_overall_lnRR_FBG,yaxis="seinv")
 
 #Tibble of overall results
 
 Glucose_overall_lnRR_FBG <- tibble(
   ID = "Overall", 
-  lnRR = 0.0875,
-  ci.lb = 0.0362,
-  ci.ub = 0.1388
+  lnRR = Glucose_overall_lnRR_FBG$b[1],
+  ci.lb = Glucose_overall_lnRR_FBG$ci.lb[1],
+  ci.ub = Glucose_overall_lnRR_FBG$ci.ub[1]
 )
 
 plot_Glucose_overall_FBG <- ggplot(Glucose_overall_lnRR_FBG, aes(x=ID, y=lnRR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "ID", y = "lnRR") +
@@ -73,18 +73,21 @@ plot_Glucose_overall_FBG
 Glucose_overall_lnRR_FBG_MG <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_FBG_lnRR_MG, method = 'REML')
 
 summary(Glucose_overall_lnRR_FBG_MG)
-funnel(Glucose_overall_lnRR_FBG_MG)
+funnel(Glucose_overall_lnRR_FBG_MG,yaxis="seinv")
 
 Glucose_overall_lnRR_FBG_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_FBG_lnRR_OF, method = 'REML')
 
 summary(Glucose_overall_lnRR_FBG_OF)
-funnel(Glucose_overall_lnRR_FBG_OF)
+funnel(Glucose_overall_lnRR_FBG_OF,yaxis="seinv")
+k_exp <- Glucose_FBG_lnRR_OF %>% group_by(Exposure_Type) %>% count()
+k_exp
+
 
 Glucose_FBG_Exp_lnRR <- tibble(
-  Exposure_Type = c("Multigenerational", "One off"),
-  lnRR = c(0.1189,0.0499),
-  ci.lb = c(0.0434,-0.0172),
-  ci.ub = c(0.1945,0.1171)
+  Exposure_Type = c("Multigenertional","One off"),
+  lnRR = c(Glucose_overall_lnRR_FBG_MG$b[1],Glucose_overall_lnRR_FBG_OF$b[1]),
+  ci.lb = c(Glucose_overall_lnRR_FBG_MG$ci.lb[1],Glucose_overall_lnRR_FBG_OF$ci.lb[1]),
+  ci.ub = c(Glucose_overall_lnRR_FBG_MG$ci.ub[1],Glucose_overall_lnRR_FBG_OF$ci.ub[1])
 )
 
 Glucose_FBG_Exp_lnRR
@@ -94,7 +97,7 @@ Glucose_FBG_Exp_lnRR
 #Plotting when split by exp type
 
 plot_Glucose_FBG_exp_type <- ggplot(Glucose_FBG_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "Exp_Type", y = "lnRR") +
@@ -109,19 +112,19 @@ plot_Glucose_FBG_exp_type
 Glucose_overall_lnRR_TT <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_TT_lnRR, method = 'REML')
 
 summary(Glucose_overall_lnRR_TT)
-funnel(Glucose_overall_lnRR_TT)
+funnel(Glucose_overall_lnRR_TT,yaxis="seinv")
 
 #Tibble of overall results
 
 Glucose_overall_lnRR_TT <- tibble(
   ID = "Overall", 
-  lnRR = 0.0541,
-  ci.lb = -0.0200,
-  ci.ub = 0.1283
+  lnRR = Glucose_overall_lnRR_TT$b[1],
+  ci.lb = Glucose_overall_lnRR_TT$ci.lb[1],
+  ci.ub = Glucose_overall_lnRR_TT$ci.ub[1]
 )
 
 plot_Glucose_overall_TT <- ggplot(Glucose_overall_lnRR_TT, aes(x=ID, y=lnRR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "ID", y = "lnRR") +
@@ -138,13 +141,17 @@ funnel(Glucose_overall_lnRR_TT_MG)
 Glucose_overall_lnRR_TT_OF <- rma.mv(yi, vi, random = list(~1|ES_ID,~1|Cohort_ID), data=Glucose_TT_lnRR_OF, method = 'REML')
 
 summary(Glucose_overall_lnRR_TT_OF)
+k_exp <- Glucose_TT_lnRR_OF %>% group_by(Exposure_Type) %>% count()
+k_exp
+
+
 funnel(Glucose_overall_lnRR_TT_OF)
 
 Glucose_TT_Exp_lnRR <- tibble(
-  Exposure_Type = c("Multigenerational", "One off"),
-  lnRR = c(0.1949,-0.0012),
-  ci.lb = c(0.0124,-0.0552),
-  ci.ub = c(0.3774,0.0528)
+  Exposure_Type = c("Multigenerational","One off"),
+  lnRR = c(Glucose_overall_lnRR_TT_MG$b[1],Glucose_overall_lnRR_TT_OF$b[1]),
+  ci.lb = c(Glucose_overall_lnRR_TT_MG$ci.lb[1],Glucose_overall_lnRR_TT_OF$ci.lb[1]),
+  ci.ub = c(Glucose_overall_lnRR_TT_MG$ci.ub[1],Glucose_overall_lnRR_TT_OF$ci.ub[1])
 )
 
 Glucose_TT_Exp_lnRR
@@ -154,7 +161,7 @@ Glucose_TT_Exp_lnRR
 #Plotting when split by exp type
 
 plot_Glucose_TT_exp_type <- ggplot(Glucose_TT_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "Exp_Type", y = "lnRR") +
@@ -173,9 +180,9 @@ funnel(Glucose_overall_lnCVR_FBG)
 
 Glucose_overall_lnCVR_FBG <- tibble(
   ID = "Overall", 
-  lnCVR = -0.0725,
-  ci.lb = -0.3003,
-  ci.ub = 0.1552
+  lnCVR = Glucose_overall_lnCVR_FBG$b[1],
+  ci.lb = Glucose_overall_lnCVR_FBG$ci.lb[1],
+  ci.ub = Glucose_overall_lnCVR_FBG$ci.ub[1]
 )
 
 plot_Glucose_overall_FBG_lnCVR <- ggplot(Glucose_overall_lnCVR_FBG, aes(x=ID, y=lnCVR)) + 
@@ -200,9 +207,9 @@ funnel(Glucose_overall_lnCVR_FBG_OF)
 
 Glucose_FBG_Exp_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnCVR = c(-0.2477,0.3524),
-  ci.lb = c(-0.4446,0.0207),
-  ci.ub = c(-0.0508,0.6842)
+  lnCVR = c(Glucose_overall_lnCVR_FBG_MG$b[1],Glucose_overall_lnCVR_FBG_OF$b[1]),
+  ci.lb = c(Glucose_overall_lnCVR_FBG_MG$ci.lb[1],Glucose_overall_lnCVR_FBG_OF$ci.lb[1]),
+  ci.ub = c(Glucose_overall_lnCVR_FBG_MG$ci.ub[1],Glucose_overall_lnCVR_FBG_OF$ci.ub[1])
 )
 
 Glucose_FBG_Exp_lnCVR
@@ -212,7 +219,7 @@ Glucose_FBG_Exp_lnCVR
 #Plotting when split by exp type
 
 plot_Glucose_FBG_exp_type_lnCVR <- ggplot(Glucose_FBG_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "Exp_Type", y = "lnCVR") +
@@ -232,9 +239,9 @@ funnel(Glucose_overall_lnCVR_TT)
 
 Glucose_overall_lnCVR_TT <- tibble(
   ID = "Overall", 
-  lnCVR = 0.0859,
-  ci.lb =-0.0699 ,
-  ci.ub =0.2416 
+  lnCVR = Glucose_overall_lnCVR_TT$b[1],
+  ci.lb =Glucose_overall_lnCVR_TT$ci.lb[1] ,
+  ci.ub =Glucose_overall_lnCVR_TT$ci.ub[1] 
 )
 
 plot_Glucose_overall_TT_lnCVR <- ggplot(Glucose_overall_lnCVR_TT, aes(x=ID, y=lnCVR)) + 
@@ -259,9 +266,9 @@ funnel(Glucose_overall_lnCVR_TT_OF)
 
 Glucose_TT_Exp_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnCVR = c(-0.0098,0.1176),
-  ci.lb = c(-0.3219,-0.0621),
-  ci.ub = c(0.3023,0.2973)
+  lnCVR = c(Glucose_overall_lnCVR_TT_MG$b[1],Glucose_overall_lnCVR_TT_OF$b[1]),
+  ci.lb = c(Glucose_overall_lnCVR_TT_MG$ci.lb[1],Glucose_overall_lnCVR_TT_OF$ci.lb[1]),
+  ci.ub = c(Glucose_overall_lnCVR_TT_MG$ci.ub[1],Glucose_overall_lnCVR_TT_OF$ci.ub[1])
 )
 
 Glucose_TT_Exp_lnCVR
@@ -271,7 +278,7 @@ Glucose_TT_Exp_lnCVR
 #Plotting when split by exp type
 
 plot_Glucose_TT_exp_type_lnCVR <- ggplot(Glucose_TT_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "Exp_Type", y = "lnCVR") +

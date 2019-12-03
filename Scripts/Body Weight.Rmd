@@ -32,23 +32,26 @@ Body_Weight_lnRR_MG <- subset(Body_Weight_lnRR, Body_Weight_lnRR$Exposure_Type =
 
 Body_Weight_lnRR_OF <- subset(Body_Weight_lnRR, Body_Weight_lnRR$Exposure_Type == "One off")
 ```
+
 #Overall analysis, not split
 ```{r}
-
 
 
 Body_Weight_overall <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnRR, method = 'REML')
 
 summary(Body_Weight_overall)
-funnel(Body_Weight_overall)
+funnel(Body_Weight_overall,yaxis="seinv")
+
+
+
 
 #Tibble of overall results
 
 Body_Weight_overall_lnRR <- tibble(
   ID = "Overall", 
-  lnRR = 0.1018,
-  ci.lb = 0.0128,
-  ci.ub = 0.1909
+  lnRR = Body_Weight_overall$b[1],
+  ci.lb = Body_Weight_overall$ci.lb[1],
+  ci.ub = Body_Weight_overall$ci.ub[1]
 )
 
 plot_BW_overall <- ggplot(Body_Weight_overall_lnRR, aes(x=ID, y=lnRR)) + 
@@ -68,22 +71,24 @@ plot_BW_overall
 Body_Weight_MG <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnRR_MG, method = 'REML')
 
 summary(Body_Weight_MG)
-funnel(Body_Weight_MG)
+funnel(Body_Weight_MG,yaxis="seinv")
 
 Body_Weight_OF <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnRR_OF, method = 'REML')
 
 summary(Body_Weight_OF)
-funnel(Body_Weight_OF)
+funnel(Body_Weight_OF,yaxis="seinv")
+
 
 #Tibble of results
 
 Body_Weight_Exp_lnRR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  k = c(52,94),
-  lnRR = c(0.1952, 0.0245),
-  ci.lb = c(0.0337, 0.0018),
-  ci.ub = c(0.3566, 0.0471)
+  k = c(94),
+  lnRR = c(Body_Weight_MG$b[1],Body_Weight_OF$b[1]),
+  ci.lb = c(Body_Weight_MG$ci.lb[1],Body_Weight_OF$ci.lb[1]),
+  ci.ub = c(Body_Weight_MG$ci.ub[1],Body_Weight_OF$ci.ub[1])
 )
+
 
 Body_Weight_Exp_lnRR
 
@@ -92,10 +97,10 @@ Body_Weight_Exp_lnRR
 #Plotting when split by exp type
 
 plot_BW_exp_type <- ggplot(Body_Weight_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Body Weight differences, exp type", x = "Exp_Type", y = "lnRR") +
+  labs(x = "Exp_Type", y = "lnRR") +
   coord_flip()
 plot_BW_exp_type
 ```
@@ -106,22 +111,23 @@ plot_BW_exp_type
 BW_Exp_Type <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnRR, method = 'REML')
 
 BW_Exp_Type
-funnel(BW_Exp_Type)
+funnel(BW_Exp_Type,yaxis="seinv")
 
 BW_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnRR, method = 'REML')
 
 summary(BW_F0)
-funnel(BW_F0)
+funnel(BW_F0,yaxis="seinv")
 
 BW_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnRR, method = 'REML')
 
 summary(BW_Sex)
-funnel(BW_Sex)
+funnel(BW_Sex,yaxis="seinv")
 
 #Tibble of results
 
 Body_Weight_Mods_lnRR <- tibble(
-  ID = c("Multigenerational", "One off", "Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
+  ID = c("Multigenerational", "One off", "Both", "Female", "Male", "Both", "Female", "Male"),
+  Mod = c("Exposure Type", "Exposure Type", "Exposed F0", "Exposed F0","Exposed F0", "Grand-offspring Sex", "Grand-offspring Sex", "Grand-offspring Sex"),
   lnRR = c(BW_Exp_Type$b[1],BW_Exp_Type$b[2],BW_F0$b[1],BW_F0$b[2],BW_F0$b[3],BW_Sex$b[1],BW_Sex$b[2],BW_Sex$b[3]),
   ci.lb = c(BW_Exp_Type$ci.lb[1],BW_Exp_Type$ci.lb[2],BW_F0$ci.lb[1],BW_F0$ci.lb[2],BW_F0$ci.lb[3],BW_Sex$ci.lb[1],BW_Sex$ci.lb[2],BW_Sex$ci.lb[3]),
   ci.ub = c(BW_Exp_Type$ci.ub[1],BW_Exp_Type$ci.ub[2],BW_F0$ci.ub[1],BW_F0$ci.ub[2],BW_F0$ci.ub[3],BW_Sex$ci.ub[1],BW_Sex$ci.ub[2],BW_Sex$ci.ub[3])
@@ -134,10 +140,14 @@ plot_BW_mods <- ggplot(Body_Weight_Mods_lnRR, aes(x=ID, y=lnRR)) +
   geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "Exp_Type", y = "lnRR") +
-  coord_flip()
+  coord_flip()+
+  facet_grid(~Mod)
 plot_BW_mods
 
 ```
+
+
+
 ```{r}
 #splitting by exposure type
 
@@ -148,9 +158,12 @@ Body_Weight_MG_F0
 Body_Weight_OF_F0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnRR_OF, method = 'REML')
 
 Body_Weight_OF_F0
-
+k_exp <- Body_Weight_lnRR_OF %>% group_by(F0_Parent_Exposed) %>% count()
+k_exp
 
 Body_Weight_MG_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnRR_MG, method = 'REML')
+
+
 
 Body_Weight_MG_Sex
 
@@ -158,20 +171,26 @@ Body_Weight_OF_Sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1
 
 Body_Weight_OF_Sex
 
+
+k_exp <- Body_Weight_lnRR_OF %>% group_by(Sex) %>% count()
+k_exp
+
 Overall_Exp_mods_lnRR <- tibble(
   Exposure_Type = c("Multigenerational","Multigenerational", "One off", "One off", "One off", "Multigenerational", "Multigenerational","Multigenerational", "One off","One off","One off" ),
-  mod = c("F0 Female","F0 Male", "F0 Both", "F0 Female", "F0 Male","Both Offspring Sex","Female Offspring", "Male Offspring", "Both Offspring Sex","Female Offspring", "Male Offspring"),
-  lnRR = c(0.2197,0.0723,0.1409,0.0296,0.0025,-0.0353,0.2799,0.2805,-0.1987,0.0242,0.0252),
-  ci.lb = c(0.0378,-0.3345,0.0592,0.0039,-0.0367,-0.3238,0.1021,0.1008,-0.9166,-0.0012,0.0002),
-  ci.ub = c(0.4015,0.4791,0.2226,0.0553,0.0417,0.2532,0.4576,0.4602,0.5192,0.0496,0.0502)
+  Sex = c("Female","Male", "Both", "Female", "Male","Both","Female", "Male", "Both","Female", "Male"),
+  Mod = c("Exposed F0","Exposed F0","Exposed F0","Exposed F0","Exposed F0","Grand-Offspring","Grand-Offspring","Grand-Offspring","Grand-Offspring","Grand-Offspring","Grand-Offspring"),
+  lnRR = c(Body_Weight_MG_F0$b[1],Body_Weight_MG_F0$b[2],Body_Weight_OF_F0$b[1],Body_Weight_OF_F0$b[2],Body_Weight_OF_F0$b[3],Body_Weight_MG_Sex$b[1],Body_Weight_MG_Sex$b[2],Body_Weight_MG_Sex$b[3],Body_Weight_OF_Sex$b[1],Body_Weight_OF_Sex$b[2],Body_Weight_OF_Sex$b[3]),
+  ci.lb = c(Body_Weight_MG_F0$ci.lb[1],Body_Weight_MG_F0$ci.lb[2],Body_Weight_OF_F0$ci.lb[1],Body_Weight_OF_F0$ci.lb[2],Body_Weight_OF_F0$ci.lb[3],Body_Weight_MG_Sex$ci.lb[1],Body_Weight_MG_Sex$ci.lb[2],Body_Weight_MG_Sex$ci.lb[3],Body_Weight_OF_Sex$ci.lb[1],Body_Weight_OF_Sex$ci.lb[2],Body_Weight_OF_Sex$ci.lb[3]),
+  ci.ub = c(Body_Weight_MG_F0$ci.ub[1],Body_Weight_MG_F0$ci.ub[2],Body_Weight_OF_F0$ci.ub[1],Body_Weight_OF_F0$ci.ub[2],Body_Weight_OF_F0$ci.ub[3],Body_Weight_MG_Sex$ci.ub[1],Body_Weight_MG_Sex$ci.ub[2],Body_Weight_MG_Sex$ci.ub[3],Body_Weight_OF_Sex$ci.ub[1],Body_Weight_OF_Sex$ci.ub[2],Body_Weight_OF_Sex$ci.ub[3])
 )
 
-plot_lnRR_overall_mods_exp <- ggplot(Overall_Exp_mods_lnRR, aes(x=mod, y=lnRR, colour=Exposure_Type))+ 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = mod, y = lnRR), position = position_dodge(0.3))+
+plot_lnRR_overall_mods_exp <- ggplot(Overall_Exp_mods_lnRR, aes(x=Sex, y=lnRR, colour=Exposure_Type))+ 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
+  geom_point(aes(x = Sex, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(x = "mod", y = "lnRR") +
-  coord_flip()
+  labs(x = "Sex", y = "lnRR") +
+  coord_flip()+
+  facet_grid(~Mod)
  
 plot_lnRR_overall_mods_exp
 
@@ -203,21 +222,22 @@ Body_Weight_lnCVR_OF <- subset(Body_Weight_lnCVR, Body_Weight_lnCVR$Exposure_Typ
 Body_Weight_lnCVR_0mods <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnCVR, method = 'REML')
 
 summary(Body_Weight_lnCVR_0mods)
+funnel(Body_Weight_lnCVR_0mods,yaxis="seinv")
 
 #Tibble of overall results
 
 Body_Weight_overall_lnCVR <- tibble(
   ID = "Overall", 
-  lnCVR = 0.0744,
-  ci.lb = -0.0430,
-  ci.ub = 0.1917
+  lnCVR = Body_Weight_lnCVR_0mods$b[1],
+  ci.lb = Body_Weight_lnCVR_0mods$ci.lb[1],
+  ci.ub = Body_Weight_lnCVR_0mods$ci.ub[1]
 )
 
-plot_BW_overall_lnCVR <- ggplot(Body_Weight_overall_lnCVR, aes(x=ID, y=lnCVR, colour=ID)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+plot_BW_overall_lnCVR <- ggplot(Body_Weight_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Body Weight differences, overall lnCVR", x = "ID", y = "lnCVR") +
+  labs(x = "ID", y = "lnCVR") +
   coord_flip()
 plot_BW_overall_lnCVR
 
@@ -231,6 +251,7 @@ Body_Weight_lnCVR_0mods_MG <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort
 
 
 summary(Body_Weight_lnCVR_0mods_MG)
+funnel(Body_Weight_lnCVR_0mods_MG,yaxis="seinv")
 
 
 
@@ -238,14 +259,16 @@ summary(Body_Weight_lnCVR_0mods_MG)
 Body_Weight_lnCVR_0mods_OF <- rma.mv(yi, vi, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnCVR_OF, method = 'REML')
 
 summary(Body_Weight_lnCVR_0mods_OF)
+funnel(Body_Weight_lnCVR_0mods_OF,yaxis="seinv")
+
 
 #Tibble of results
 
 Body_Weight_Exp_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnCVR = c(0.1757,0.0044),
-  ci.lb = c(0.0476,-0.1448),
-  ci.ub = c(0.3038,0.1537)
+  lnCVR = c(Body_Weight_lnCVR_0mods_MG$b[1],Body_Weight_lnCVR_0mods_OF$b[1]),
+  ci.lb = c(Body_Weight_lnCVR_0mods_MG$ci.lb[1],Body_Weight_lnCVR_0mods_OF$ci.lb[1]),
+  ci.ub = c(Body_Weight_lnCVR_0mods_MG$ci.ub[1],Body_Weight_lnCVR_0mods_OF$ci.ub[1])
 )
 
 Body_Weight_Exp_lnCVR
@@ -255,10 +278,10 @@ Body_Weight_Exp_lnCVR
 #Plotting when split by exp type
 
 plot_BW_exp_type_lnCVR <- ggplot(Body_Weight_Exp_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="Body Weight differences, exp type_lnCVR", x = "Exp_Type", y = "lnCVR") +
+  labs(x = "Exp_Type", y = "lnCVR") +
   coord_flip()
 plot_BW_exp_type_lnCVR
 
@@ -268,9 +291,6 @@ plot_BW_exp_type_lnCVR
 
 ```{r, echo=FALSE}
 #Adding moderators
-BW_Exp_lnCVR <- rma.mv(yi, vi, mods = ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnCVR, method = 'REML')
-
-summary(BW_Exp_lnCVR)
 
 BW_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnCVR, method = 'REML')
 
@@ -283,20 +303,22 @@ summary(BW_Sex_lnCVR)
 #Tibble of results
 
 Body_Weight_Mods_lnCVR <- tibble(
-  ID = c("Multigenerational", "One off", "Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
-  lnCVR = c(BW_Exp_lnCVR$b[1], BW_Exp_lnCVR$b[2], BW_F0_lnCVR$b[1], BW_F0_lnCVR$b[2],BW_F0_lnCVR$b[3],BW_Sex_lnCVR$b[1],BW_Sex_lnCVR$b[2],BW_Sex_lnCVR$b[3]),
-  ci.lb = c(BW_Exp_lnCVR$ci.lb[1], BW_Exp_lnCVR$ci.lb[2],BW_F0_lnCVR$ci.lb[1], BW_F0_lnCVR$ci.lb[2],BW_F0_lnCVR$ci.lb[3],BW_Sex_lnCVR$ci.lb[1],BW_Sex_lnCVR$ci.lb[2],BW_Sex_lnCVR$ci.lb[3]),
-  ci.ub = c(BW_Exp_lnCVR$ci.ub[1], BW_Exp_lnCVR$ci.ub[2],BW_F0_lnCVR$ci.ub[1], BW_F0_lnCVR$ci.ub[2],BW_F0_lnCVR$ci.ub[3],BW_Sex_lnCVR$ci.ub[1],BW_Sex_lnCVR$ci.ub[2],BW_Sex_lnCVR$ci.ub[3])
+  ID = c("Both", "Female", "Male", "Both", "Female", "Male"),
+  Mod = c("F0 Exposed","F0 Exposed","F0 Exposed","Grand-offspring","Grand-offspring","Grand-offspring"),
+  lnCVR = c(BW_F0_lnCVR$b[1], BW_F0_lnCVR$b[2],BW_F0_lnCVR$b[3],BW_Sex_lnCVR$b[1],BW_Sex_lnCVR$b[2],BW_Sex_lnCVR$b[3]),
+  ci.lb = c(BW_F0_lnCVR$ci.lb[1], BW_F0_lnCVR$ci.lb[2],BW_F0_lnCVR$ci.lb[3],BW_Sex_lnCVR$ci.lb[1],BW_Sex_lnCVR$ci.lb[2],BW_Sex_lnCVR$ci.lb[3]),
+  ci.ub = c(BW_F0_lnCVR$ci.ub[1], BW_F0_lnCVR$ci.ub[2],BW_F0_lnCVR$ci.ub[3],BW_Sex_lnCVR$ci.ub[1],BW_Sex_lnCVR$ci.ub[2],BW_Sex_lnCVR$ci.ub[3])
 )
 
 Body_Weight_Mods_lnCVR
 
 plot_BW_mods_lnCVR <- ggplot(Body_Weight_Mods_lnCVR, aes(x=ID, y=lnCVR )) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3), colour = "red") +
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
   labs(x = "ID", y = "lnCVR") +
-  coord_flip()
+  coord_flip()+
+  facet_grid(~Mod)
 plot_BW_mods_lnCVR
 ```
 # Meta-regression when split by exposure type
@@ -304,34 +326,40 @@ plot_BW_mods_lnCVR
 Body_Weight_MG_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnCVR_MG, method = 'REML')
 
 Body_Weight_MG_F0_lnCVR
+funnel(Body_Weight_MG_F0_lnCVR,yaxis="seinv")
 
 Body_Weight_OF_F0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnCVR_OF, method = 'REML')
 
 Body_Weight_OF_F0_lnCVR
+funnel(Body_Weight_OF_F0_lnCVR,yaxis="seinv")
 
 
 Body_Weight_MG_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnCVR_MG, method = 'REML')
 
 Body_Weight_MG_Sex_lnCVR
+funnel(Body_Weight_MG_Sex_lnCVR,yaxis="seinv")
 
 Body_Weight_OF_Sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnCVR_OF, method = 'REML')
 
 Body_Weight_OF_Sex_lnCVR
+funnel(Body_Weight_OF_Sex_lnCVR,yaxis="seinv")
 
 Overall_Exp_mods_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational","Multigenerational", "One off", "One off", "One off", "Multigenerational", "Multigenerational","Multigenerational", "One off","One off","One off" ),
-  mod = c("F0 Female","F0 Male", "F0 Both", "F0 Female", "F0 Male","Both Offspring Sex","Female Offspring", "Male Offspring", "Both Offspring Sex","Female Offspring", "Male Offspring"),
-  lnCVR = c(0.1930,0.1122,-0.1228,-0.0000,0.0387,0.2032,0.2676,0.0518,-0.2760,-0.0174,0.0364),
-  ci.lb = c(0.0477,-0.1682,-0.8491,-0.1743,-0.2637,-0.0966,0.0769,-0.1570,-1.5441,-0.1997,-0.1468),
-  ci.ub = c(0.3383,0.3925,0.6035,0.1742,0.3410,0.5029,0.4583,0.2607,0.9920,0.1648,0.2195)
+  Sex = c("Female","Male", "Both", "Female", "Male","Both","Female", "Male", "Both","Female", "Male"),
+  Mod = c("Exposed F0","Exposed F0","Exposed F0","Exposed F0","Exposed F0","Grand-offspring","Grand-offspring","Grand-offspring","Grand-offspring","Grand-offspring","Grand-offspring"),
+  lnCVR = c(Body_Weight_MG_F0_lnCVR$b[1],Body_Weight_MG_F0_lnCVR$b[2],Body_Weight_OF_F0_lnCVR$b[1],Body_Weight_OF_F0_lnCVR$b[2],Body_Weight_OF_F0_lnCVR$b[3],Body_Weight_MG_Sex_lnCVR$b[1],Body_Weight_MG_Sex_lnCVR$b[2],Body_Weight_MG_Sex_lnCVR$b[3],Body_Weight_OF_Sex_lnCVR$b[1],Body_Weight_OF_Sex_lnCVR$b[2],Body_Weight_OF_Sex_lnCVR$b[3]),
+  ci.lb = c(Body_Weight_MG_F0_lnCVR$ci.lb[1],Body_Weight_MG_F0_lnCVR$ci.lb[2],Body_Weight_OF_F0_lnCVR$ci.lb[1],Body_Weight_OF_F0_lnCVR$ci.lb[2],Body_Weight_OF_F0_lnCVR$ci.lb[3],Body_Weight_MG_Sex_lnCVR$ci.lb[1],Body_Weight_MG_Sex_lnCVR$ci.lb[2],Body_Weight_MG_Sex_lnCVR$ci.lb[3],Body_Weight_OF_Sex_lnCVR$ci.lb[1],Body_Weight_OF_Sex_lnCVR$ci.lb[2],Body_Weight_OF_Sex_lnCVR$ci.lb[3]),
+  ci.ub = c(Body_Weight_MG_F0_lnCVR$ci.ub[1],Body_Weight_MG_F0_lnCVR$ci.ub[2],Body_Weight_OF_F0_lnCVR$ci.ub[1],Body_Weight_OF_F0_lnCVR$ci.ub[2],Body_Weight_OF_F0_lnCVR$ci.ub[3],Body_Weight_MG_Sex_lnCVR$ci.ub[1],Body_Weight_MG_Sex_lnCVR$ci.ub[2],Body_Weight_MG_Sex_lnCVR$ci.ub[3],Body_Weight_OF_Sex_lnCVR$ci.ub[1],Body_Weight_OF_Sex_lnCVR$ci.ub[2],Body_Weight_OF_Sex_lnCVR$ci.ub[3])
 )
 
-plot_lnCVR_overall_mods_exp <- ggplot(Overall_Exp_mods_lnCVR, aes(x=mod, y=lnCVR, colour=Exposure_Type))+ 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = mod, y = lnCVR), position = position_dodge(0.3))+
+plot_lnCVR_overall_mods_exp <- ggplot(Overall_Exp_mods_lnCVR, aes(x=Sex, y=lnCVR, colour=Exposure_Type))+ 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
+  geom_point(aes(x = Sex, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(x = "mod", y = "lnCVR") +
-  coord_flip()
+  labs(x = "Sex", y = "lnCVR") +
+  coord_flip()+
+  facet_grid(~Mod)
  
 plot_lnCVR_overall_mods_exp
 ```

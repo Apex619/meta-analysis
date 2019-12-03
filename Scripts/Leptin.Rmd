@@ -45,16 +45,16 @@ summary(Leptin_overall_lnRR_0mods)
 
 Leptin_overall_lnRR <- tibble(
   ID = "Overall", 
-  lnRR = 1.1962,
-  ci.lb = 0.0808,
-  ci.ub = 2.3115
+  lnRR = Leptin_overall_lnRR_0mods$b[1],
+  ci.lb = Leptin_overall_lnRR_0mods$ci.lb[1],
+  ci.ub = Leptin_overall_lnRR_0mods$ci.ub[1]
 )
 
 plot_leptin_overall <- ggplot(Leptin_overall_lnRR, aes(x=ID, y=lnRR)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="leptin differences, overall", x = "ID", y = "lnRR") +
+  labs(x = "ID", y = "lnRR") +
   coord_flip()
 plot_leptin_overall
 ```
@@ -73,9 +73,9 @@ funnel(Leptin_lnRR_OF)
 
 Leptin_Exp_lnRR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnRR = c(1.8529,0.1585),
-  ci.lb = c(0.2579,-0.1631),
-  ci.ub = c(3.4478,0.4801)
+  lnRR = c(Leptin_lnRR_MG$b[1],Leptin_lnRR_OF$b[1]),
+  ci.lb = c(Leptin_lnRR_MG$ci.lb[1],Leptin_lnRR_OF$ci.lb[1]),
+  ci.ub = c(Leptin_lnRR_MG$ci.ub[1],Leptin_lnRR_OF$ci.ub[1])
 )
 
 Leptin_Exp_lnRR
@@ -109,16 +109,16 @@ summary(Leptin_overall_lnCVR_0mods)
 
 Leptin_overall_lnCVR <- tibble(
   ID = "Overall", 
-  lnCVR = -0.4352,
-  ci.lb = -1.2688,
-  ci.ub = 0.3984
+  lnCVR = Leptin_overall_lnCVR_0mods$b[1],
+  ci.lb = Leptin_overall_lnCVR_0mods$ci.lb[1],
+  ci.ub = Leptin_overall_lnCVR_0mods$ci.ub[1]
 )
 
 plot_leptin_overall_lnCVR <- ggplot(Leptin_overall_lnCVR, aes(x=ID, y=lnCVR)) + 
   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
   geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
   geom_hline(yintercept = 0, lty = "dotted") +
-  labs(title ="leptin differences, overall", x = "ID", y = "lnCVR") +
+  labs(x = "ID", y = "lnCVR") +
   coord_flip()
 plot_leptin_overall_lnCVR
 ```
@@ -137,9 +137,9 @@ funnel(Leptin_lnCVR_OF)
 
 Leptin_Exp_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"),
-  lnCVR = c(-0.8512,0.2219),
-  ci.lb = c(-2.1508,-0.1468),
-  ci.ub = c(0.4483,0.5906)
+  lnCVR = c(Leptin_lnCVR_MG$b[1],Leptin_lnCVR_OF$b[1]),
+  ci.lb = c(Leptin_lnCVR_MG$ci.lb[1],Leptin_lnCVR_OF$ci.lb[1]),
+  ci.ub = c(Leptin_lnCVR_MG$ci.ub[1],Leptin_lnCVR_OF$ci.ub[1])
 )
 
 Leptin_Exp_lnCVR
