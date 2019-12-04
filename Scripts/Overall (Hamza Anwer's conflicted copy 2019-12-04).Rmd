@@ -1,0 +1,525 @@
+---
+title: "Overall Results"
+author: "Hamza"
+date: "30 September 2019"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+library(readxl)
+
+#Install miktex and then run this to knit a pdf file
+#install.packages('tinytex')
+#tinytex::install_tinytex()
+```
+
+## Meta-analysis
+
+### Calculating effect sizes
+
+Here, we calculated our effect sizes (log response ratio lnRR) for our complete data set (all traits).
+
+```{r, include = FALSE}
+
+
+#Import data
+ALL_TRAITS <- read_excel("../data/ALL_TRAITS.xlsx")
+```
+
+## Meta-analysis overall results (lnRR)
+
+### 1. Calculating effect sizes (Done)
+
+We calculated our effect sizes (log response ratio lnRR) for our complete data set (all traits).
+```{r, include = FALSE}
+
+Effect_Size_All_Traits <- escalc(measure="ROM", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
+
+hist(Effect_Size_All_Traits$yi)
+hist(log(Effect_Size_All_Traits$vi))
+
+#Adding Effect Size ID's
+ES_ID <- factor(1:dim(Effect_Size_All_Traits)[1])
+Effect_Size_All_Traits$ES_ID <-ES_ID
+
+#Converting into factors
+
+Effect_Size_All_Traits$Trait <- factor(Effect_Size_All_Traits$Trait)
+Effect_Size_All_Traits$Exposure_Type <- factor(Effect_Size_All_Traits$Exposure_Type)
+Effect_Size_All_Traits$Sex <- factor(Effect_Size_All_Traits$Sex)
+Effect_Size_All_Traits$Generation <- factor(Effect_Size_All_Traits$Generation)
+Effect_Size_All_Traits$Cohort_ID <- factor(Effect_Size_All_Traits$Cohort_ID)
+Effect_Size_All_Traits$Paper_ID <- factor(Effect_Size_All_Traits$Paper_ID)
+Effect_Size_All_Traits$Rodent_type <- factor(Effect_Size_All_Traits$Rodent_type)
+Effect_Size_All_Traits$F2_Diet_at_measurement <- factor(Effect_Size_All_Traits$F2_Diet_at_measurement)
+Effect_Size_All_Traits$Strain <- factor(Effect_Size_All_Traits$Strain)
+Effect_Size_All_Traits$F0_Parent_Exposed <- factor(Effect_Size_All_Traits$F0_Parent_Exposed)
+
+Effect_Size_All_Traits$Sex <- gsub("Both ", "Both", Effect_Size_All_Traits$Sex)
+
+#Subsetting by One off and Multigenerational
+
+MG_ALL <- subset(Effect_Size_All_Traits, Effect_Size_All_Traits$Exposure_Type == "Multigenerational")
+
+OF_ALL <- subset(Effect_Size_All_Traits, Effect_Size_All_Traits$Exposure_Type == "One off")
+
+write.csv(Effect_Size_All_Traits, file ="Effect_Size_All_Traits.csv")
+
+save(Effect_Size_All_Traits, file = "Effect_Size_All_Traits.RData") #DOUBLE CHECK THIS IS CORRECT FOR ALL TRAITS!!!
+```
+
+### 2. Deciding random effects (Done)
+We used AIC values to decide which random effects to use. Combining "Trait", "ES_ID",Paper_ID" and "Cohort_ID" yielded the lowest AIC values. 
+```{r, include= FALSE}
+meta1null <- rma.mv(yi, vi, data=Effect_Size_All_Traits, method = 'ML') 
+
+metastudy <- rma.mv(yi, vi,random = ~1|Cohort_ID, data=Effect_Size_All_Traits, method = 'ML') 
+anova(meta1null, metastudy)
+meta0study <- rma.mv(yi, vi,random = list(~1|Paper_ID, ~1|Cohort_ID), data=Effect_Size_All_Traits, method = 'ML') 
+anova(meta1null, meta0study)
+meta1study <- rma.mv(yi, vi,random = ~1|Trait, data=Effect_Size_All_Traits, method = 'ML') 
+anova(meta1null, meta1study)
+metastudy_best <- rma.mv(yi, vi,random = list(~1|Paper_ID,~1|Cohort_ID,~1|Trait), data=Effect_Size_All_Traits, method = 'ML') 
+anova(meta0study, metastudy_best)
+
+```
+
+#### 3. Running meta-analysis (overall, with and without moderators)
+I conducted meta-analysis, first on the complete dataset, with and without moderators.
+
+```{r}
+#ALL DATA
+
+All_Traits_Analysis_0mods <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis_0mods)
+funnel(All_Traits_Analysis_0mods)
+
+
+W <- diag(1/Effect_Size_All_Traits$vi)
+X <- model.matrix(All_Traits_Analysis_0mods)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_overall <- 100 * sum(All_Traits_Analysis_0mods$sigma2) / (sum(All_Traits_Analysis_0mods$sigma2) + (All_Traits_Analysis_0mods$k-All_Traits_Analysis_0mods$p)/sum(diag(P)))
+I2_overall
+
+Overall_effect_size <- tibble(
+  ID = "Overall", 
+  lnRR = c(All_Traits_Analysis_0mods$b[1]),
+  ci.lb = c(All_Traits_Analysis_0mods$ci.lb),
+  ci.ub = c(All_Traits_Analysis_0mods$ci.ub),
+  k = 241
+)
+
+plot_lnRR_overall <- ggplot(Overall_effect_size, aes(x=ID, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "ID", y = "lnRR", subtitle = "k=341") +
+  coord_flip()
+plot_lnRR_overall
+```
+### Meta Regression for Traits and Exposure Type
+```{r}
+
+### Meta Regression
+
+#Traits meta-regression
+All_Traits_Analysis_traits <- rma.mv(yi, vi, mods= ~Trait-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis_traits)
+funnel(All_Traits_Analysis_traits,yaxis="seinv")
+k_traits <- Effect_Size_All_Traits %>% group_by(Trait) %>% count()
+k_traits
+
+Traits_overall_lnRR <- tibble(
+  Trait = c("Adiposity", "Body Weight","Glucose FBG", "Glucose TT", "Insulin FI","Insulin TT", "Leptin", "Triglycerides"), 
+  lnRR = c(All_Traits_Analysis_traits$b[1],All_Traits_Analysis_traits$b[2],All_Traits_Analysis_traits$b[3],All_Traits_Analysis_traits$b[4],All_Traits_Analysis_traits$b[5],All_Traits_Analysis_traits$b[6],All_Traits_Analysis_traits$b[7],All_Traits_Analysis_traits$b[8]),
+  ci.lb = c(All_Traits_Analysis_traits$ci.lb[1],All_Traits_Analysis_traits$ci.lb[2],All_Traits_Analysis_traits$ci.lb[3],All_Traits_Analysis_traits$ci.lb[4],All_Traits_Analysis_traits$ci.lb[5],All_Traits_Analysis_traits$ci.lb[6],All_Traits_Analysis_traits$ci.lb[7],All_Traits_Analysis_traits$ci.lb[8]),
+  ci.ub = c(All_Traits_Analysis_traits$ci.ub[1],All_Traits_Analysis_traits$ci.ub[2],All_Traits_Analysis_traits$ci.ub[3],All_Traits_Analysis_traits$ci.ub[4],All_Traits_Analysis_traits$ci.ub[5],All_Traits_Analysis_traits$ci.ub[6],All_Traits_Analysis_traits$ci.ub[7],All_Traits_Analysis_traits$ci.ub[8]),
+  k = c(k_traits$n[1],k_traits$n[2],k_traits$n[3],k_traits$n[4],k_traits$n[5],k_traits$n[6],k_traits$n[7],k_traits$n[8])
+)
+Traits_overall_lnRR
+
+plot_lnRR_overall_traits <- ggplot(Traits_overall_lnRR, aes(x=Trait, y=lnRR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Trait, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Trait", y = "lnRR") +
+  coord_flip()
+plot_lnRR_overall_traits
+
+#Exposure type meta-regression
+All_Traits_Analysis_Exp <- rma.mv(yi, vi, mods= ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis_Exp)
+funnel(All_Traits_Analysis_Exp)
+k_exp <- Effect_Size_All_Traits %>% group_by(Exposure_Type) %>% count()
+k_exp
+
+Overall_Exp_meta_lnRR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"), 
+  lnRR = c(All_Traits_Analysis_Exp$b[1],All_Traits_Analysis_Exp$b[2]),
+  ci.lb = c(All_Traits_Analysis_Exp$ci.lb[1],All_Traits_Analysis_Exp$ci.lb[2]),
+  ci.ub = c(All_Traits_Analysis_Exp$ci.ub[1],All_Traits_Analysis_Exp$ci.ub[2]),
+  k = c(k_exp$n[1],k_exp$n[2])
+)
+Overall_Exp_meta_lnRR
+
+plot_lnRR_overall_expmeta <- ggplot(Overall_Exp_meta_lnRR, aes(x=Exposure_Type, y=lnRR, colour=Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Exposure_Type", y = "lnRR") +
+  coord_flip()
+plot_lnRR_overall_expmeta
+```
+
+### Meta-regression of overall dataset for F0 parent and offspring sex
+```{r}
+All_Data_Analysis_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Data_Analysis_f0)
+
+k_All_Data_Analysis_f0 <- Effect_Size_All_Traits %>% group_by(F0_Parent_Exposed) %>% count()
+k_All_Data_Analysis_f0
+
+All_Data_Analysis_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Data_Analysis_sex)
+
+Overall_effects_not_split_f0_sex <- tibble(
+  ID = c("Both F0", "F0 Female", "F0 Male", "Both Sexes Grand Offspring", "Female Grand Offspring", "Male Grand Offspring"),
+  lnRR = c(All_Data_Analysis_f0$b[1],All_Data_Analysis_f0$b[2],All_Data_Analysis_f0$b[3],All_Data_Analysis_sex$b[1],All_Data_Analysis_sex$b[2],All_Data_Analysis_sex$b[3]),
+  ci.lb = c(All_Data_Analysis_f0$ci.lb[1],All_Data_Analysis_f0$ci.lb[2],All_Data_Analysis_f0$ci.lb[3],All_Data_Analysis_sex$ci.lb[1],All_Data_Analysis_sex$ci.lb[2],All_Data_Analysis_sex$ci.lb[3]),
+  ci.ub = c(All_Data_Analysis_f0$ci.ub[1],All_Data_Analysis_f0$ci.ub[2],All_Data_Analysis_f0$ci.ub[3],All_Data_Analysis_sex$ci.ub[1],All_Data_Analysis_sex$ci.ub[2],All_Data_Analysis_sex$ci.ub[3])
+)
+
+
+plot_lnRR_overall_mods_f0_sex <- ggplot(Overall_effects_not_split_f0_sex, aes(x=ID, y=lnRR))+ 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "ID", y = "lnRR") +
+  coord_flip()
+ 
+plot_lnRR_overall_mods_f0_sex
+```
+### Meta-analysis with subsetted dataset (MG and OF exposure type)
+```{r}
+
+#Overall analysis split by exposure type
+All_Data_Analysis_MG <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(All_Data_Analysis_MG)
+funnel(All_Data_Analysis_MG)
+
+All_Data_Analysis_OF <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(All_Data_Analysis_OF)
+funnel(All_Data_Analysis_OF)
+
+Overall_Exp_lnRR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"), 
+  lnRR = c(All_Data_Analysis_MG$b[1],All_Data_Analysis_OF$b[2]),
+  ci.lb = c(All_Data_Analysis_MG$ci.lb[1],All_Data_Analysis_OF$ci.lb[2]),
+  ci.ub = c(All_Data_Analysis_MG$ci.ub[1],All_Data_Analysis_OF$ci.ub[2]),
+  k = c(118,223)
+)
+Overall_Exp_lnRR
+
+plot_lnRR_overall_exp <- ggplot(Overall_Exp_lnRR, aes(x=Exposure_Type, y=lnRR, colour=Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Exposure_Type", y = "lnRR") +
+  coord_flip()
+plot_lnRR_overall_exp
+
+#Overall analysis with moderators (by exposure type)
+Traits_Analysis_MG <- rma.mv(yi, vi, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(Traits_Analysis_MG)
+k_traits_MG <- MG_ALL %>% group_by(Trait) %>% count()
+k_traits_MG
+
+Traits_Analysis_OF <- rma.mv(yi, vi, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(Traits_Analysis_OF)
+k_traits_OF <- OF_ALL %>% group_by(Trait) %>% count()
+k_traits_OF
+
+Traits_analysis_Exp <- tibble(
+  Exposure_Type = c("Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","One off","One off","One off","One off","One off","One off","One off","One off" ),
+  Trait = c("Adiposity", "Body Weight", "Glucose_FBG","Glucose_TT", "Insulin_FI", "Insulin_TT","Leptin", "Triglycerides","Adiposity", "Body Weight", "Glucose_FBG","Glucose_TT", "Insulin_FI", "Insulin_TT","Leptin", "Triglycerides"),
+  lnRR = c(Traits_Analysis_MG$b[1],Traits_Analysis_MG$b[2],Traits_Analysis_MG$b[3],Traits_Analysis_MG$b[4],Traits_Analysis_MG$b[5],Traits_Analysis_MG$b[6],Traits_Analysis_MG$b[7],Traits_Analysis_MG$b[8],Traits_Analysis_OF$b[1],Traits_Analysis_OF$b[2],Traits_Analysis_OF$b[3],Traits_Analysis_OF$b[4],Traits_Analysis_OF$b[5],Traits_Analysis_OF$b[6],Traits_Analysis_OF$b[7],Traits_Analysis_OF$b[8]),
+  ci.lb = c(Traits_Analysis_MG$ci.lb[1],Traits_Analysis_MG$ci.lb[2],Traits_Analysis_MG$ci.lb[3],Traits_Analysis_MG$ci.lb[4],Traits_Analysis_MG$ci.lb[5],Traits_Analysis_MG$ci.lb[6],Traits_Analysis_MG$ci.lb[7],Traits_Analysis_MG$ci.lb[8],Traits_Analysis_OF$ci.lb[1],Traits_Analysis_OF$ci.lb[2],Traits_Analysis_OF$ci.lb[3],Traits_Analysis_OF$ci.lb[4],Traits_Analysis_OF$ci.lb[5],Traits_Analysis_OF$ci.lb[6],Traits_Analysis_OF$ci.lb[7],Traits_Analysis_OF$ci.lb[8]),
+  ci.ub = c(Traits_Analysis_MG$ci.ub[1],Traits_Analysis_MG$ci.ub[2],Traits_Analysis_MG$ci.ub[3],Traits_Analysis_MG$ci.ub[4],Traits_Analysis_MG$ci.ub[5],Traits_Analysis_MG$ci.ub[6],Traits_Analysis_MG$ci.ub[7],Traits_Analysis_MG$ci.ub[8],Traits_Analysis_OF$ci.ub[1],Traits_Analysis_OF$ci.ub[2],Traits_Analysis_OF$ci.ub[3],Traits_Analysis_OF$ci.ub[4],Traits_Analysis_OF$ci.ub[5],Traits_Analysis_OF$ci.ub[6],Traits_Analysis_OF$ci.ub[7],Traits_Analysis_OF$ci.ub[8]),
+  k = c(k_traits_MG$n[1],k_traits_MG$n[2],k_traits_MG$n[3],k_traits_MG$n[4],k_traits_MG$n[5],k_traits_MG$n[6],k_traits_MG$n[7],k_traits_MG$n[8],k_traits_OF$n[1],k_traits_OF$n[2],k_traits_OF$n[3],k_traits_OF$n[4],k_traits_OF$n[5],k_traits_OF$n[6],k_traits_OF$n[7],k_traits_OF$n[8])
+)
+
+plot_lnRR_overall_trait_exp <- ggplot(Traits_analysis_Exp, aes(x=Trait, y=lnRR, colour=Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Trait, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Exposure_Type", y = "lnRR") +
+  coord_flip()
+plot_lnRR_overall_trait_exp
+
+#F0 and offspring sex analysis
+All_Traits_Analysis_0mods_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_MG_f0)
+funnel(All_Traits_Analysis_0mods_MG_f0)
+
+
+All_Traits_Analysis_0mods_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_OF_f0)
+funnel(All_Traits_Analysis_0mods_OF_f0)
+
+All_Traits_Analysis_0mods_MG_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_MG_sex)
+funnel(All_Traits_Analysis_0mods_MG_sex)
+
+
+All_Traits_Analysis_0mods_OF_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_OF_sex)
+funnel(All_Traits_Analysis_0mods_OF_sex)
+
+Overall_Exp_mods_lnRR <- tibble(
+  Exposure_Type = c("Multigenerational","Multigenerational", "One off", "One off", "One off", "Multigenerational", "Multigenerational","Multigenerational", "One off","One off","One off" ),
+  mod = c("F0 Female","F0 Male", "F0 Both", "F0 Female", "F0 Male","Both Offspring Sex","Female Offspring", "Male Offspring", "Both Offspring Sex","Female Offspring", "Male Offspring"),
+  lnRR = c(),
+  ci.lb = c(),
+  ci.ub = c()
+)
+
+plot_lnRR_overall_mods_exp <- ggplot(Overall_Exp_mods_lnRR, aes(x=mod, y=lnRR, colour=Exposure_Type))+ 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = mod, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "mod", y = "lnRR") +
+  coord_flip()
+ 
+plot_lnRR_overall_mods_exp
+
+```
+
+
+## Meta-analysis overall results (lnCVR)
+
+### 4. Calculating effect sizes (Done)
+
+We calculated our effect sizes (lnCVR) for our complete data set (all traits).
+```{r, include = FALSE}
+
+Effect_Size_All_Traits_lnCVR <- escalc(measure="CVR", m1i=Mean_Treatment, sd1i=SD_Treatment, n1i=Sample_Size_n_Treatment, m2i=Mean_Control, sd2i=SD_Control, n2i=Sample_Size_n_Control, data=ALL_TRAITS)
+
+#Adding Effect Size ID's
+ES_ID <- factor(1:dim(Effect_Size_All_Traits_lnCVR)[1])
+Effect_Size_All_Traits_lnCVR$ES_ID <-ES_ID
+
+#Converting into factors
+
+Effect_Size_All_Traits_lnCVR$Trait <- factor(Effect_Size_All_Traits_lnCVR$Trait)
+Effect_Size_All_Traits_lnCVR$Exposure_Type <- factor(Effect_Size_All_Traits_lnCVR$Exposure_Type)
+Effect_Size_All_Traits_lnCVR$Sex <- factor(Effect_Size_All_Traits_lnCVR$Sex)
+Effect_Size_All_Traits_lnCVR$Generation <- factor(Effect_Size_All_Traits_lnCVR$Generation)
+Effect_Size_All_Traits_lnCVR$Cohort_ID <- factor(Effect_Size_All_Traits_lnCVR$Cohort_ID)
+Effect_Size_All_Traits_lnCVR$Paper_ID <- factor(Effect_Size_All_Traits_lnCVR$Paper_ID)
+Effect_Size_All_Traits_lnCVR$Rodent_type <- factor(Effect_Size_All_Traits_lnCVR$Rodent_type)
+Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement <- factor(Effect_Size_All_Traits_lnCVR$F2_Diet_at_measurement)
+Effect_Size_All_Traits_lnCVR$Strain <- factor(Effect_Size_All_Traits_lnCVR$Strain)
+Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed <- factor(Effect_Size_All_Traits_lnCVR$F0_Parent_Exposed)
+
+Effect_Size_All_Traits_lnCVR$Sex <- gsub("Both ", "Both", Effect_Size_All_Traits_lnCVR$Sex)
+
+#Subsetting into MG and OF
+MG_ALL_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Exposure_Type == "Multigenerational")
+
+OF_ALL_lnCVR <- subset(Effect_Size_All_Traits_lnCVR, Effect_Size_All_Traits_lnCVR$Exposure_Type == "One off")
+
+```
+
+#### 5. Running meta-analysis for lnCVR
+```{r}
+#Modelling entire dataset with no moderators
+
+All_Traits_Analysis_0mods_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_lnCVR)
+funnel(All_Traits_Analysis_0mods_lnCVR)
+
+Overall_lnCVR <- tibble(
+  ID = "Overall", 
+  lnCVR = c(-0.0579),
+  ci.lb = c(-0.1961),
+  ci.ub = c(0.0804)
+)
+Overall_lnCVR
+
+plot_lnRR_overall_lnCVR <- ggplot(Overall_lnCVR, aes(x=ID, y=lnCVR)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = ID, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "ID", y = "lnCVR") +
+  coord_flip()
+plot_lnRR_overall_lnCVR
+```
+
+# Modelling traits with overall dataset
+```{r}
+
+
+
+All_Traits_Analysis_traits_lnCVR <- rma.mv(yi, vi, mods= ~Trait-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_traits_lnCVR)
+funnel(All_Traits_Analysis_traits_lnCVR)
+
+Traits_overall_lnCVR <- tibble(
+  Trait = c("Adiposity", "Body Weight","Glucose", "Insulin", "Leptin", "Triglycerides"), 
+  lnCVR = c(-0.0107,0.0261,0.0143,-0.1468,0.0245,-0.0817),
+  ci.lb = c(-0.1557,-0.0742,-0.1343,-0.3042,-0.2159,-0.2524),
+  ci.ub = c(0.1343,0.1264,0.1629,0.0106,0.2648,0.0891)
+)
+Traits_overall_lnCVR
+
+plot_lnRR_overall_traits_lnCVR <- ggplot(Traits_overall_lnCVR, aes(x=Trait, y=lnCVR, colour = Trait)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Trait, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Trait", y = "lnCVR") +
+  coord_flip()
+plot_lnRR_overall_traits_lnCVR
+```
+
+# Modelling MG and OF (no mods) (lnCVR)
+```{r}
+
+All_Data_Analysis_0mods_MG_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+summary(All_Data_Analysis_0mods_MG_lnCVR)
+funnel(All_Data_Analysis_0mods_MG_lnCVR)
+
+All_Data_Analysis_0mods_OF_lnCVR <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(All_Data_Analysis_0mods_OF_lnCVR)
+funnel(All_Data_Analysis_0mods_OF_lnCVR)
+
+Exp_overall_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational", "One off"), 
+  lnCVR = c(-0.1366,-0.1366),
+  ci.lb = c(-0.3394,-0.3394),
+  ci.ub = c(0.0662,0.0662)
+)
+Exp_overall_lnCVR
+
+plot_lnRR_overall_exp_lnCVR <- ggplot(Exp_overall_lnCVR, aes(x=Exposure_Type, y=lnCVR, colour = Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Exposure_Type, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Exposure_Type", y = "lnCVR") +
+  coord_flip()
+plot_lnRR_overall_exp_lnCVR
+
+```
+
+
+# Modelling all traits split by MG and OF (lnCVR)
+```{r}
+
+
+All_Traits_Analysis_MG_lnCVR <- rma.mv(yi, vi, mods= ~Trait-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_MG_lnCVR)
+funnel(All_Traits_Analysis_MG_lnCVR)
+
+All_Traits_Analysis_OF_lnCVR <- rma.mv(yi, vi, mods= ~Trait-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_OF_lnCVR)
+funnel(All_Traits_Analysis_OF_lnCVR)
+
+Traits_analysis_Exp_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","One off","One off","One off","One off","One off","One off","One off","One off" ),
+  Trait = c("Adiposity", "Body Weight", "Glucose_FBG","Glucose_TT", "Insulin_FI", "Insulin_TT","Leptin", "Triglycerides","Adiposity", "Body Weight", "Glucose_FBG","Glucose_TT", "Insulin_FI", "Insulin_TT","Leptin", "Triglycerides"),
+  lnRR = c(-0.1021,0.1770,-0.3227,0.0195,-0.4823,0.2532,-0.387,-0.4652,-0.0602,-0.0451,0.1298,0.1545,-0.3959,0.2375,0.1847,-0.0098),
+  ci.lb = c(-0.3570,0.0422,-0.6840,-0.3920,-0.9048,-0.1541,-0.8007,-0.8806,-0.2606,-0.1821,-0.3384,-0.0966,-0.6562,-0.1203,-0.2548,-0.2398),
+  ci.ub = c(0.1528,0.3118,0.0386,0.4310,-0.0597,0.6604,0.0266,-0.0499,0.1402,0.0919,0.5981,0.4056,-0.1357,0.5953,0.6242,0.2202),
+  k = c(k_traits_MG$n[1],k_traits_MG$n[2],k_traits_MG$n[3],k_traits_MG$n[4],k_traits_MG$n[5],k_traits_MG$n[6],k_traits_MG$n[7],k_traits_MG$n[8],k_traits_OF$n[1],k_traits_OF$n[2],k_traits_OF$n[3],k_traits_OF$n[4],k_traits_OF$n[5],k_traits_OF$n[6],k_traits_OF$n[7],k_traits_OF$n[8])
+)
+
+plot_lnRR_overall_trait_exp_lnCVR <- ggplot(Traits_analysis_Exp_lnCVR, aes(x=Trait, y=lnRR, colour=Exposure_Type)) + 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = Trait, y = lnRR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "Exposure_Type", y = "lnRR") +
+  coord_flip()
+plot_lnRR_overall_trait_exp_lnCVR
+
+```
+
+# Modelling all traits with moderators (split by exposure type)
+```{r}
+
+
+All_Traits_Analysis_lnCVR_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_lnCVR_MG_f0)
+funnel(All_Traits_Analysis_lnCVR_MG_f0)
+
+
+All_Traits_Analysis_lnCVR_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_lnCVR_OF_f0)
+funnel(All_Traits_Analysis_lnCVR_OF_f0)
+
+All_Traits_Analysis_lnCVR_MG_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_lnCVR_MG_sex)
+funnel(All_Traits_Analysis_lnCVR_MG_sex)
+
+
+All_Traits_Analysis_lnCVR_OF_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_lnCVR_OF_sex)
+funnel(All_Traits_Analysis_lnCVR_OF_sex)
+
+Overall_Exp_mods_lnCVR <- tibble(
+  Exposure_Type = c("Multigenerational","Multigenerational", "One off", "One off", "One off", "Multigenerational", "Multigenerational","Multigenerational", "One off","One off","One off" ),
+  mod = c("F0 Female","F0 Male", "F0 Both", "F0 Female", "F0 Male","Both Offspring Sex","Female Offspring", "Male Offspring", "Both Offspring Sex","Female Offspring", "Male Offspring"),
+  lnCVR = c(-0.1175,-0.1728,-0.0418,-0.0011,-0.0329,-0.0204,-0.0522,-0.2292,-0.3737,-0.0034,0.0073),
+  ci.lb = c(-0.3294,-0.4247,-0.5383,-0.1806,-0.2872,-0.3612,-0.2875,-0.4567,-1.1772,-0.1879,-0.1742),
+  ci.ub = c(0.0944,0.0791,0.4547,0.1784,0.2215,0.3205,0.1832,-0.0017,0.4298,0.1812,0.1889)
+)
+
+plot_lnCVR_overall_mods_exp <- ggplot(Overall_Exp_mods_lnCVR, aes(x=mod, y=lnCVR, colour=Exposure_Type))+ 
+  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+  geom_point(aes(x = mod, y = lnCVR), position = position_dodge(0.3))+
+  geom_hline(yintercept = 0, lty = "dotted") +
+  labs(x = "mod", y = "lnCVR") +
+  coord_flip()
+ 
+plot_lnCVR_overall_mods_exp
+```
+
+
+
+
+
+
+
+
+
+
+
