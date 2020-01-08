@@ -98,6 +98,14 @@ All_Traits_Analysis_0mods <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,
 summary(All_Traits_Analysis_0mods)
 funnel(All_Traits_Analysis_0mods,yaxis="seinv")
 
+#NOTES
+#Yes, adding vi as a moderator is indeed the logical way of extending Egger's test to more complex models. Actually, using the sampling variances as a moderator is just one possibility of conducting the "regression test for funnel plot asymmetry". 
+
+#regtest() no longer works (for now) with rma.mv objects (it wasn't meant to in the first place); if you want to run something along the same lines, just consider adding some measure of the precision of the observed outcomes (e.g., their standard errors) as a predictor to the model
+
+Regtest_Overall <- All_Traits_Analysis_0mods <- rma.mv(yi, vi, mod = vi, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+Regtest_Overall
+
 
 W <- diag(1/Effect_Size_All_Traits$vi)
 X <- model.matrix(All_Traits_Analysis_0mods)

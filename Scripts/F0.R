@@ -1,7 +1,7 @@
 library(openxlsx) 
 
-Body_Weight_F0 <- read.xlsx("C:\\Users\\hamanw\\Dropbox\\Meta Analysis Project\\Extraction\\Transgenerational Meta-Analysis\\data\\Body_Weight.xlsx", sheet = Body_Weight.F0)
-
+Body_Weight_F0 <- Body_Weight <- read_excel("data/Archive/Body_Weight.xlsx", 
+                                            sheet = "Body_Weight F0")
 
 library(metafor)
 #Calculate Effect Size (lnRR)

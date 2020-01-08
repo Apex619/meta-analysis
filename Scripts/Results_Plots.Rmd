@@ -1,0 +1,81 @@
+---
+title: "Results (Plots)"
+author: "Hamza"
+date: "8 January 2020"
+output: html_document
+---
+
+```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+library(readxl)
+library(orchaRd)
+library(patchwork)
+library(tidyverse)
+library(cowplot)
+library(ggpubr)
+#Install miktex and then run this to knit a pdf file
+#install.packages('tinytex')
+#tinytex::install_tinytex()
+```
+
+### Question 1 - Exposure Type
+```{r}
+#lnRR
+Overall_Exposure_Type_orchard_lnRR <- orchard_plot(All_Traits_Analysis_Exp, mod = "Exposure_Type", xlab = "lnRR", transfm = "none")
+Overall_Exposure_Type_orchard_lnRR
+
+#lnCVR
+Overall_Exposure_Type_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_Exp_lnCVR, mod = "Exposure_Type", xlab = "lnCVR", transfm = "none")
+Overall_Exposure_Type_orchard_lnCVR
+
+?orchard_plot
+
+#Joining Plots 
+
+Overall_Exp_Type_orchard_joined <- Overall_Exposure_Type_orchard_lnRR/Overall_Exposure_Type_orchard_lnCVR
+Overall_Exp_Type_orchard_joined
+```
+
+### Question 2 - Parental Sex
+```{r}
+#MG F0 lnRR
+All_Traits_Analysis_0mods_MG_f0_orchard <- orchard_plot(All_Traits_Analysis_0mods_MG_f0, mod = "F0_Parent_Exposed", xlab = "lnRR", transfm = "none")
+All_Traits_Analysis_0mods_MG_f0_orchard
+#OF F0 lnRR
+All_Traits_Analysis_0mods_OF_f0_orchard <- orchard_plot(All_Traits_Analysis_0mods_OF_f0, mod = "F0_Parent_Exposed", xlab = "lnRR", transfm = "none")
+All_Traits_Analysis_0mods_OF_f0_orchard
+
+#MG Sex lnRR
+All_Traits_Analysis_0mods_MG_sex_orchard <- orchard_plot(All_Traits_Analysis_0mods_MG_sex, mod = "Sex", xlab = "lnRR", transfm = "none")
+All_Traits_Analysis_0mods_MG_sex_orchard
+
+#OF Sex lnRR
+All_Traits_Analysis_0mods_OF_sex_orchard <- orchard_plot(All_Traits_Analysis_0mods_OF_sex, mod = "Sex", xlab = "lnRR", transfm = "none")
+All_Traits_Analysis_0mods_OF_sex_orchard
+
+#JOINING lnRR PLOTS
+
+
+Joined_F0
+
+#MG F0 lnCVR
+All_Traits_Analysis_0mods_MG_f0_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_MG_f0_lnCVR, mod = "F0_Parent_Exposed", xlab = "lnCVR", transfm = "none")
+All_Traits_Analysis_0mods_MG_f0_orchard_lnCVR
+#OF F0 lnCVR
+All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_OF_f0_lnCVR, mod = "F0_Parent_Exposed", xlab = "lnCVR", transfm = "none")
+All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR
+
+#MG Sex lnCVR
+All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_MG_sex_lnCVR, mod = "Sex", xlab = "lnCVR", transfm = "none")
+All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR
+
+#OF Sex lnCVR
+All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_OF_sex_lnCVR, mod = "Sex", xlab = "lnCVR", transfm = "none")
+All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR
+```
+
+
