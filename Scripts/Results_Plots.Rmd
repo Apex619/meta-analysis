@@ -6,6 +6,17 @@ output: html_document
 ---
 
 ```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
+#install.packages("devtools")
+#install.packages("tidyverse")
+#install.packages("metafor")
+#install.packages("patchwork")
+#install.packages("R.rsp")
+#install.packages("cowplot")
+#install.packages("ggpubr")
+
+#devtools::install_github("itchyshin/orchard_plot", subdir = "orchaRd", force = TRUE, build_vignettes = TRUE)
+
+
 library(tidyverse)
 library(openxlsx)  
 library(knitr)
@@ -40,7 +51,7 @@ Overall_Exp_Type_orchard_joined <- Overall_Exposure_Type_orchard_lnRR/Overall_Ex
 Overall_Exp_Type_orchard_joined
 ```
 
-### Question 2 - Parental Sex
+### Question2 and 3 - Parental Sex and Offspring Sex
 ```{r}
 #MG F0 lnRR
 All_Traits_Analysis_0mods_MG_f0_orchard <- orchard_plot(All_Traits_Analysis_0mods_MG_f0, mod = "F0_Parent_Exposed", xlab = "lnRR", transfm = "none")
@@ -57,10 +68,6 @@ All_Traits_Analysis_0mods_MG_sex_orchard
 All_Traits_Analysis_0mods_OF_sex_orchard <- orchard_plot(All_Traits_Analysis_0mods_OF_sex, mod = "Sex", xlab = "lnRR", transfm = "none")
 All_Traits_Analysis_0mods_OF_sex_orchard
 
-#JOINING lnRR PLOTS
-
-
-Joined_F0
 
 #MG F0 lnCVR
 All_Traits_Analysis_0mods_MG_f0_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_MG_f0_lnCVR, mod = "F0_Parent_Exposed", xlab = "lnCVR", transfm = "none")
@@ -77,5 +84,30 @@ All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR
 All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_OF_sex_lnCVR, mod = "Sex", xlab = "lnCVR", transfm = "none")
 All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR
 ```
+
+
+### Question 4 - Traits
+```{r}
+#MG Trats lnRR
+
+Traits_Analysis_MG_orchard <- orchard_plot(Traits_Analysis_MG, mod = "Trait", xlab = "lnRR", transfm = "none")
+Traits_Analysis_MG_orchard
+
+#OF Trats lnRR
+Traits_Analysis_OF_orchard <- orchard_plot(Traits_Analysis_OF, mod = "Trait", xlab = "lnRR", transfm = "none")
+Traits_Analysis_OF_orchard
+
+#MG Trats lnCVR
+
+Traits_Analysis_MG_orchard_lnCVR <- orchard_plot(Traits_Analysis_MG_lnCVR, mod = "Trait", xlab = "lnCVR", transfm = "none")
+Traits_Analysis_MG_orchard_lnCVR
+
+#OF Trats lnCVR
+Traits_Analysis_OF_orchard_lnCVR <- orchard_plot(Traits_Analysis_OF_lnCVR, mod = "Trait", xlab = "lnCVR", transfm = "none")
+Traits_Analysis_OF_orchard_lnCVR
+```
+
+
+
 
 

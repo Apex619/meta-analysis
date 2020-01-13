@@ -15,7 +15,9 @@ library(knitr)
 library(metafor)
 library(ggplot2)
 library(readxl)
-
+library(orchaRd)
+library(patchwork)
+library(tidyverse)
 #Install miktex and then run this to knit a pdf file
 #install.packages('tinytex')
 #tinytex::install_tinytex()
