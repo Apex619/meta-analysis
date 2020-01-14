@@ -2,7 +2,9 @@
 title: "Results (Plots)"
 author: "Hamza"
 date: "8 January 2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
@@ -95,52 +97,20 @@ OF_ALL$N <- rowSums(OF_ALL[, c("Sample_Size_n_Control", "Sample_Size_n_Treatment
 
 #MG Trats lnRR
 
-Traits_Analysis_MG_orchard <- orchard_plot(Traits_Analysis_MG, mod = "Trait", xlab = "lnRR", transfm = "none", angle = 45)+
-  theme(
-legend.position = c(0.09, 1.02),
-legend.justification = c(0, 1),
-legend.key.size = unit(1, "mm")) +
-theme(
-legend.direction = "horizontal",
-legend.title = element_text(size = 7),
-legend.text = element_text(size = 8))
+Traits_Analysis_MG_orchard <- orchard_plot(Traits_Analysis_MG, mod = "Trait", xlab = "lnRR", transfm = "none", angle = 45)
 Traits_Analysis_MG_orchard
 
 #OF Trats lnRR
-Traits_Analysis_OF_orchard <- orchard_plot(Traits_Analysis_OF, mod = "Trait", xlab = "lnRR", transfm = "none", angle = 45)+
-  theme(
-legend.position = c(0.09, 1.02),
-legend.justification = c(0, 1),
-legend.key.size = unit(1, "mm")) +
-theme(
-legend.direction = "horizontal",
-legend.title = element_text(size = 7),
-legend.text = element_text(size = 8))
+Traits_Analysis_OF_orchard <- orchard_plot(Traits_Analysis_OF, mod = "Trait", xlab = "lnRR", transfm = "none", angle = 45)
 Traits_Analysis_OF_orchard
 
 #MG Trats lnCVR
 
-Traits_Analysis_MG_orchard_lnCVR <- orchard_plot(Traits_Analysis_MG_lnCVR, mod = "Trait", xlab = "lnCVR", transfm = "none", angle = 45)+
-  theme(
-legend.position = c(0.09, 1.02),
-legend.justification = c(0, 1),
-legend.key.size = unit(1, "mm")) +
-theme(
-legend.direction = "horizontal",
-legend.title = element_text(size = 7),
-legend.text = element_text(size = 8))
+Traits_Analysis_MG_orchard_lnCVR <- orchard_plot(Traits_Analysis_MG_lnCVR, mod = "Trait", xlab = "lnCVR", transfm = "none", angle = 45)
 Traits_Analysis_MG_orchard_lnCVR
 
 #OF Trats lnCVR
-Traits_Analysis_OF_orchard_lnCVR <- orchard_plot(Traits_Analysis_OF_lnCVR, mod = "Trait", xlab = "lnCVR", transfm = "none", angle = 45)+
-  theme(
-legend.position = c(0.09, 1.02),
-legend.justification = c(0, 1),
-legend.key.size = unit(1, "mm")) +
-theme(
-legend.direction = "horizontal",
-legend.title = element_text(size = 7),
-legend.text = element_text(size = 8))
+Traits_Analysis_OF_orchard_lnCVR <- orchard_plot(Traits_Analysis_OF_lnCVR, mod = "Trait", xlab = "lnCVR", transfm = "none", angle = 45)
 Traits_Analysis_OF_orchard_lnCVR
 ```
 
