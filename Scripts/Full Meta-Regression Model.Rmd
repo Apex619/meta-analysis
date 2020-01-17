@@ -1,0 +1,69 @@
+---
+title: "Full Meta-Regression Models"
+author: "Hamza"
+date: "1/17/2020"
+output: html_document
+---
+```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+library(readxl)
+library(orchaRd)
+library(patchwork)
+library(tidyverse)
+#Install miktex and then run this to knit a pdf file
+#install.packages('tinytex')
+#tinytex::install_tinytex()
+```
+
+### Overall Model (Full, not split by exposure type) lnRR
+
+```{r}
+Full_Regression <- rma.mv(yi, vi, mods =  ~ Trait + Exposure_Type + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(Full_Regression)
+funnel(Full_Regression,yaxis="seinv")
+
+#Publication Bias Test on full model
+Full_Regression_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Exposure_Type + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(Full_Regression_egg)
+funnel(Full_Regression_egg,yaxis="seinv")
+
+```
+
+### Full Model (split by exposure type) lnRR
+```{r}
+#MG
+Full_Regression_MG <- rma.mv(yi, vi, mods =  ~ Trait + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(Full_Regression_MG)
+funnel(Full_Regression_MG,yaxis="seinv")
+
+#Publication Bias Test on full model MG
+Full_Regression_MG_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(Full_Regression_MG_egg)
+funnel(Full_Regression_MG_egg,yaxis="seinv")
+
+#OF
+Full_Regression_OF <- rma.mv(yi, vi, mods =  ~ Trait + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(Full_Regression_OF)
+funnel(Full_Regression_OF,yaxis="seinv")
+
+#Publication Bias Test on full model MG
+Full_Regression_OF_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(Full_Regression_OF_egg)
+funnel(Full_Regression_OF_egg,yaxis="seinv")
+
+```
+
+
+
+
+

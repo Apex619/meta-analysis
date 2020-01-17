@@ -20,22 +20,25 @@ library(tidyverse)
 #Install miktex and then run this to knit a pdf file
 #install.packages('tinytex')
 #tinytex::install_tinytex()
+
 ```
 
 
-### Overall lnRR and lnCVR
+### Overall lnRR and lnCVR (split by OF and MG)
 ```{r}
 #lnRR
-All_Traits_Analysis_Exp_egg <- rma.mv(yi, vi, mods= ~Exposure_Type-1 + sqrt(vi), random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+All_Traits_Analysis_Exp_egg <- rma.mv(yi, vi, mods= ~Exposure_Type-1 + sqrt(vi), random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID,~1|Trait), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Traits_Analysis_Exp_egg)
 funnel(All_Traits_Analysis_Exp_egg, yaxis = "seinv")
 
 #lnCVR
-All_Traits_Analysis_Exp_egg_lnCVR <- rma.mv(yi, vi, mods= ~Exposure_Type-1 + sqrt(vi), random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+All_Traits_Analysis_Exp_egg_lnCVR <- rma.mv(yi, vi, mods= ~Exposure_Type-1 + sqrt(vi), random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID,~1|Trait), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_Exp_egg_lnCVR)
 funnel(All_Traits_Analysis_Exp_egg_lnCVR, yaxis = "seinv")
+
+#Make plots like in Shinichi's code
 ```
 
 ### F0 Sex and Grandoffspring Sex lnRR

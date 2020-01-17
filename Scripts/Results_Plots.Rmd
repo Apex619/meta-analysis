@@ -38,14 +38,13 @@ library(ggpubr)
 ### Question 1 - Exposure Type
 ```{r}
 #lnRR
-Overall_Exposure_Type_orchard_lnRR <- orchard_plot(All_Traits_Analysis_Exp, mod = "Exposure_Type", xlab = "lnRR", transfm = "none")+
+Overall_Exposure_Type_orchard_lnRR <- orchard_plot(All_Traits_Analysis_Exp, mod = "Exposure_Type", xlab = "lnRR", transfm = "none", angle = 45)+
   scale_colour_manual(values=c("#E69F00", "#56B4E9"))+
-  scale_fill_manual(values=c("#999999","#999999"))+
-   ggtitle("Overall Analysis")
+  scale_fill_manual(values=c("#999999","#999999"))
 Overall_Exposure_Type_orchard_lnRR
 
 #lnCVR
-Overall_Exposure_Type_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_Exp_lnCVR, mod = "Exposure_Type", xlab = "lnCVR", transfm = "none")+
+Overall_Exposure_Type_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_Exp_lnCVR, mod = "Exposure_Type", xlab = "lnCVR", transfm = "none", angle =45)+
   scale_colour_manual(values=c("#E69F00", "#56B4E9"))+
   scale_fill_manual(values=c("#999999","#999999"))
 Overall_Exposure_Type_orchard_lnCVR

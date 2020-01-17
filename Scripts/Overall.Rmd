@@ -173,7 +173,7 @@ plot_lnRR_overall_traits
 ```{r}
 
 #Exposure type meta-regression
-All_Traits_Analysis_Exp <- rma.mv(yi, vi, mods= ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+All_Traits_Analysis_Exp <- rma.mv(yi, vi, mods= ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID,~1|Trait), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Traits_Analysis_Exp)
 funnel(All_Traits_Analysis_Exp,yaxis="seinv")
