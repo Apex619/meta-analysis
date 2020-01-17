@@ -1,0 +1,131 @@
+---
+title: "Publication Bias Tests"
+author: "Hamza"
+date: "15 January 2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+library(readxl)
+library(orchaRd)
+library(patchwork)
+library(tidyverse)
+#Install miktex and then run this to knit a pdf file
+#install.packages('tinytex')
+#tinytex::install_tinytex()
+```
+
+
+### Overall lnRR and lnCVR
+```{r}
+#lnRR
+All_Traits_Analysis_Exp_egg <- rma.mv(yi, vi, mods= ~Exposure_Type-1 + sqrt(vi), random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+summary(All_Traits_Analysis_Exp_egg)
+funnel(All_Traits_Analysis_Exp_egg, yaxis = "seinv")
+
+#lnCVR
+All_Traits_Analysis_Exp_egg_lnCVR <- rma.mv(yi, vi, mods= ~Exposure_Type-1 + sqrt(vi), random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_Exp_egg_lnCVR)
+funnel(All_Traits_Analysis_Exp_egg_lnCVR, yaxis = "seinv")
+```
+
+### F0 Sex and Grandoffspring Sex lnRR
+
+```{r}
+#MG F0
+
+All_Traits_Analysis_0mods_MG_f0_egg <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_MG_f0_egg) 
+funnel(All_Traits_Analysis_0mods_MG_f0_egg,yaxis="seinv")
+
+#OF F0
+All_Traits_Analysis_0mods_OF_f0_egg <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_OF_f0_egg)
+funnel(All_Traits_Analysis_0mods_OF_f0_egg,yaxis="seinv")
+
+#MG Sex
+All_Traits_Analysis_0mods_MG_sex_egg <- rma.mv(yi, vi, mods = ~Sex-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_MG_sex_egg)
+funnel(All_Traits_Analysis_0mods_MG_sex_egg,yaxis="seinv")
+
+#OF Sex
+All_Traits_Analysis_0mods_OF_sex_egg <- rma.mv(yi, vi, mods = ~Sex-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_OF_sex_egg)
+funnel(All_Traits_Analysis_0mods_OF_sex_egg,yaxis="seinv")
+
+
+```
+
+### F0 and Offspring Sex lnCVR
+```{r}
+All_Traits_Analysis_0mods_MG_f0_egg_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_MG_f0_egg_lnCVR) 
+funnel(All_Traits_Analysis_0mods_MG_f0_egg_lnCVR,yaxis="seinv")
+
+#OF F0
+All_Traits_Analysis_0mods_OF_f0_egg_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_OF_f0_egg_lnCVR)
+funnel(All_Traits_Analysis_0mods_OF_f0_egg_lnCVR,yaxis="seinv")
+
+#MG Sex
+All_Traits_Analysis_0mods_MG_sex_egg_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_MG_sex_egg_lnCVR)
+funnel(All_Traits_Analysis_0mods_MG_sex_egg_lnCVR,yaxis="seinv")
+
+#OF Sex
+All_Traits_Analysis_0mods_OF_sex_egg_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(All_Traits_Analysis_0mods_OF_sex_egg_lnCVR)
+funnel(All_Traits_Analysis_0mods_OF_sex_egg_lnCVR,yaxis="seinv")
+```
+
+
+### Traits lnRR and lnCVR
+```{r}
+#Traits MG
+
+Traits_Analysis_MG_egg <- rma.mv(yi, vi, mods = ~Trait-1 + sqrt(vi), random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(Traits_Analysis_MG_egg)
+funnel(Traits_Analysis_MG_egg,yaxis="seinv")
+
+#Traits OF
+
+Traits_Analysis_OF_egg <- rma.mv(yi, vi, mods = ~Trait-1 + sqrt(vi), random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(Traits_Analysis_OF_egg)
+funnel(Traits_Analysis_OF_egg,yaxis="seinv")
+
+#Traits MG lnCVR
+
+Traits_Analysis_MG_egg_lnCVR <- rma.mv(yi, vi, mods = ~Trait-1 + sqrt(vi), random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+
+summary(Traits_Analysis_MG_egg_lnCVR)
+funnel(Traits_Analysis_MG_egg_lnCVR,yaxis="seinv")
+
+#Traits OF lnCVR
+
+Traits_Analysis_OF_egg_lnCVR <- rma.mv(yi, vi, mods = ~Trait-1 + sqrt(vi), random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+
+summary(Traits_Analysis_OF_egg_lnCVR)
+funnel(Traits_Analysis_OF_egg_lnCVR,yaxis="seinv")
+```
+
+
+

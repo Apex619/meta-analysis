@@ -353,7 +353,7 @@ plot_lnRR_overall_trait_exp
 #F0 and offspring sex analysis
 All_Traits_Analysis_0mods_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
 
-summary(All_Traits_Analysis_0mods_MG_f0)
+summary(All_Traits_Analysis_0mods_MG_f0) #Run eggers regression
 funnel(All_Traits_Analysis_0mods_MG_f0,yaxis="seinv")
 
 All_Traits_Analysis_0mods_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
@@ -697,7 +697,7 @@ All_Traits_Analysis_0mods_OF_f0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Expose
 summary(All_Traits_Analysis_0mods_OF_f0_lnCVR)
 funnel(All_Traits_Analysis_0mods_OF_f0_lnCVR,yaxis="seinv")
 
-All_Traits_Analysis_0mods_MG_sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+All_Traits_Analysis_0mods_MG_sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG_sex_lnCVR)
 funnel(All_Traits_Analysis_0mods_MG_sex,yaxis="seinv")

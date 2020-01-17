@@ -40,8 +40,7 @@ library(ggpubr)
 #lnRR
 Overall_Exposure_Type_orchard_lnRR <- orchard_plot(All_Traits_Analysis_Exp, mod = "Exposure_Type", xlab = "lnRR", transfm = "none")+
   scale_colour_manual(values=c("#E69F00", "#56B4E9"))+
-  scale_fill_manual(values=c("#999999","#999999"))+
-   ggtitle("Overall Analysis")
+  scale_fill_manual(values=c("#999999","#999999"))
 Overall_Exposure_Type_orchard_lnRR
 
 #lnCVR
@@ -106,21 +105,10 @@ All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR <- orchard_plot(All_Traits_Analys
 All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR
 ```
 
-### Joining Plots - Exposed Sex F0
+### Joining Plots
 ```{r}
-Exposed_Sex_F0_Joined <- All_Traits_Analysis_0mods_OF_sex_orchard + All_Traits_Analysis_0mods_MG_f0_orchard + All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR +  All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
 
-Exposed_Sex_F0_Joined
 ```
-
-### Joining plots - Grand offspring Sex
-
-```{r}
-Sex_Joined <- All_Traits_Analysis_0mods_OF_sex_orchard + All_Traits_Analysis_0mods_MG_sex_orchard + All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR + All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
-
-Sex_Joined
-```
-
 
 
 
@@ -157,15 +145,3 @@ Traits_Analysis_OF_orchard_lnCVR <- orchard_plot(Traits_Analysis_OF_lnCVR, mod =
    scale_fill_manual(values=c("#999999","#999999","#999999","#999999","#999999","#999999","#999999","#999999"))
 Traits_Analysis_OF_orchard_lnCVR
 ```
-
-### Joining Traits
-
-```{r}
-Traits_Joined <- Traits_Analysis_OF_orchard + Traits_Analysis_MG_orchard + Traits_Analysis_OF_orchard_lnCVR + Traits_Analysis_MG_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
-
-Traits_Joined
-```
-
-
-
-
