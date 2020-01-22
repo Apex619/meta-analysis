@@ -15,10 +15,12 @@ output:
 #install.packages("R.rsp")
 #install.packages("cowplot")
 #install.packages("ggpubr")
+#install.packages("extrafont")
+#extrafont::loadfonts(device="win")
 
 #devtools::install_github("itchyshin/orchard_plot", subdir = "orchaRd", force = TRUE, build_vignettes = TRUE)
 
-
+library(extrafontdb)
 library(tidyverse)
 library(openxlsx)  
 library(knitr)
@@ -60,24 +62,32 @@ Overall_Exp_Type_orchard_joined
 #MG F0 lnRR
 All_Traits_Analysis_0mods_MG_f0_orchard <- orchard_plot(All_Traits_Analysis_0mods_MG_f0, mod = "F0_Parent_Exposed", xlab = "lnRR", transfm = "none")+
   scale_colour_manual(values=c("#E69F00","#E69F00"))+
-   scale_fill_manual(values=c("#999999","#999999"))
+   scale_fill_manual(values=c("#999999","#999999"))+
+  ggtitle("Multigenerational")+
+   theme(plot.title=element_text(face = 'bold', colour="#E69F00")) 
 All_Traits_Analysis_0mods_MG_f0_orchard
 #OF F0 lnRR
 All_Traits_Analysis_0mods_OF_f0_orchard <- orchard_plot(All_Traits_Analysis_0mods_OF_f0, mod = "F0_Parent_Exposed", xlab = "lnRR", transfm = "none")+
   scale_colour_manual(values=c("#56B4E9","#56B4E9","#56B4E9"))+
-   scale_fill_manual(values=c("#999999","#999999","#999999"))
+   scale_fill_manual(values=c("#999999","#999999","#999999"))+
+  ggtitle("One off")+       #Adding title
+   theme(plot.title=element_text(face = 'bold', colour="#56B4E9"))   #Adding colour for title to match forest plot
 All_Traits_Analysis_0mods_OF_f0_orchard
 
 #MG Sex lnRR
 All_Traits_Analysis_0mods_MG_sex_orchard <- orchard_plot(All_Traits_Analysis_0mods_MG_sex, mod = "Sex", xlab = "lnRR", transfm = "none")+
   scale_colour_manual(values=c("#E69F00","#E69F00","#E69F00"))+
-   scale_fill_manual(values=c("#999999","#999999","#999999"))
+   scale_fill_manual(values=c("#999999","#999999","#999999"))+
+  ggtitle("Multigenerational")+
+   theme(plot.title=element_text(face = 'bold', colour="#E69F00")) 
 All_Traits_Analysis_0mods_MG_sex_orchard
 
 #OF Sex lnRR
 All_Traits_Analysis_0mods_OF_sex_orchard <- orchard_plot(All_Traits_Analysis_0mods_OF_sex, mod = "Sex", xlab = "lnRR", transfm = "none")+
   scale_colour_manual(values=c("#56B4E9","#56B4E9","#56B4E9"))+
-   scale_fill_manual(values=c("#999999","#999999","#999999"))
+   scale_fill_manual(values=c("#999999","#999999","#999999"))+
+  ggtitle("One off")+       #Adding title
+   theme(plot.title=element_text(face = 'bold', colour="#56B4E9"))
 All_Traits_Analysis_0mods_OF_sex_orchard
 
 
@@ -89,19 +99,34 @@ All_Traits_Analysis_0mods_MG_f0_orchard_lnCVR
 #OF F0 lnCVR
 All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_OF_f0_lnCVR, mod = "F0_Parent_Exposed", xlab = "lnCVR", transfm = "none")+
   scale_colour_manual(values=c("#56B4E9","#56B4E9","#56B4E9"))+
-   scale_fill_manual(values=c("#999999","#999999","#999999"))
+   scale_fill_manual(values=c("#999999","#999999","#999999"))+
+  ggtitle("One off")+       #Adding title
+   theme(plot.title=element_text(face = 'bold', colour="#56B4E9"))
 All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR
 
 #MG Sex lnCVR
 All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_MG_sex_lnCVR, mod = "Sex", xlab = "lnCVR", transfm = "none")+
   scale_colour_manual(values=c("#E69F00","#E69F00","#E69F00"))+
-   scale_fill_manual(values=c("#999999","#999999","#999999"))
+   scale_fill_manual(values=c("#999999","#999999","#999999"))+
+  ggtitle("Multigenerational")+
+   theme(plot.title=element_text(face = 'bold', colour="#E69F00")) 
 All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR
 
 #OF Sex lnCVR
 All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_OF_sex_lnCVR, mod = "Sex", xlab = "lnCVR", transfm = "none")+
   scale_colour_manual(values=c("#56B4E9","#56B4E9","#56B4E9"))+
-   scale_fill_manual(values=c("#999999","#999999","#999999"))
+   scale_fill_manual(values=c("#999999","#999999","#999999"))+
+  ggtitle("One off")+       #Adding title
+   theme(plot.title=element_text(face = 'bold', colour="#56B4E9"))
+  #theme(                                # Everything from here onwards edits the legend
+#legend.position = c(0.05, 0.99),
+#legend.justification = c(0, 1),
+#legend.key.size = unit(1, "mm")) +
+#theme(
+#legend.direction = "horizontal",
+#legend.title = element_text(size = 8),
+#legend.text = element_text(size = 10)) +
+#scale_x_continuous(expand = c(0.1, 0.1))
 All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR
 ```
 
@@ -109,15 +134,23 @@ All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR
 ```{r}
 Exposed_Sex_F0_Joined <- All_Traits_Analysis_0mods_OF_sex_orchard + All_Traits_Analysis_0mods_MG_f0_orchard + All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR +  All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
 
-Exposed_Sex_F0_Joined
+Title_F0 <- Exposed_Sex_F0_Joined + plot_annotation(
+  title = 'Exposed Sex (F0)',
+  theme = theme(plot.title = element_text(size = 20, family = "Garamond")))
+ 
+
+Final_Exposed_F0 <- Title_F0 + plot_annotation(tag_levels = 'A') 
+
+Final_Exposed_F0
 ```
 
 ### Joining plots - Grand offspring Sex
 
 ```{r}
-Sex_Joined <- All_Traits_Analysis_0mods_OF_sex_orchard + All_Traits_Analysis_0mods_MG_sex_orchard + All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR + All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
+Sex_Joined <- All_Traits_Analysis_0mods_OF_sex_orchard + All_Traits_Analysis_0mods_MG_sex_orchard + All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR + All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR + plot_layout(ncol=2,nrow = 2) 
 
-Sex_Joined
+
+Sex_Joined + plot_annotation()
 ```
 
 
@@ -128,6 +161,7 @@ Sex_Joined
 #Sample Sizes Multigenerational and One off
 
 #MG_ALL$N <- rowSums(MG_ALL[, c("Sample_Size_n_Control", "Sample_Size_n_Treatment")])
+
 #OF_ALL$N <- rowSums(OF_ALL[, c("Sample_Size_n_Control", "Sample_Size_n_Treatment")])
 
 #MG Trats lnRR
