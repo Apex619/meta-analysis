@@ -22,8 +22,8 @@ output:
 
 #font_import() #importing fonts
 #loadfonts() #loading fonts
-#extrafont::loadfonts(device="win")
 library(extrafontdb)
+extrafont::loadfonts(device="win")
 library(tidyverse)
 library(openxlsx)  
 library(knitr)
@@ -62,7 +62,7 @@ Overall_Exp_Type_orchard_joined <- Overall_Exposure_Type_orchard_lnRR/Overall_Ex
 
 Overall <- Overall_Exp_Type_orchard_joined + plot_annotation(
   title = 'Overall',
-  theme = theme(plot.title = element_text(size = 20, family = "Garamond"))) 
+  theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold'))) 
 Overall
 ```
 
@@ -165,7 +165,7 @@ Exposed_Sex_F0_Joined <- All_Traits_Analysis_0mods_OF_f0_orchard + All_Traits_An
 
 Final_Exposed_F0 <- Exposed_Sex_F0_Joined + plot_annotation(
   title = 'Exposed Sex (F0)',
-  theme = theme(plot.title = element_text(size = 20, family = "Garamond")))
+  theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold')))
  
 
 Final_Exposed_F0
@@ -179,10 +179,10 @@ Sex_Joined <- All_Traits_Analysis_0mods_OF_sex_orchard + All_Traits_Analysis_0mo
 
 Final_Sex <- Sex_Joined + plot_annotation(
   title = 'Grand offspring Sex',
-  theme = theme(plot.title = element_text(size = 20, family = "Garamond")))
+  theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold')))
  
 
-  Final_Sex
+Final_Sex
 ```
 
 
@@ -260,7 +260,7 @@ Traits_Joined <- Traits_Analysis_OF_orchard + Traits_Analysis_MG_orchard + Trait
 
 Traits_Final <- Traits_Joined + plot_annotation(
   title = 'Traits',
-  theme = theme(plot.title = element_text(size = 20, family = "Garamond")))
+  theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold')))
 
 Traits_Final
 ```
