@@ -22,10 +22,11 @@ library(tidyverse)
 ### Overall Model (Full, not split by exposure type) lnRR
 
 ```{r}
-Full_Regression <- rma.mv(yi, vi, mods =  ~ Trait + Exposure_Type + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+Full_Regression <- rma.mv(yi, VmatCVR_all, mods =  ~ Trait + Exposure_Type + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(Full_Regression)
 funnel(Full_Regression,yaxis="seinv")
+I2_full <- I2_Hamza(Full_Regression)
 
 #Publication Bias Test on full model
 Full_Regression_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Exposure_Type + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
@@ -79,54 +80,6 @@ funnel(Full_Regression_egg_trait,yaxis="seinv")
 ```
 
 
-
-### Time lag bias - Univariate lnRR
-```{r}
-Time_Lag <- rma.mv(yi, vi, mods =  ~ Year, random = list(~1|Trait,~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-pred_time_lag_effect_uni <- predict.rma(Time_Lag)
-
-fit_time_lag_effect <- Effect_Size_All_Traits %>% mutate(ymin = pred_time_lag_effect_uni$ci.lb, 
-    ymax = pred_time_lag_effect_uni$ci.ub, ymin2 = pred_time_lag_effect_uni$cr.lb, 
-    ymax2 = pred_time_lag_effect_uni$cr.ub, pred = pred_time_lag_effect_uni$pred) %>% 
-    ggplot(aes(x = Year, y = yi, size = (1/ vi) + 3)) + geom_point(shape = 21, 
-    fill = "grey90")+
-  geom_smooth(aes(y = ymin2), method = "loess", se = FALSE, lty = "dotted", lwd = 0.25, 
-    colour = "#0072B2") + geom_smooth(aes(y = ymax2), method = "loess", se = FALSE, 
-    lty = "dotted", lwd = 0.25, colour = "#0072B2") + geom_smooth(aes(y = ymin), 
-    method = "loess", se = FALSE, lty = "dotted", lwd = 0.25, colour = "#D55E00") + 
-    geom_smooth(aes(y = ymax), method = "loess", se = FALSE, lty = "dotted", 
-        lwd = 0.25, colour = "#D55E00") + geom_smooth(aes(y = pred), method = "loess", 
-    se = FALSE, lty = "dashed", lwd = 0.5, colour = "black") + ylim(-1, 2) + 
-    xlim(1994, 2019) + scale_x_continuous(breaks = c(1995, 2000, 2005, 2010, 
-    2015, 2020)) 
-
-fit_time_lag_effect
-```
-
-### Time lag bias - Multivariate lnRR
-```{r}
-Time_Lag_multi <- rma.mv(yi, vi, mods =  ~ Year + Trait + F0_Parent_Exposed + Sex + Exposure_Type, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-pred_time_lag_effect_multi <- predict.rma(Time_Lag_multi)
-
-fit_time_lag_effect_multi <- Effect_Size_All_Traits %>% mutate(ymin = pred_time_lag_effect_multi$ci.lb, 
-    ymax = pred_time_lag_effect_multi$ci.ub, ymin2 = pred_time_lag_effect_multi$cr.lb, 
-    ymax2 = pred_time_lag_effect_multi$cr.ub, pred = pred_time_lag_effect_multi$pred) %>% 
-    ggplot(aes(x = Year, y = yi, size = (1/ vi) + 3)) + geom_point(shape = 21, 
-    fill = "grey90")+
-  geom_smooth(aes(y = ymin2), method = "loess", se = FALSE, lty = "dotted", lwd = 0.25, 
-    colour = "#0072B2") + geom_smooth(aes(y = ymax2), method = "loess", se = FALSE, 
-    lty = "dotted", lwd = 0.25, colour = "#0072B2") + geom_smooth(aes(y = ymin), 
-    method = "loess", se = FALSE, lty = "dotted", lwd = 0.25, colour = "#D55E00") + 
-    geom_smooth(aes(y = ymax), method = "loess", se = FALSE, lty = "dotted", 
-        lwd = 0.25, colour = "#D55E00") + geom_smooth(aes(y = pred), method = "loess", 
-    se = FALSE, lty = "dashed", lwd = 0.5, colour = "black") + ylim(-1, 2) + 
-    xlim(1994, 2019) + scale_x_continuous(breaks = c(1995, 2000, 2005, 2010, 
-    2015, 2020)) 
-
-fit_time_lag_effect_multi
-```
 
 
 

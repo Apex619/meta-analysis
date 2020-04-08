@@ -1,0 +1,42 @@
+---
+title: "Results_Tables"
+author: "Hamza"
+date: "28/01/2020"
+output: html_document
+---
+
+```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
+#install.packages("devtools")
+#install.packages("tidyverse")
+#install.packages("metafor")
+#install.packages("patchwork")
+#install.packages("R.rsp")
+#install.packages("cowplot")
+#install.packages("ggpubr")
+#install.packages("extrafont")
+#install.packages("stargazer")
+
+
+#devtools::install_github("itchyshin/orchard_plot", subdir = "orchaRd", force = TRUE, build_vignettes = TRUE)
+
+#font_import() #importing fonts
+#loadfonts() #loading fonts
+library(stargazer)
+library(extrafontdb)
+extrafont::loadfonts(device="win")
+library(tidyverse)
+library(openxlsx)  
+library(knitr)
+library(metafor)
+library(ggplot2)
+library(readxl)
+library(orchaRd)
+library(patchwork)
+library(tidyverse)
+library(cowplot)
+library(sj)
+library(ggpubr)
+#Install miktex and then run this to knit a pdf file
+#install.packages('tinytex')
+#tinytex::install_tinytex()
+```

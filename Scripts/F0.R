@@ -16,5 +16,13 @@ funnel(modelf0)
 modelf1 <- rma.mv(yi, vi, mod = ~Age_Days, random = ~ 1|Paper_ID, data=Effect_Size_F0)
 summary(modelf1)
 
-prediction <- predict(modelf1, newmods = 100)
+prediction <- predict(modelf1, newmods = c(50, 100, 150))
 prediction
+
+model_offspring <- rma.mv(yi, vi, mod = ~Age_Days, random = list(~1|Cohort_ID,~1|ES_ID), data=Body_Weight_lnRR_MG)
+
+prediction_f2 <- predict(model_offspring, newmods = c(50, 100, 150))
+
+prediction_f2
+
+

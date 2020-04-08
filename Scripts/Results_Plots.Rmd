@@ -40,20 +40,25 @@ library(ggpubr)
 #tinytex::install_tinytex()
 ```
 
-### Question 1 - Exposure Type
+
+### Question 1 - Exposure Type (used as a moderator)
 ```{r}
 #lnRR
 Overall_Exposure_Type_orchard_lnRR <- orchard_plot(All_Traits_Analysis_Exp, mod = "Exposure_Type", xlab = "lnRR", transfm = "none", angle = 45)+
   scale_colour_manual(values=c("#E69F00", "#56B4E9"))+
   scale_fill_manual(values=c("#999999","#999999"))+
-  labs(title="A")
+  labs(title="A",
+       subtitle = "Differences in means between control and treatment groups" )+
+  xlim(-3, 4)
 Overall_Exposure_Type_orchard_lnRR
 
 #lnCVR
 Overall_Exposure_Type_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_Exp_lnCVR, mod = "Exposure_Type", xlab = "lnCVR", transfm = "none", angle =45)+
   scale_colour_manual(values=c("#E69F00", "#56B4E9"))+
   scale_fill_manual(values=c("#999999","#999999"))+
-  labs(title = "B")
+  labs(title = "B",
+       subtitle = "Differences in variance between control and treatment groups")+
+  xlim(-3,4)
 Overall_Exposure_Type_orchard_lnCVR
 
 #Joining Plots 
@@ -62,9 +67,22 @@ Overall_Exp_Type_orchard_joined <- Overall_Exposure_Type_orchard_lnRR/Overall_Ex
 
 Overall <- Overall_Exp_Type_orchard_joined + plot_annotation(
   title = 'Overall',
-  theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold'))) 
+  theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold')))
+
 Overall
+
+#Saving plots
+#setwd if I really want to save in Plots folder
+
+ggsave("Overall.pdf", width = 16, height = 20, units = "cm", device = cairo_pdf)
+
+ggsave("Overall.jpg", width = 16, height = 20, units = "cm")
+
+
+ 
 ```
+
+
 
 ### Question 2 and 3 - Parental Sex and Offspring Sex
 ```{r}
@@ -72,9 +90,10 @@ Overall
 All_Traits_Analysis_0mods_MG_f0_orchard <- orchard_plot(All_Traits_Analysis_0mods_MG_f0, mod = "F0_Parent_Exposed", xlab = "lnRR", transfm = "none")+
   scale_colour_manual(values=c("#E69F00","#E69F00"))+
    scale_fill_manual(values=c("#999999","#999999"))+
-  labs(title = "D",
+  labs(title = "E",
   subtitle = "Multigenerational")+
-  theme(plot.subtitle=element_text(face = 'bold', colour="#E69F00")) 
+  theme(plot.subtitle=element_text(face = 'bold', colour="#E69F00")) +
+   xlim(-1,4)
   
 All_Traits_Analysis_0mods_MG_f0_orchard
 #OF F0 lnRR
@@ -83,14 +102,15 @@ All_Traits_Analysis_0mods_OF_f0_orchard <- orchard_plot(All_Traits_Analysis_0mod
    scale_fill_manual(values=c("#999999","#999999","#999999"))+
   labs(title = "C",
   subtitle = "One off")+
-  theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9"))   #Adding colour for title to match forest plot
+  theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9"))+
+  xlim(-1,4)
 All_Traits_Analysis_0mods_OF_f0_orchard
 
 #MG Sex lnRR
 All_Traits_Analysis_0mods_MG_sex_orchard <- orchard_plot(All_Traits_Analysis_0mods_MG_sex, mod = "Sex", xlab = "lnRR", transfm = "none")+
   scale_colour_manual(values=c("#E69F00","#E69F00","#E69F00"))+
    scale_fill_manual(values=c("#999999","#999999","#999999"))+
-  labs(title = "H",
+  labs(title = "I",
   subtitle = "Multigenerational")+
   theme(plot.subtitle=element_text(face = 'bold', colour="#E69F00")) 
 All_Traits_Analysis_0mods_MG_sex_orchard
@@ -101,7 +121,8 @@ All_Traits_Analysis_0mods_OF_sex_orchard <- orchard_plot(All_Traits_Analysis_0mo
    scale_fill_manual(values=c("#999999","#999999","#999999"))+
   labs(title = "G",
   subtitle = "One off")+
-  theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9")) 
+  theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9"))+
+  xlim(-1,4) 
 All_Traits_Analysis_0mods_OF_sex_orchard
 
 
@@ -117,7 +138,7 @@ All_Traits_Analysis_0mods_MG_f0_orchard_lnCVR
 All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_OF_f0_lnCVR, mod = "F0_Parent_Exposed", xlab = "lnCVR", transfm = "none")+
   scale_colour_manual(values=c("#56B4E9","#56B4E9","#56B4E9"))+
    scale_fill_manual(values=c("#999999","#999999","#999999"))+
-  labs(title = "E",
+  labs(title = "D",
   subtitle = "One off")+
   theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9")) 
 All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR
@@ -144,9 +165,10 @@ All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR
 All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_0mods_OF_sex_lnCVR, mod = "Sex", xlab = "lnCVR", transfm = "none")+
   scale_colour_manual(values=c("#56B4E9","#56B4E9","#56B4E9"))+
    scale_fill_manual(values=c("#999999","#999999","#999999"))+
-  labs(title = "I",
+  labs(title = "H",
   subtitle = "One off")+
-  theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9")) 
+  theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9")) +
+  xlim(-3,2)
   #theme(                                # Everything from here onwards edits the legend
 #legend.position = c(0.05, 0.99),
 #legend.justification = c(0, 1),
@@ -161,20 +183,26 @@ All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR
 
 ### Joining Plots - Exposed Sex F0
 ```{r}
-Exposed_Sex_F0_Joined <- All_Traits_Analysis_0mods_OF_f0_orchard + All_Traits_Analysis_0mods_MG_f0_orchard + All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR +  All_Traits_Analysis_0mods_MG_f0_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
+Exposed_Sex_F0_Joined <- All_Traits_Analysis_0mods_OF_f0_orchard + All_Traits_Analysis_0mods_OF_f0_orchard_lnCVR + All_Traits_Analysis_0mods_MG_f0_orchard +  All_Traits_Analysis_0mods_MG_f0_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
 
 Final_Exposed_F0 <- Exposed_Sex_F0_Joined + plot_annotation(
   title = 'Exposed Sex (F0)',
   theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold')))
  
 
+
 Final_Exposed_F0
+
+ggsave("Exposed_F0.pdf", width = 20, height = 20, units = "cm", device = cairo_pdf)
+ggsave("Exposed_F0.jpg", width = 20, height = 20, units = "cm")
+
+
 ```
 
 ### Joining plots - Grand offspring Sex
 
 ```{r}
-Sex_Joined <- All_Traits_Analysis_0mods_OF_sex_orchard + All_Traits_Analysis_0mods_MG_sex_orchard + All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR + All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR + plot_layout(ncol=2,nrow = 2) 
+Sex_Joined <- All_Traits_Analysis_0mods_OF_sex_orchard + All_Traits_Analysis_0mods_OF_sex_orchard_lnCVR + All_Traits_Analysis_0mods_MG_sex_orchard + All_Traits_Analysis_0mods_MG_sex_orchard_lnCVR + plot_layout(ncol=2,nrow = 2) 
 
 
 Final_Sex <- Sex_Joined + plot_annotation(
@@ -183,6 +211,9 @@ Final_Sex <- Sex_Joined + plot_annotation(
  
 
 Final_Sex
+
+ggsave("Sex.pdf", width = 20, height = 20, units = "cm", device = cairo_pdf)
+ggsave("Sex.jpg", width = 20, height = 20, units = "cm")
 ```
 
 
@@ -201,7 +232,7 @@ Final_Sex
 Traits_Analysis_MG_orchard <- orchard_plot(Traits_Analysis_MG, mod = "Trait", xlab = "lnRR", transfm = "none", angle = 45)+
   scale_colour_manual(values=c("#E69F00","#E69F00","#E69F00","#E69F00","#E69F00","#E69F00","#E69F00","#E69F00"))+
    scale_fill_manual(values=c("#999999","#999999","#999999","#999999","#999999","#999999","#999999","#999999"))+
-  labs(title = "L",
+  labs(title = "M",
   subtitle = "Multigenerational")+
   theme(plot.subtitle=element_text(face = 'bold', colour="#E69F00")) 
 Traits_Analysis_MG_orchard
@@ -212,7 +243,8 @@ Traits_Analysis_OF_orchard <- orchard_plot(Traits_Analysis_OF, mod = "Trait", xl
    scale_fill_manual(values=c("#999999","#999999","#999999","#999999","#999999","#999999","#999999","#999999"))+
   labs(title = "K",
   subtitle = "One off")+
-  theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9")) 
+  theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9")) +
+  xlim(-1,4)
 Traits_Analysis_OF_orchard
 
 #MG Trats lnCVR
@@ -238,7 +270,7 @@ Traits_Analysis_MG_orchard_lnCVR
 Traits_Analysis_OF_orchard_lnCVR <- orchard_plot(Traits_Analysis_OF_lnCVR, mod = "Trait", xlab = "lnCVR", transfm = "none", angle = 45)+
   scale_colour_manual(values=c("#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9"))+
    scale_fill_manual(values=c("#999999","#999999","#999999","#999999","#999999","#999999","#999999","#999999"))+
-  labs(title = "M",
+  labs(title = "L",
   subtitle = "One off")+
   theme(plot.subtitle=element_text(face = 'bold', colour="#56B4E9")) +
    theme(                                # Everything from here onwards edits the legend
@@ -249,20 +281,31 @@ theme(
 legend.direction = "horizontal",
 legend.title = element_text(size = 8),
 legend.text = element_text(size = 10)) +
-scale_x_continuous(expand = c(0.1, 0.1))
+scale_x_continuous(expand = c(0.1, 0.1))+
+  xlim(-3,2)
 Traits_Analysis_OF_orchard_lnCVR
 ```
 
 ### Joining Traits
 
 ```{r}
-Traits_Joined <- Traits_Analysis_OF_orchard + Traits_Analysis_MG_orchard + Traits_Analysis_OF_orchard_lnCVR + Traits_Analysis_MG_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
+Traits_Joined_OF <- Traits_Analysis_OF_orchard + Traits_Analysis_OF_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
+Traits_Joined_MG <- Traits_Analysis_MG_orchard + Traits_Analysis_MG_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
+Traits_Joined_OF
+ggsave("Traits_OF.jpg", width = 20, height = 16, units = "cm")
+
+
 
 Traits_Final <- Traits_Joined + plot_annotation(
   title = 'Traits',
   theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold')))
 
 Traits_Final
+
+ggsave("Traits.pdf", width = 25, height = 20, units = "cm", device = cairo_pdf)
+ggsave("Traits.jpg", width = 25, height = 20, units = "cm")
+
+
 ```
 
 

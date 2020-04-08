@@ -7,6 +7,223 @@ output:
   html_document: default
   word_document: default
 ---
+## Setups
+
+### Loading packages and custom functions
+
+```{r}
+# loading packages
+# devtools::install_github("thomasp85/patchwork")
+pacman::p_load(tidyverse, # tidy family and related pacakges below
+               kableExtra, 
+               gridExtra, # may not use this
+               purrr,
+               magrittr, # extending piping
+               pander,   # nice tables
+               metafor,  # package for meta-analysis
+               MCMCglmm,  # Bayeisan mixed model package
+               ggbeeswarm, # making bee-swarm plots possible
+               plotly,     # interactive plots using ggplot2
+               MuMIn,  # multi-model inference
+               lme4,   # lmm & glmm (models)
+               broom.mixed, # getting estimates from lmer + glmer objects
+               performance, # getting R2 from lmer + glmer objects
+               png,         # reading png files
+               grid,        # graphic layout manipulation
+               patchwork    # putting ggplots together - you need to install via devtool
+               #lmerTest   # more functions for lme4
+               #mi,      # missing data analysis
+               #betareg   # dependance of the above
+)
+```
+
+#### Custom functions
+
+We have 5 custom functions named : `p_to_Zr()`,`I2()`, `R2()`, `get_est()`, `get_pred()`, and `cont_gen()`, all of which are used later (see below for their functionality) and the code are included here. 
+
+```{r}
+# coustm functions
+
+#' Title: getting Zr and its sampling variance from p value 
+#'
+#' @param data: data frame 
+#' @param pval: p value
+#' @param N: sample size (N: the number of species ) and the degrees of freedom df = N - 2
+#'
+#' @return
+#' @export
+#'
+#' @examples
+p_to_Zr <- function(data, pval, N) {
+  
+  # turning them into strings
+  pval <- data[[deparse(substitute(pval))]]
+  N <- data[[deparse(substitute(N))]]
+  
+  # getting t values 
+  tval<- -qt(pval, N - 2) 
+  rval <- tval / sqrt((tval^2) + (N - 2))
+  
+  # define Zr function
+  # Zr <- 0.5*(log(1 + rval) - log(1 - rval)); the same as below
+  # r <-tanh(Zr) # turning Zr to r
+  Zr <- atanh(rval)
+  
+  # getting Var(Zr)
+  VZr <- 1 / (N - 3)
+  
+  # putting all together
+  Zrs <- tibble(rval, Zr, VZr)
+  data <- bind_cols(data, Zrs)
+}
+
+# coverting back Zr to r
+# Just use "psych" pacakge - fisherz2r(z) - <http://personality-project.org/r/psych/help/fisherz.html>
+# or this will do : r to Zr is tanh(r)!!
+
+# Functions for processing
+
+
+# General modeling functions 
+# Functions for I2
+
+#' Title Function to obtain total and separate I2 from multilevel-meta-analytic model
+#'
+#' @param model 
+#' @param method 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+I2 <- function(model, method = c("Wolfgang", "Shinichi")){
+  
+  ## evaluate choices
+  method <- match.arg(method)
+  
+  # Wolfgang's method
+  if(method == "Wolfgang"){
+    W <- solve(model$V) 
+    X <- model.matrix(model)
+    P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+    I2_total <- sum(model$sigma2) / (sum(model$sigma2) + (model$k - model$p) / sum(diag(P)))
+    I2_each  <- model$sigma2 / (sum(model$sigma2) + (model$k - model$p) / sum(diag(P)))
+    names(I2_each) = paste0("I2_", model$s.names)
+    
+    # putting all together
+    I2s <- c(I2_total = I2_total, I2_each)
+    
+    # or my way
+  } else {
+    # sigma2_v = typical sampling error variance
+    sigma2_v <- sum(1/model$vi) * (model$k-1) / (sum(1/model$vi)^2 - sum((1/model$vi)^2)) 
+    I2_total <- sum(model$sigma2) / (sum(model$sigma2) + sigma2_v) #s^2_t = total variance
+    I2_each  <- model$sigma2 / (sum(model$sigma2) + sigma2_v)
+    names(I2_each) = paste0("I2_", model$s.names)
+    
+    # putting all together
+    I2s <- c(I2_total = I2_total, I2_each)
+  }
+  return(I2s)
+}
+
+I2_Hamza <- function(model){
+W <- diag(1/model$vi)
+X <- model.matrix(model)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2_total <- 100 * sum(model$sigma2) / (sum(model$sigma2) + (model$k-model$p)/sum(diag(P)))
+}
+
+
+# test <- dataset$fit4.1[[3]]
+# I2(test, method = "Wolfgang")
+# I2(test, method = "Shinichi")
+
+
+#' Title: R2 based on Nakagawa & Schielzeth 2013
+#'
+#' @param model 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+R2 <- function(model){
+  warning("Conditional R2 is not meaningful and the same as marginal R2\n")
+  
+  # fixed effect variance
+  fix <- var(as.numeric(as.vector(model$b) %*% t(as.matrix(model$X))))
+  
+  # marginal
+  R2m <- fix / (fix + sum(model$sigma2))
+  R2
+  #Rm <- round(100*R2m, 3)
+  
+  # conditional
+  R2c <- (fix + sum(model$sigma2) - model$sigma2[length(model$sigma2)]) / 
+    (fix + sum(model$sigma2))
+  
+  R2s <- c(R2_marginal = R2m, R2_coditional = R2c)
+  return(R2s)
+}
+
+
+#' Title: the function to get estimates from rma objects (metafor)
+#'
+#' @param model: rma.mv object 
+#' @param mod: the name of a moderator 
+get_est <- function (model, mod = " ") {
+  
+  name <- as.factor(str_replace(row.names(model$beta), mod, ""))
+  estimate <- as.numeric(model$beta)
+  lowerCL <- model$ci.lb
+  upperCL <- model$ci.ub 
+  
+  table <- tibble(name = name, estimate = estimate, lowerCL = lowerCL, upperCL = upperCL)
+}
+
+
+#' Title: the function to get prediction intervals (crediblity intervals) from rma objects (metafor)
+#'
+#' @param model: rma.mv object 
+#' @param mod: the name of a moderator 
+get_pred <- function (model, mod = " ") {
+  name <- as.factor(str_replace(row.names(model$beta), mod, ""))
+  len <- length(name)
+  
+  if(len != 1){
+  newdata <- matrix(NA, ncol = len, nrow = len)
+  for(i in 1:len) {
+    # getting the position of unique case from X (design matrix)
+    pos <- which(model$X[,i] == 1)[[1]]
+    newdata[, i] <- model$X[pos,]
+    }
+  pred <- predict.rma(model, newmods = newdata)
+  }
+  else {
+    pred <- predict.rma(model)
+    }
+  lowerPR <- pred$cr.lb
+  upperPR <- pred$cr.ub 
+  
+  table <- tibble(name = name, lowerPR = lowerPR, upperPR = upperPR)
+}
+
+#Here are links for how to do confidence regions for rma.mv regression lines
+#https://www.rdocumentation.org/packages/metafor/versions/1.9-9/topics/predict.rma
+#https://stackoverflow.com/questions/50804464/out-of-sample-prediction-for-rma-object-in-metafor
+
+
+#' Title: Contrast name geneator
+#'
+#' @param name: a vector of character strings
+cont_gen <- function (name) {
+  combination <- combn(name,2)
+  name_dat <- t(combination)
+  names <- paste(name_dat[ ,1], name_dat[, 2], sep = "-")
+  return(names)
+}
+```
 
 ```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -30,6 +247,22 @@ library(tidyverse)
 
 #Import data
 ALL_TRAITS <- read_excel("../data/ALL_TRAITS.xlsx")
+```
+
+### Calculating control animals and treatment animals used
+
+```{r}
+sum(ALL_TRAITS$Sample_Size_n_Treatment)
+
+sum(ALL_TRAITS$Sample_Size_n_Control)
+
+#Assigning Control Id's by combining Paper ID and Shared_Control
+
+
+ALL_TRAITS$Control_ID <- paste(ALL_TRAITS$Paper_ID, ALL_TRAITS$Shared_Control)
+
+unique(ALL_TRAITS$Cohort_ID) %>% length()
+
 ```
 
 ## Meta-analysis overall results (lnRR)
@@ -99,6 +332,12 @@ All_Traits_Analysis_0mods <- rma.mv(yi, vi, random = list(~1|Trait, ~1|Paper_ID,
 
 summary(All_Traits_Analysis_0mods)
 funnel(All_Traits_Analysis_0mods,yaxis="seinv")
+
+#With Control_ID Matrix as "vi"
+
+All_Traits_Analysis_0mods_matrix <- rma.mv(yi, VmatCVR_all, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+
+All_Traits_Analysis_0mods_matrix
 
 #NOTES
 #Yes, adding vi as a moderator is indeed the logical way of extending Egger's test to more complex models. Actually, using the sampling variances as a moderator is just one possibility of conducting the "regression test for funnel plot asymmetry". 
@@ -173,16 +412,14 @@ plot_lnRR_overall_traits
 ```{r}
 
 #Exposure type meta-regression
-All_Traits_Analysis_Exp <- rma.mv(yi, vi, mods= ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID,~1|Trait), data=Effect_Size_All_Traits, method = 'REML')
+All_Traits_Analysis_Exp <- rma.mv(yi, VmatCVR_all, mods= ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID,~1|Trait), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Traits_Analysis_Exp)
 funnel(All_Traits_Analysis_Exp,yaxis="seinv")
+I2 <- I2_Hamza(All_Traits_Analysis_Exp)
+I2
 
-W <- diag(1/Effect_Size_All_Traits$vi)
-X <- model.matrix(All_Traits_Analysis_Exp)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-I2_Overall_Exposure <- 100 * sum(All_Traits_Analysis_Exp$sigma2) / (sum(All_Traits_Analysis_Exp$sigma2) + (All_Traits_Analysis_Exp$k-All_Traits_Analysis_Exp$p)/sum(diag(P)))
-I2_Overall_Exposure
+
 
 k_exp <- Effect_Size_All_Traits %>% group_by(Exposure_Type) %>% count()
 k_exp
@@ -208,7 +445,7 @@ plot_lnRR_overall_expmeta
 ## Meta-regression of overall dataset for F0 parent and offspring sex
 Univariate analysis
 ```{r}
-All_Data_Analysis_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+All_Data_Analysis_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Data_Analysis_f0)
 funnel(All_Data_Analysis_f0,yaxis="seinv")
@@ -227,11 +464,7 @@ All_Data_Analysis_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~
 summary(All_Data_Analysis_sex)
 funnel(All_Data_Analysis_sex,yaxis="seinv")
 
-W <- diag(1/Effect_Size_All_Traits$vi)
-X <- model.matrix(All_Data_Analysis_sex)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-I2_Overall_sex <- 100 * sum(All_Data_Analysis_sex$sigma2) / (sum(All_Data_Analysis_sex$sigma2) + (All_Data_Analysis_sex$k-All_Data_Analysis_sex$p)/sum(diag(P)))
-I2_Overall_sex
+
 
 Overall_effects_not_split_f0_sex <- tibble(
   Sex = c("Both", "Female", "Male", "Both", "Female", "Male"),
@@ -299,24 +532,22 @@ plot_lnRR_overall_exp
 ```{r}
 
 #Overall analysis with moderators (by exposure type)
-Traits_Analysis_MG <- rma.mv(yi, vi, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+Traits_Analysis_MG <- rma.mv(yi, VmatCVR_MG, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
 
 summary(Traits_Analysis_MG)
 funnel(Traits_Analysis_MG,yaxis="seinv")
-
-W <- diag(1/MG_ALL$vi)
-X <- model.matrix(Traits_Analysis_MG)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-I2_Trait_MG <- 100 * sum(Traits_Analysis_MG$sigma2) / (sum(Traits_Analysis_MG$sigma2) + (Traits_Analysis_MG$k-Traits_Analysis_MG$p)/sum(diag(P)))
+I2_Trait_MG <- I2_Hamza(Traits_Analysis_MG)
 I2_Trait_MG
 
 k_traits_MG <- MG_ALL %>% group_by(Trait) %>% count()
 k_traits_MG
 
-Traits_Analysis_OF <- rma.mv(yi, vi, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+Traits_Analysis_OF <- rma.mv(yi, VmatCVR_OF, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
 
 summary(Traits_Analysis_OF)
 funnel(Traits_Analysis_OF,yaxis="seinv")
+I2_Traits_OF <- I2_Hamza(Traits_Analysis_OF)
+I2_Traits_OF
 
 W <- diag(1/OF_ALL$vi)
 X <- model.matrix(Traits_Analysis_OF)
@@ -351,26 +582,33 @@ plot_lnRR_overall_trait_exp
 ```{r}
 
 #F0 and offspring sex analysis
-All_Traits_Analysis_0mods_MG_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+All_Traits_Analysis_0mods_MG_f0 <- rma.mv(yi, VmatCVR_MG, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG_f0) #Run eggers regression
 funnel(All_Traits_Analysis_0mods_MG_f0,yaxis="seinv")
+I2_MG_F0 <- I2_Hamza(All_Traits_Analysis_0mods_MG_f0)
+I2_MG_F0
 
-All_Traits_Analysis_0mods_OF_f0 <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+All_Traits_Analysis_0mods_OF_f0 <- rma.mv(yi, VmatCVR_OF, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_f0)
 funnel(All_Traits_Analysis_0mods_OF_f0,yaxis="seinv")
+I2_OF_F0 <- I2_Hamza(All_Traits_Analysis_0mods_OF_f0)
+I2_OF_F0
 
-All_Traits_Analysis_0mods_MG_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+All_Traits_Analysis_0mods_MG_sex <- rma.mv(yi, VmatCVR_MG, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG_sex)
 funnel(All_Traits_Analysis_0mods_MG_sex,yaxis="seinv")
+I2_MG_sex <- I2_Hamza(All_Traits_Analysis_0mods_MG_sex)
+I2_MG_sex
 
-
-All_Traits_Analysis_0mods_OF_sex <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+All_Traits_Analysis_0mods_OF_sex <- rma.mv(yi, VmatCVR_OF, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_sex)
 funnel(All_Traits_Analysis_0mods_OF_sex,yaxis="seinv")
+I2_OF_sex <- I2_Hamza(All_Traits_Analysis_0mods_OF_sex)
+I2_OF_sex
 
 Overall_Exp_mods_lnRR <- tibble(
   Exposure_Type = c("Multigenerational","Multigenerational", "One off", "One off", "One off", "Multigenerational", "Multigenerational","Multigenerational", "One off","One off","One off" ),
@@ -511,19 +749,12 @@ plot_lnRR_overall_traits_lnCVR
 ```{r}
 
 #Exposure type meta-regression
-All_Traits_Analysis_Exp_lnCVR <- rma.mv(yi, vi, mods= ~Exposure_Type-1, random = list(~1|Trait,~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+All_Traits_Analysis_Exp_lnCVR <- rma.mv(yi, VmatCVR_all_lnCVR, mods= ~Exposure_Type-1, random = list(~1|Trait,~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_Exp_lnCVR)
 funnel(All_Traits_Analysis_Exp_lnCVR,yaxis="seinv")
 
-W <- diag(1/Effect_Size_All_Traits_lnCVR$vi)
-X <- model.matrix(All_Traits_Analysis_Exp_lnCVR)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-I2_Overall_Exposure_lnCVR <- 100 * sum(All_Traits_Analysis_Exp_lnCVR$sigma2) / (sum(All_Traits_Analysis_Exp_lnCVR$sigma2) + (All_Traits_Analysis_Exp_lnCVR$k-All_Traits_Analysis_Exp_lnCVR$p)/sum(diag(P)))
-I2_Overall_Exposure_lnCVR
 
-k_exp_lnCVR <- Effect_Size_All_Traits_lnCVR %>% group_by(Exposure_Type) %>% count()
-k_exp_lnCVR
 
 Overall_Exp_meta_lnCVR <- tibble(
   Exposure_Type = c("Multigenerational", "One off"), 
@@ -636,7 +867,7 @@ plot_lnCVR_overall_exp
 ```{r}
 
 
-Traits_Analysis_MG_lnCVR <- rma.mv(yi, vi, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+Traits_Analysis_MG_lnCVR <- rma.mv(yi, VmatCVR_MG_lnCVR, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
 
 summary(Traits_Analysis_MG_lnCVR)
 funnel(Traits_Analysis_MG_lnCVR,yaxis="seinv")
@@ -650,7 +881,7 @@ I2_Trait_MG_lnCVR
 k_traits_MG_lnCVR <- MG_ALL_lnCVR %>% group_by(Trait) %>% count()
 k_traits_MG_lnCVR
 
-Traits_Analysis_OF_lnCVR <- rma.mv(yi, vi, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+Traits_Analysis_OF_lnCVR <- rma.mv(yi, VmatCVR_OF_lnCVR, mods = ~Trait-1, random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
 
 summary(Traits_Analysis_OF_lnCVR)
 funnel(Traits_Analysis_OF_lnCVR,yaxis="seinv")
@@ -687,23 +918,23 @@ plot_lnCVR_overall_trait_exp
 ```{r}
 
 #F0 and offspring sex analysis
-All_Traits_Analysis_0mods_MG_f0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_0mods_MG_f0_lnCVR <- rma.mv(yi, VmatCVR_MG_lnCVR, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG_f0_lnCVR)
 funnel(All_Traits_Analysis_0mods_MG_f0_lnCVR,yaxis="seinv")
 
-All_Traits_Analysis_0mods_OF_f0_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_0mods_OF_f0_lnCVR <- rma.mv(yi, VmatCVR_OF_lnCVR, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_f0_lnCVR)
 funnel(All_Traits_Analysis_0mods_OF_f0_lnCVR,yaxis="seinv")
 
-All_Traits_Analysis_0mods_MG_sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_0mods_MG_sex_lnCVR <- rma.mv(yi, VmatCVR_MG_lnCVR, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG_sex_lnCVR)
 funnel(All_Traits_Analysis_0mods_MG_sex,yaxis="seinv")
 
 
-All_Traits_Analysis_0mods_OF_sex_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_0mods_OF_sex_lnCVR <- rma.mv(yi, VmatCVR_OF_lnCVR, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_sex_lnCVR)
 funnel(All_Traits_Analysis_0mods_OF_sex_lnCVR,yaxis="seinv")
