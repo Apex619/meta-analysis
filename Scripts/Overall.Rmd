@@ -895,23 +895,23 @@ I2_Trait_OF_lnCVR
 k_traits_OF_lnCVR <- OF_ALL_lnCVR %>% group_by(Trait) %>% count()
 k_traits_OF_lnCVR
 
-Traits_analysis_Exp_lnCVR <- tibble(
-  Exposure_Type = c("Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","One off","One off","One off","One off","One off","One off","One off","One off" ),
-  Trait = c("Adiposity", "Body Weight", "Glucose_FBG","Glucose_TT", "Insulin_FI", "Insulin_TT","Leptin", "Triglycerides","Adiposity", "Body Weight", "Glucose_FBG","Glucose_TT", "Insulin_FI", "Insulin_TT","Leptin", "Triglycerides"),
-  lnCVR = c(Traits_Analysis_MG_lnCVR$b[1],Traits_Analysis_MG_lnCVR$b[2],Traits_Analysis_MG_lnCVR$b[3],Traits_Analysis_MG_lnCVR$b[4],Traits_Analysis_MG_lnCVR$b[5],Traits_Analysis_MG_lnCVR$b[6],Traits_Analysis_MG_lnCVR$b[7],Traits_Analysis_MG_lnCVR$b[8],Traits_Analysis_OF_lnCVR$b[1],Traits_Analysis_OF_lnCVR$b[2],Traits_Analysis_OF_lnCVR$b[3],Traits_Analysis_OF_lnCVR$b[4],Traits_Analysis_OF_lnCVR$b[5],Traits_Analysis_OF_lnCVR$b[6],Traits_Analysis_OF_lnCVR$b[7],Traits_Analysis_OF_lnCVR$b[8]),
-  ci.lb = c(Traits_Analysis_MG_lnCVR$ci.lb[1],Traits_Analysis_MG_lnCVR$ci.lb[2],Traits_Analysis_MG_lnCVR$ci.lb[3],Traits_Analysis_MG_lnCVR$ci.lb[4],Traits_Analysis_MG_lnCVR$ci.lb[5],Traits_Analysis_MG_lnCVR$ci.lb[6],Traits_Analysis_MG_lnCVR$ci.lb[7],Traits_Analysis_MG_lnCVR$ci.lb[8],Traits_Analysis_OF_lnCVR$ci.lb[1],Traits_Analysis_OF_lnCVR$ci.lb[2],Traits_Analysis_OF_lnCVR$ci.lb[3],Traits_Analysis_OF_lnCVR$ci.lb[4],Traits_Analysis_OF_lnCVR$ci.lb[5],Traits_Analysis_OF_lnCVR$ci.lb[6],Traits_Analysis_OF_lnCVR$ci.lb[7],Traits_Analysis_OF_lnCVR$ci.lb[8]),
-  ci.ub = c(Traits_Analysis_MG_lnCVR$ci.ub[1],Traits_Analysis_MG_lnCVR$ci.ub[2],Traits_Analysis_MG_lnCVR$ci.ub[3],Traits_Analysis_MG_lnCVR$ci.ub[4],Traits_Analysis_MG_lnCVR$ci.ub[5],Traits_Analysis_MG_lnCVR$ci.ub[6],Traits_Analysis_MG_lnCVR$ci.ub[7],Traits_Analysis_MG_lnCVR$ci.ub[8],Traits_Analysis_OF_lnCVR$ci.ub[1],Traits_Analysis_OF_lnCVR$ci.ub[2],Traits_Analysis_OF_lnCVR$ci.ub[3],Traits_Analysis_OF_lnCVR$ci.ub[4],Traits_Analysis_OF_lnCVR$ci.ub[5],Traits_Analysis_OF_lnCVR$ci.ub[6],Traits_Analysis_OF_lnCVR$ci.ub[7],Traits_Analysis_OF_lnCVR$ci.ub[8]),
-  k = c(k_traits_MG_lnCVR$n[1],k_traits_MG_lnCVR$n[2],k_traits_MG_lnCVR$n[3],k_traits_MG_lnCVR$n[4],k_traits_MG_lnCVR$n[5],k_traits_MG_lnCVR$n[6],k_traits_MG_lnCVR$n[7],k_traits_MG_lnCVR$n[8],k_traits_OF_lnCVR$n[1],k_traits_OF_lnCVR$n[2],k_traits_OF_lnCVR$n[3],k_traits_OF_lnCVR$n[4],k_traits_OF_lnCVR$n[5],k_traits_OF_lnCVR$n[6],k_traits_OF_lnCVR$n[7],k_traits_OF_lnCVR$n[8])
-)
+#Traits_analysis_Exp_lnCVR <- tibble(
+ # Exposure_Type = c("Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","Multigenerational","One off","One off","One off","One off","One off","One off","One off","One off" ),
+  #Trait = c("Adiposity", "Body Weight", "Glucose_FBG","Glucose_TT", "Insulin_FI", "Insulin_TT","Leptin", "Triglycerides","Adiposity", "Body Weight", "Glucose_FBG","Glucose_TT", "Insulin_FI", "Insulin_TT","Leptin", "Triglycerides"),
+  #lnCVR = c(Traits_Analysis_MG_lnCVR$b[1],Traits_Analysis_MG_lnCVR$b[2],Traits_Analysis_MG_lnCVR$b[3],Traits_Analysis_MG_lnCVR$b[4],Traits_Analysis_MG_lnCVR$b[5],Traits_Analysis_MG_lnCVR$b[6],Traits_Analysis_MG_lnCVR$b[7],Traits_Analysis_MG_lnCVR$b[8],Traits_Analysis_OF_lnCVR$b[1],Traits_Analysis_OF_lnCVR$b[2],Traits_Analysis_OF_lnCVR$b[3],Traits_Analysis_OF_lnCVR$b[4],Traits_Analysis_OF_lnCVR$b[5],Traits_Analysis_OF_lnCVR$b[6],Traits_Analysis_OF_lnCVR$b[7],Traits_Analysis_OF_lnCVR$b[8]),
+  #ci.lb = c(Traits_Analysis_MG_lnCVR$ci.lb[1],Traits_Analysis_MG_lnCVR$ci.lb[2],Traits_Analysis_MG_lnCVR$ci.lb[3],Traits_Analysis_MG_lnCVR$ci.lb[4],Traits_Analysis_MG_lnCVR$ci.lb[5],Traits_Analysis_MG_lnCVR$ci.lb[6],Traits_Analysis_MG_lnCVR$ci.lb[7],Traits_Analysis_MG_lnCVR$ci.lb[8],Traits_Analysis_OF_lnCVR$ci.lb[1],Traits_Analysis_OF_lnCVR$ci.lb[2],Traits_Analysis_OF_lnCVR$ci.lb[3],Traits_Analysis_OF_lnCVR$ci.lb[4],Traits_Analysis_OF_lnCVR$ci.lb[5],Traits_Analysis_OF_lnCVR$ci.lb[6],Traits_Analysis_OF_lnCVR$ci.lb[7],Traits_Analysis_OF_lnCVR$ci.lb[8]),
+  #ci.ub = c(Traits_Analysis_MG_lnCVR$ci.ub[1],Traits_Analysis_MG_lnCVR$ci.ub[2],Traits_Analysis_MG_lnCVR$ci.ub[3],Traits_Analysis_MG_lnCVR$ci.ub[4],Traits_Analysis_MG_lnCVR$ci.ub[5],Traits_Analysis_MG_lnCVR$ci.ub[6],Traits_Analysis_MG_lnCVR$ci.ub[7],Traits_Analysis_MG_lnCVR$ci.ub[8],Traits_Analysis_OF_lnCVR$ci.ub[1],Traits_Analysis_OF_lnCVR$ci.ub[2],Traits_Analysis_OF_lnCVR$ci.ub[3],Traits_Analysis_OF_lnCVR$ci.ub[4],Traits_Analysis_OF_lnCVR$ci.ub[5],Traits_Analysis_OF_lnCVR$ci.ub[6],Traits_Analysis_OF_lnCVR$ci.ub[7],Traits_Analysis_OF_lnCVR$ci.ub[8]),
+  #k = c(k_traits_MG_lnCVR$n[1],k_traits_MG_lnCVR$n[2],k_traits_MG_lnCVR$n[3],k_traits_MG_lnCVR$n[4],k_traits_MG_lnCVR$n[5],k_traits_MG_lnCVR$n[6],k_traits_MG_lnCVR$n[7],k_traits_MG_lnCVR$n[8],k_traits_OF_lnCVR$n[1],k_traits_OF_lnCVR$n[2],k_traits_OF_lnCVR$n[3],k_traits_OF_lnCVR$n[4],k_traits_OF_lnCVR$n[5],k_traits_OF_lnCVR$n[6],k_traits_OF_lnCVR$n[7],k_traits_OF_lnCVR$n[8])
+#)
 
-plot_lnCVR_overall_trait_exp <- ggplot(Traits_analysis_Exp_lnCVR, aes(x=Trait, y=lnCVR, colour=Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
-  geom_point(aes(x = Trait, y = lnCVR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(x = "Exposure_Type", y = "lnCVR") +
-  coord_flip()+
-  facet_grid(~Exposure_Type)
-plot_lnCVR_overall_trait_exp
+#plot_lnCVR_overall_trait_exp <- ggplot(Traits_analysis_Exp_lnCVR, aes(x=Trait, y=lnCVR, colour=Exposure_Type)) + 
+ # geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0.05, position = position_dodge(0.3)) +
+  #geom_point(aes(x = Trait, y = lnCVR), position = position_dodge(0.3))+
+  #geom_hline(yintercept = 0, lty = "dotted") +
+  #labs(x = "Exposure_Type", y = "lnCVR") +
+  #coord_flip()+
+  #facet_grid(~Exposure_Type)
+#plot_lnCVR_overall_trait_exp
 ```
 
 

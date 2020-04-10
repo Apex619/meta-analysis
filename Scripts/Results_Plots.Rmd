@@ -289,22 +289,9 @@ Traits_Analysis_OF_orchard_lnCVR
 ### Joining Traits
 
 ```{r}
-Traits_Joined_OF <- Traits_Analysis_OF_orchard + Traits_Analysis_OF_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
-Traits_Joined_MG <- Traits_Analysis_MG_orchard + Traits_Analysis_MG_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
-Traits_Joined_OF
-ggsave("Traits_OF.jpg", width = 20, height = 16, units = "cm")
-
-
-
-Traits_Final <- Traits_Joined + plot_annotation(
-  title = 'Traits',
-  theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold')))
+Traits_Final <- Traits_Analysis_OF_orchard + Traits_Analysis_OF_orchard_lnCVR + Traits_Analysis_MG_orchard + Traits_Analysis_MG_orchard_lnCVR + plot_layout(ncol=2,nrow = 2)
 
 Traits_Final
-
-ggsave("Traits.pdf", width = 25, height = 20, units = "cm", device = cairo_pdf)
-ggsave("Traits.jpg", width = 25, height = 20, units = "cm")
-
 
 ```
 

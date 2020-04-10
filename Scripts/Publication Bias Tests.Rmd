@@ -33,7 +33,7 @@ summary(All_Traits_Analysis_Exp_egg)
 funnel(All_Traits_Analysis_Exp_egg, yaxis = "seinv")
 
 #lnCVR
-All_Traits_Analysis_Exp_egg_lnCVR <- rma.mv(yi, vi, mods= ~Exposure_Type-1 + sqrt(vi), random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID,~1|Trait), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
+All_Traits_Analysis_Exp_egg_lnCVR <- rma.mv(yi, VmatCVR_all_lnCVR, mods= ~Exposure_Type-1 + sqrt(vi), random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID,~1|Trait), data=Effect_Size_All_Traits_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_Exp_egg_lnCVR)
 funnel(All_Traits_Analysis_Exp_egg_lnCVR, yaxis = "seinv")
@@ -74,25 +74,27 @@ funnel(All_Traits_Analysis_0mods_OF_sex_egg,yaxis="seinv")
 
 ### F0 and Offspring Sex lnCVR
 ```{r}
-All_Traits_Analysis_0mods_MG_f0_egg_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+#MG F0
+
+All_Traits_Analysis_0mods_MG_f0_egg_lnCVR <- rma.mv(yi, VmatCVR_MG_lnCVR, mods = ~F0_Parent_Exposed-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG_f0_egg_lnCVR) 
 funnel(All_Traits_Analysis_0mods_MG_f0_egg_lnCVR,yaxis="seinv")
 
 #OF F0
-All_Traits_Analysis_0mods_OF_f0_egg_lnCVR <- rma.mv(yi, vi, mods = ~F0_Parent_Exposed-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_0mods_OF_f0_egg_lnCVR <- rma.mv(yi, VmatCVR_OF_lnCVR, mods = ~F0_Parent_Exposed-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_f0_egg_lnCVR)
 funnel(All_Traits_Analysis_0mods_OF_f0_egg_lnCVR,yaxis="seinv")
 
 #MG Sex
-All_Traits_Analysis_0mods_MG_sex_egg_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_0mods_MG_sex_egg_lnCVR <- rma.mv(yi, VmatCVR_MG_lnCVR, mods = ~Sex-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_MG_sex_egg_lnCVR)
 funnel(All_Traits_Analysis_0mods_MG_sex_egg_lnCVR,yaxis="seinv")
 
 #OF Sex
-All_Traits_Analysis_0mods_OF_sex_egg_lnCVR <- rma.mv(yi, vi, mods = ~Sex-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+All_Traits_Analysis_0mods_OF_sex_egg_lnCVR <- rma.mv(yi, VmatCVR_OF_lnCVR, mods = ~Sex-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_sex_egg_lnCVR)
 funnel(All_Traits_Analysis_0mods_OF_sex_egg_lnCVR,yaxis="seinv")
@@ -117,14 +119,14 @@ funnel(Traits_Analysis_OF_egg,yaxis="seinv")
 
 #Traits MG lnCVR
 
-Traits_Analysis_MG_egg_lnCVR <- rma.mv(yi, vi, mods = ~Trait-1 + sqrt(vi), random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
+Traits_Analysis_MG_egg_lnCVR <- rma.mv(yi, VmatCVR_MG_lnCVR, mods = ~Trait-1 + sqrt(vi), random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')
 
 summary(Traits_Analysis_MG_egg_lnCVR)
 funnel(Traits_Analysis_MG_egg_lnCVR,yaxis="seinv")
 
 #Traits OF lnCVR
 
-Traits_Analysis_OF_egg_lnCVR <- rma.mv(yi, vi, mods = ~Trait-1 + sqrt(vi), random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
+Traits_Analysis_OF_egg_lnCVR <- rma.mv(yi, VmatCVR_OF_lnCVR, mods = ~Trait-1 + sqrt(vi), random = list( ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
 
 summary(Traits_Analysis_OF_egg_lnCVR)
 funnel(Traits_Analysis_OF_egg_lnCVR,yaxis="seinv")
@@ -181,11 +183,6 @@ fit_time_lag_effect_multi
 ```
 
 
-### Calculating how many papers use same control animals (per trait)
-```{r}
-Papers_Controls <- ALL_TRAITS %>% group_by(Cohort_ID)  %>% count(Control_ID)
-Papers_Controls
-```
 
 
 
