@@ -615,10 +615,12 @@ summary(All_Traits_Analysis_0mods_MG_sex)
 funnel(All_Traits_Analysis_0mods_MG_sex,yaxis="seinv")
 
 
-All_Traits_Analysis_0mods_OF_sex <- rma.mv(yi, VmatCVR_OF, mods = ~Sex-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+All_Traits_Analysis_0mods_OF_sex <- rma.mv(yi, VmatCVR_OF, mods = ~Sex, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_sex)
 funnel(All_Traits_Analysis_0mods_OF_sex,yaxis="seinv")
+k_sexof <- OF_ALL %>% group_by(Sex) %>% count()
+k_sexof
 
 
 # Overall_Exp_mods_lnRR <- tibble(
@@ -943,13 +945,16 @@ All_Traits_Analysis_0mods_MG_f0_lnCVR <- rma.mv(yi, VmatCVR_MG_lnCVR, mods = ~F0
 
 summary(All_Traits_Analysis_0mods_MG_f0_lnCVR)
 funnel(All_Traits_Analysis_0mods_MG_f0_lnCVR,yaxis="seinv")
-
+mgf0lncvrr2 <- R2(All_Traits_Analysis_0mods_MG_f0_lnCVR)
+mgf0lncvrr2*100
 
 
 All_Traits_Analysis_0mods_OF_f0_lnCVR <- rma.mv(yi, VmatCVR_OF_lnCVR, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL_lnCVR, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_f0_lnCVR)
 funnel(All_Traits_Analysis_0mods_OF_f0_lnCVR,yaxis="seinv")
+fooflncvrr2 <- R2(All_Traits_Analysis_0mods_OF_f0_lnCVR)
+fooflncvrr2*100
 k_traits_off0 <- OF_ALL_lnCVR %>% group_by(F0_Parent_Exposed) %>% count()
 k_traits_off0
 
