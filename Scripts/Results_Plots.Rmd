@@ -39,7 +39,7 @@ library(ggpubr)
 #install.packages('tinytex')
 #tinytex::install_tinytex()
 ```
-
+PLOTS WILL ONLY WORK WITH INTERCEPT MODELS !!!
 
 ### Question 1 - Exposure Type (used as a moderator)
 ```{r}
