@@ -41,7 +41,7 @@ funnel(All_Traits_Analysis_Exp_egg_lnCVR, yaxis = "seinv")
 #Make plots like in Shinichi's code
 ```
 
-### F0 Sex and Grandoffspring Sex lnRR
+### F0 Sex and Grandoffspring Sex lnRR and lnCVR
 
 ```{r}
 #MG F0
@@ -70,10 +70,8 @@ summary(All_Traits_Analysis_0mods_OF_sex_egg)
 funnel(All_Traits_Analysis_0mods_OF_sex_egg,yaxis="seinv")
 
 
-```
-
 ### F0 and Offspring Sex lnCVR
-```{r}
+
 #MG F0
 
 All_Traits_Analysis_0mods_MG_f0_egg_lnCVR <- rma.mv(yi, VmatCVR_MG_lnCVR, mods = ~F0_Parent_Exposed-1 + sqrt(vi), random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL_lnCVR, method = 'REML')

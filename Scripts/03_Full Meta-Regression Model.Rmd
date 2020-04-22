@@ -18,6 +18,7 @@ library(tidyverse)
 #install.packages('tinytex')
 #tinytex::install_tinytex()
 ```
+Missing lnCVR !!!
 
 ### Overall Model (Full, not split by exposure type) lnRR
 
@@ -26,13 +27,13 @@ Full_Regression <- rma.mv(yi, VmatCVR_all, mods =  ~ Trait + Exposure_Type + Sex
 
 summary(Full_Regression)
 funnel(Full_Regression,yaxis="seinv")
-I2_full <- I2_Hamza(Full_Regression)
 
-#Publication Bias Test on full model
-Full_Regression_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Exposure_Type + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-summary(Full_Regression_egg)
-funnel(Full_Regression_egg,yaxis="seinv")
+# 
+# #Publication Bias Test on full model
+# Full_Regression_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Exposure_Type + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+# 
+# summary(Full_Regression_egg)
+# funnel(Full_Regression_egg,yaxis="seinv")
 
 ```
 
@@ -44,11 +45,11 @@ Full_Regression_MG <- rma.mv(yi, vi, mods =  ~ Trait + Sex + F0_Parent_Exposed, 
 summary(Full_Regression_MG)
 funnel(Full_Regression_MG,yaxis="seinv")
 
-#Publication Bias Test on full model MG
-Full_Regression_MG_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
-
-summary(Full_Regression_MG_egg)
-funnel(Full_Regression_MG_egg,yaxis="seinv")
+# #Publication Bias Test on full model MG
+# Full_Regression_MG_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+# 
+# summary(Full_Regression_MG_egg)
+# funnel(Full_Regression_MG_egg,yaxis="seinv")
 
 #OF
 Full_Regression_OF <- rma.mv(yi, vi, mods =  ~ Trait + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
@@ -56,11 +57,11 @@ Full_Regression_OF <- rma.mv(yi, vi, mods =  ~ Trait + Sex + F0_Parent_Exposed, 
 summary(Full_Regression_OF)
 funnel(Full_Regression_OF,yaxis="seinv")
 
-#Publication Bias Test on full model MG
-Full_Regression_OF_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
-
-summary(Full_Regression_OF_egg)
-funnel(Full_Regression_OF_egg,yaxis="seinv")
+# #Publication Bias Test
+# Full_Regression_OF_egg <- rma.mv(yi, vi, mods =  ~ vi + Trait + Sex + F0_Parent_Exposed, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+# 
+# summary(Full_Regression_OF_egg)
+# funnel(Full_Regression_OF_egg,yaxis="seinv")
 
 ```
 
@@ -72,11 +73,11 @@ Full_Regression_trait <- rma.mv(yi, vi, mods =  ~ Exposure_Type + Sex + F0_Paren
 summary(Full_Regression_trait)
 funnel(Full_Regression_trait,yaxis="seinv")
 
-#Publication Bias Test on full model
-Full_Regression_egg_trait <- rma.mv(yi, vi, mods =  ~ vi + Exposure_Type + Sex + F0_Parent_Exposed, random = list(~1|Trait,~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
-
-summary(Full_Regression_egg_trait)
-funnel(Full_Regression_egg_trait,yaxis="seinv")
+# #Publication Bias Test on full model
+# Full_Regression_egg_trait <- rma.mv(yi, vi, mods =  ~ vi + Exposure_Type + Sex + F0_Parent_Exposed, random = list(~1|Trait,~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=Effect_Size_All_Traits, method = 'REML')
+# 
+# summary(Full_Regression_egg_trait)
+# funnel(Full_Regression_egg_trait,yaxis="seinv")
 ```
 
 
