@@ -5,6 +5,8 @@ date: "8 January 2020"
 output:
   pdf_document: default
   html_document: default
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
@@ -43,40 +45,63 @@ PLOTS WILL ONLY WORK WITH INTERCEPT MODELS !!! Add in the intercept models here 
 
 ### Question 1 - Exposure Type (used as a moderator)
 ```{r}
-#lnRR
-Overall_Exposure_Type_orchard_lnRR <- orchard_plot(All_Traits_Analysis_Exp, mod = "Exposure_Type", xlab = "lnRR", transfm = "none", angle = 45)+
-  scale_colour_manual(values=c("#E69F00", "#56B4E9"))+
-  scale_fill_manual(values=c("#999999","#999999"))+
+#lnRR One off
+All_Data_Analysis_OF <- rma.mv(yi, VmatCVR_OF, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+
+summary(All_Data_Analysis_OF)
+
+Overall_Exposure_Type_orchard_OF <- orchard_plot(All_Data_Analysis_OF_int, mod = "Exposure_Type", xlab = "lnRR", transfm = "none", angle = 45)+
+  scale_colour_manual(values=c("#56B4E9"))+ 
+  scale_fill_manual(values=c("#999999"))+
   labs(title="A",
        subtitle = "Differences in means between control and treatment groups" )+
-  xlim(-3, 4)
-Overall_Exposure_Type_orchard_lnRR
+  scale_x_continuous(breaks = seq(-3, 4, by = 0.5))
+Overall_Exposure_Type_orchard_OF
 
-#lnCVR
-Overall_Exposure_Type_orchard_lnCVR <- orchard_plot(All_Traits_Analysis_Exp_lnCVR, mod = "Exposure_Type", xlab = "lnCVR", transfm = "none", angle =45)+
-  scale_colour_manual(values=c("#E69F00", "#56B4E9"))+
-  scale_fill_manual(values=c("#999999","#999999"))+
+#lnRR MG
+All_Data_Analysis_MG <- rma.mv(yi, VmatCVR_MG, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=MG_ALL, method = 'REML')
+
+summary(All_Data_Analysis_MG)
+
+Overall_Exposure_Type_orchard_MG <- orchard_plot(All_Data_Analysis_MG, mod = "Multigenerational", xlab = "lnRR", transfm = "none", angle = 45)+
+  scale_colour_manual(values=c("#E69F00"))+
+  scale_fill_manual(values=c("#999999"))+
+  scale_x_continuous(breaks = seq(-3, 4, by = 0.5))
+Overall_Exposure_Type_orchard_MG
+
+#lnCVR One off
+Overall_Exposure_Type_orchard_OF_lnCVR <- orchard_plot(All_Data_Analysis_OF_lnCVR, mod = "Exposure_Type", xlab = "lnCVR", transfm = "none", angle =45)+
+  scale_colour_manual(values=c("#56B4E9"))+
+  scale_fill_manual(values=c("#999999"))+
   labs(title = "B",
        subtitle = "Differences in variance between control and treatment groups")+
-  xlim(-3,4)
-Overall_Exposure_Type_orchard_lnCVR
+  scale_x_continuous(breaks = seq(-3, 4, by = 0.5))
+Overall_Exposure_Type_orchard_OF_lnCVR
+
+#lnCVR MG
+Overall_Exposure_Type_orchard_MG_lnCVR <- orchard_plot(All_Data_Analysis_MG_lnCVR, mod = "Exposure_Type", xlab = "lnCVR", transfm = "none", angle =45)+
+  scale_colour_manual(values=c("#E69F00"))+
+  scale_fill_manual(values=c("#999999"))+
+  labs(title = "B",
+       subtitle = "Differences in variance between control and treatment groups")+
+  scale_x_continuous(breaks = seq(-3, 4, by = 0.5))
+Overall_Exposure_Type_orchard_MG_lnCVR
+
 
 #Joining Plots 
 
-Overall_Exp_Type_orchard_joined <- Overall_Exposure_Type_orchard_lnRR/Overall_Exposure_Type_orchard_lnCVR
+Overall_Exp_Type_orchard_joined_lnRR <- Overall_Exposure_Type_orchard_OF/Overall_Exposure_Type_orchard_MG
+Overall_Exp_Type_orchard_joined_lnRR
 
-Overall <- Overall_Exp_Type_orchard_joined + plot_annotation(
-  title = 'Overall',
-  theme = theme(plot.title = element_text(size = 30, family = "Garamond", face='bold')))
-
-Overall
+Overall_Exp_Type_orchard_joined_lnCVR <- Overall_Exposure_Type_orchard_OF_lnCVR/Overall_Exposure_Type_orchard_MG_lnCVR
+Overall_Exp_Type_orchard_joined_lnCVR
 
 #Saving plots
 #setwd if I really want to save in Plots folder
 
-ggsave("Overall.pdf", width = 16, height = 20, units = "cm", device = cairo_pdf)
-
-ggsave("Overall.jpg", width = 16, height = 20, units = "cm")
+# ggsave("Overall.pdf", width = 16, height = 20, units = "cm", device = cairo_pdf)
+# 
+# ggsave("Overall.jpg", width = 16, height = 20, units = "cm")
 
 
  

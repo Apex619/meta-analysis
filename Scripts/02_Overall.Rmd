@@ -394,55 +394,55 @@ I2_Overall_Traits
 k_traits <- Effect_Size_All_Traits %>% group_by(Trait) %>% count()
 k_traits
 
-Traits_overall_lnRR <- tibble(
-  Trait = c("Adiposity", "Body Weight","Glucose FBG", "Glucose TT", "Insulin FI","Insulin TT", "Leptin", "Triglycerides"), 
-  lnRR = c(All_Traits_Analysis_traits$b[1],All_Traits_Analysis_traits$b[2],All_Traits_Analysis_traits$b[3],All_Traits_Analysis_traits$b[4],All_Traits_Analysis_traits$b[5],All_Traits_Analysis_traits$b[6],All_Traits_Analysis_traits$b[7],All_Traits_Analysis_traits$b[8]),
-  ci.lb = c(All_Traits_Analysis_traits$ci.lb[1],All_Traits_Analysis_traits$ci.lb[2],All_Traits_Analysis_traits$ci.lb[3],All_Traits_Analysis_traits$ci.lb[4],All_Traits_Analysis_traits$ci.lb[5],All_Traits_Analysis_traits$ci.lb[6],All_Traits_Analysis_traits$ci.lb[7],All_Traits_Analysis_traits$ci.lb[8]),
-  ci.ub = c(All_Traits_Analysis_traits$ci.ub[1],All_Traits_Analysis_traits$ci.ub[2],All_Traits_Analysis_traits$ci.ub[3],All_Traits_Analysis_traits$ci.ub[4],All_Traits_Analysis_traits$ci.ub[5],All_Traits_Analysis_traits$ci.ub[6],All_Traits_Analysis_traits$ci.ub[7],All_Traits_Analysis_traits$ci.ub[8]),
-  k = c(k_traits$n[1],k_traits$n[2],k_traits$n[3],k_traits$n[4],k_traits$n[5],k_traits$n[6],k_traits$n[7],k_traits$n[8])
-)
-Traits_overall_lnRR
-
-plot_lnRR_overall_traits <- ggplot(Traits_overall_lnRR, aes(x=Trait, y=lnRR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = Trait, y = lnRR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(x = "Trait", y = "lnRR") +
-  coord_flip()
-plot_lnRR_overall_traits
+# Traits_overall_lnRR <- tibble(
+#   Trait = c("Adiposity", "Body Weight","Glucose FBG", "Glucose TT", "Insulin FI","Insulin TT", "Leptin", "Triglycerides"), 
+#   lnRR = c(All_Traits_Analysis_traits$b[1],All_Traits_Analysis_traits$b[2],All_Traits_Analysis_traits$b[3],All_Traits_Analysis_traits$b[4],All_Traits_Analysis_traits$b[5],All_Traits_Analysis_traits$b[6],All_Traits_Analysis_traits$b[7],All_Traits_Analysis_traits$b[8]),
+#   ci.lb = c(All_Traits_Analysis_traits$ci.lb[1],All_Traits_Analysis_traits$ci.lb[2],All_Traits_Analysis_traits$ci.lb[3],All_Traits_Analysis_traits$ci.lb[4],All_Traits_Analysis_traits$ci.lb[5],All_Traits_Analysis_traits$ci.lb[6],All_Traits_Analysis_traits$ci.lb[7],All_Traits_Analysis_traits$ci.lb[8]),
+#   ci.ub = c(All_Traits_Analysis_traits$ci.ub[1],All_Traits_Analysis_traits$ci.ub[2],All_Traits_Analysis_traits$ci.ub[3],All_Traits_Analysis_traits$ci.ub[4],All_Traits_Analysis_traits$ci.ub[5],All_Traits_Analysis_traits$ci.ub[6],All_Traits_Analysis_traits$ci.ub[7],All_Traits_Analysis_traits$ci.ub[8]),
+#   k = c(k_traits$n[1],k_traits$n[2],k_traits$n[3],k_traits$n[4],k_traits$n[5],k_traits$n[6],k_traits$n[7],k_traits$n[8])
+# )
+# Traits_overall_lnRR
+# 
+# plot_lnRR_overall_traits <- ggplot(Traits_overall_lnRR, aes(x=Trait, y=lnRR)) + 
+#   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+#   geom_point(aes(x = Trait, y = lnRR), position = position_dodge(0.3))+
+#   geom_hline(yintercept = 0, lty = "dotted") +
+#   labs(x = "Trait", y = "lnRR") +
+#   coord_flip()
+# plot_lnRR_overall_traits
 ```
 
 ```{r}
 
 #Exposure type meta-regression
-All_Traits_Analysis_Exp <- rma.mv(yi, VmatCVR_all, mods= ~Exposure_Type-1, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID,~1|Trait), data=Effect_Size_All_Traits, method = 'REML')
+All_Traits_Analysis_Exp <- rma.mv(yi, VmatCVR_all, mods= ~Exposure_Type, random = list(~1|Paper_ID,~1|Cohort_ID,~1|ES_ID,~1|Trait), data=Effect_Size_All_Traits, method = 'REML')
 
 summary(All_Traits_Analysis_Exp)
+anova(All_Traits_Analysis_Exp, L=c(0,-1))
 funnel(All_Traits_Analysis_Exp,yaxis="seinv")
-I2 <- I2_Hamza(All_Traits_Analysis_Exp)
-I2
-
+exp_regression_r2 <- R2(All_Traits_Analysis_Exp)
+exp_regression_r2*100
 
 
 k_exp <- Effect_Size_All_Traits %>% group_by(Exposure_Type) %>% count()
 k_exp
 
-Overall_Exp_meta_lnRR <- tibble(
-  Exposure_Type = c("Multigenerational", "One off"), 
-  lnRR = c(All_Traits_Analysis_Exp$b[1],All_Traits_Analysis_Exp$b[2]),
-  ci.lb = c(All_Traits_Analysis_Exp$ci.lb[1],All_Traits_Analysis_Exp$ci.lb[2]),
-  ci.ub = c(All_Traits_Analysis_Exp$ci.ub[1],All_Traits_Analysis_Exp$ci.ub[2]),
-  k = c(k_exp$n[1],k_exp$n[2])
-)
-Overall_Exp_meta_lnRR
-
-plot_lnRR_overall_expmeta <- ggplot(Overall_Exp_meta_lnRR, aes(x=Exposure_Type, y=lnRR, colour=Exposure_Type)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(x = "Exposure_Type", y = "lnRR") +
-  coord_flip()
-plot_lnRR_overall_expmeta
+# Overall_Exp_meta_lnRR <- tibble(
+#   Exposure_Type = c("Multigenerational", "One off"), 
+#   lnRR = c(All_Traits_Analysis_Exp$b[1],All_Traits_Analysis_Exp$b[2]),
+#   ci.lb = c(All_Traits_Analysis_Exp$ci.lb[1],All_Traits_Analysis_Exp$ci.lb[2]),
+#   ci.ub = c(All_Traits_Analysis_Exp$ci.ub[1],All_Traits_Analysis_Exp$ci.ub[2]),
+#   k = c(k_exp$n[1],k_exp$n[2])
+# )
+# Overall_Exp_meta_lnRR
+# 
+# plot_lnRR_overall_expmeta <- ggplot(Overall_Exp_meta_lnRR, aes(x=Exposure_Type, y=lnRR, colour=Exposure_Type)) + 
+#   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+#   geom_point(aes(x = Exposure_Type, y = lnRR), position = position_dodge(0.3))+
+#   geom_hline(yintercept = 0, lty = "dotted") +
+#   labs(x = "Exposure_Type", y = "lnRR") +
+#   coord_flip()
+# plot_lnRR_overall_expmeta
 ```
 
 ## Meta-regression of overall dataset for F0 parent and offspring sex
@@ -498,6 +498,7 @@ summary(All_Data_Analysis_MG)
 funnel(All_Data_Analysis_MG,yaxis="seinv")
 mgi2 <- I2_Hamza(All_Data_Analysis_MG)
 mgi2
+anova(res, L=c(0,-1,1))
 
 # W <- diag(1/MG_ALL$vi)
 # X <- model.matrix(All_Data_Analysis_MG)
@@ -605,7 +606,7 @@ r2fomg*100
 est <- get_est(All_Traits_Analysis_0mods_MG_f0)
 est
 
-All_Traits_Analysis_0mods_OF_f0 <- rma.mv(yi, VmatCVR_OF, mods = ~F0_Parent_Exposed, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
+All_Traits_Analysis_0mods_OF_f0 <- rma.mv(yi, VmatCVR_OF, mods = ~F0_Parent_Exposed-1, random = list(~1|Trait, ~1|Paper_ID,~1|Cohort_ID,~1|ES_ID), data=OF_ALL, method = 'REML')
 
 summary(All_Traits_Analysis_0mods_OF_f0)
 funnel(All_Traits_Analysis_0mods_OF_f0,yaxis="seinv")
@@ -739,32 +740,32 @@ All_Traits_Analysis_traits_lnCVR <- rma.mv(yi, vi, mods= ~Trait-1, random = list
 summary(All_Traits_Analysis_traits_lnCVR)
 funnel(All_Traits_Analysis_traits_lnCVR,yaxis="seinv")
 
-W <- diag(1/Effect_Size_All_Traits_lnCVR$vi)
-X <- model.matrix(All_Traits_Analysis_traits_lnCVR)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-I2_Overall_Traits_lnCVR <- 100 * sum(All_Traits_Analysis_traits_lnCVR$sigma2) / (sum(All_Traits_Analysis_traits_lnCVR$sigma2) + (All_Traits_Analysis_traits_lnCVR$k-All_Traits_Analysis_traits_lnCVR$p)/sum(diag(P)))
-I2_Overall_Traits_lnCVR
-
-#Will not go into figure as of yet, just as a reference for how many effect sizes we see
-k_traits_lnCVR <- Effect_Size_All_Traits_lnCVR %>% group_by(Trait) %>% count()
-k_traits_lnCVR
-
-Traits_overall_lnCVR <- tibble(
-  Trait = c("Adiposity", "Body Weight","Glucose FBG", "Glucose TT", "Insulin FI","Insulin TT", "Leptin", "Triglycerides"), 
-  lnCVR = c(All_Traits_Analysis_traits_lnCVR$b[1],All_Traits_Analysis_traits_lnCVR$b[2],All_Traits_Analysis_traits_lnCVR$b[3],All_Traits_Analysis_traits_lnCVR$b[4],All_Traits_Analysis_traits_lnCVR$b[5],All_Traits_Analysis_traits_lnCVR$b[6],All_Traits_Analysis_traits_lnCVR$b[7],All_Traits_Analysis_traits_lnCVR$b[8]),
-  ci.lb = c(All_Traits_Analysis_traits_lnCVR$ci.lb[1],All_Traits_Analysis_traits_lnCVR$ci.lb[2],All_Traits_Analysis_traits_lnCVR$ci.lb[3],All_Traits_Analysis_traits_lnCVR$ci.lb[4],All_Traits_Analysis_traits_lnCVR$ci.lb[5],All_Traits_Analysis_traits_lnCVR$ci.lb[6],All_Traits_Analysis_traits_lnCVR$ci.lb[7],All_Traits_Analysis_traits_lnCVR$ci.lb[8]),
-  ci.ub = c(All_Traits_Analysis_traits_lnCVR$ci.ub[1],All_Traits_Analysis_traits_lnCVR$ci.ub[2],All_Traits_Analysis_traits_lnCVR$ci.ub[3],All_Traits_Analysis_traits_lnCVR$ci.ub[4],All_Traits_Analysis_traits_lnCVR$ci.ub[5],All_Traits_Analysis_traits_lnCVR$ci.ub[6],All_Traits_Analysis_traits_lnCVR$ci.ub[7],All_Traits_Analysis_traits_lnCVR$ci.ub[8]),
-  k = c(k_traits_lnCVR$n[1],k_traits_lnCVR$n[2],k_traits_lnCVR$n[3],k_traits_lnCVR$n[4],k_traits_lnCVR$n[5],k_traits_lnCVR$n[6],k_traits_lnCVR$n[7],k_traits_lnCVR$n[8])
-)
-Traits_overall_lnCVR
-
-plot_lnRR_overall_traits_lnCVR <- ggplot(Traits_overall_lnCVR, aes(x=Trait, y=lnCVR)) + 
-  geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
-  geom_point(aes(x = Trait, y = lnCVR), position = position_dodge(0.3))+
-  geom_hline(yintercept = 0, lty = "dotted") +
-  labs(x = "Trait", y = "lnCVR") +
-  coord_flip()
-plot_lnRR_overall_traits_lnCVR
+# W <- diag(1/Effect_Size_All_Traits_lnCVR$vi)
+# X <- model.matrix(All_Traits_Analysis_traits_lnCVR)
+# P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+# I2_Overall_Traits_lnCVR <- 100 * sum(All_Traits_Analysis_traits_lnCVR$sigma2) / (sum(All_Traits_Analysis_traits_lnCVR$sigma2) + (All_Traits_Analysis_traits_lnCVR$k-All_Traits_Analysis_traits_lnCVR$p)/sum(diag(P)))
+# I2_Overall_Traits_lnCVR
+# 
+# #Will not go into figure as of yet, just as a reference for how many effect sizes we see
+# k_traits_lnCVR <- Effect_Size_All_Traits_lnCVR %>% group_by(Trait) %>% count()
+# k_traits_lnCVR
+# 
+# Traits_overall_lnCVR <- tibble(
+#   Trait = c("Adiposity", "Body Weight","Glucose FBG", "Glucose TT", "Insulin FI","Insulin TT", "Leptin", "Triglycerides"), 
+#   lnCVR = c(All_Traits_Analysis_traits_lnCVR$b[1],All_Traits_Analysis_traits_lnCVR$b[2],All_Traits_Analysis_traits_lnCVR$b[3],All_Traits_Analysis_traits_lnCVR$b[4],All_Traits_Analysis_traits_lnCVR$b[5],All_Traits_Analysis_traits_lnCVR$b[6],All_Traits_Analysis_traits_lnCVR$b[7],All_Traits_Analysis_traits_lnCVR$b[8]),
+#   ci.lb = c(All_Traits_Analysis_traits_lnCVR$ci.lb[1],All_Traits_Analysis_traits_lnCVR$ci.lb[2],All_Traits_Analysis_traits_lnCVR$ci.lb[3],All_Traits_Analysis_traits_lnCVR$ci.lb[4],All_Traits_Analysis_traits_lnCVR$ci.lb[5],All_Traits_Analysis_traits_lnCVR$ci.lb[6],All_Traits_Analysis_traits_lnCVR$ci.lb[7],All_Traits_Analysis_traits_lnCVR$ci.lb[8]),
+#   ci.ub = c(All_Traits_Analysis_traits_lnCVR$ci.ub[1],All_Traits_Analysis_traits_lnCVR$ci.ub[2],All_Traits_Analysis_traits_lnCVR$ci.ub[3],All_Traits_Analysis_traits_lnCVR$ci.ub[4],All_Traits_Analysis_traits_lnCVR$ci.ub[5],All_Traits_Analysis_traits_lnCVR$ci.ub[6],All_Traits_Analysis_traits_lnCVR$ci.ub[7],All_Traits_Analysis_traits_lnCVR$ci.ub[8]),
+#   k = c(k_traits_lnCVR$n[1],k_traits_lnCVR$n[2],k_traits_lnCVR$n[3],k_traits_lnCVR$n[4],k_traits_lnCVR$n[5],k_traits_lnCVR$n[6],k_traits_lnCVR$n[7],k_traits_lnCVR$n[8])
+# )
+# Traits_overall_lnCVR
+# 
+# plot_lnRR_overall_traits_lnCVR <- ggplot(Traits_overall_lnCVR, aes(x=Trait, y=lnCVR)) + 
+#   geom_errorbar(aes(ymin=ci.lb, ymax=ci.ub), width = 0, position = position_dodge(0.3)) +
+#   geom_point(aes(x = Trait, y = lnCVR), position = position_dodge(0.3))+
+#   geom_hline(yintercept = 0, lty = "dotted") +
+#   labs(x = "Trait", y = "lnCVR") +
+#   coord_flip()
+# plot_lnRR_overall_traits_lnCVR
 ```
 
 
