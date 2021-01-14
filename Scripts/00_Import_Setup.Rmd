@@ -238,6 +238,10 @@ library(tidyverse)
 
 #Import data
 ALL_TRAITS <- read_excel("../data/ALL_TRAITS.xlsx")
+
+#Assigning Control Id's by combining Paper ID and Shared_Control
+ALL_TRAITS$Control_ID <- paste(ALL_TRAITS$Paper_ID, ALL_TRAITS$Shared_Control)
+unique(ALL_TRAITS$Cohort_ID) %>% length()
 ```
 
 
