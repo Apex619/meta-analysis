@@ -1,0 +1,424 @@
+---
+title: "STEP2_MAIN_MODELS"
+subtitle: "MA of transgenerational effects of obesogenic diets on rodents"
+author: "ML"
+date: "01/05/2020"
+output: html_document
+knit: (function(inputFile, encoding) {rmarkdown::render(inputFile, encoding = encoding, output_dir = "Knitted") })
+---
+
+Main analysis models     
+[Note: run by chunks, do not knit]     
+
+### Setup    
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(scipen=100)
+
+# Load packages
+# devtools::install_github("thomasp85/patchwork")
+pacman::p_load(tidyverse, # tidy family and related pacakges below
+               metafor, # calculating effect sizes
+               magrittr, # extending piping
+               ggplot2,  # nice plots
+               patchwork,  # arranging plots
+               bbmle # for AICtab
+)
+
+#Load environment
+
+load('myEnvironment.RData')
+
+# Load custom functions
+#source("./Scripts/custom_functions.R") #load custom functions
+```
+
+### Load data     
+Processed data for analyses is stored in data_all_ES.csv and data_all_ES.RData fils.    
+It needs to be split into One-off and Multigenerational data.      
+
+```{r load and subset data, include = FALSE}
+# Load preprocessed data with effect sizes
+data_all <- read.csv(file ="../Data/data_all_ES.csv")
+#load(data_all, file = "./Rdata/data_all_ES.RData") #alternative
+#str(data_all)
+
+# Subset by One off and Multigenerational
+data_MG <- filter(data_all, Exposure_Type == "Multigenerational")
+data_OF <- filter(data_all, Exposure_Type == "One-off")
+dim(data_MG)
+dim(data_OF)
+data_MG <- droplevels(data_MG) #adjust factor levels
+data_OF <- droplevels(data_OF) #adjust factor levels
+```
+
+Make VCV (variance-covariance matices    
+
+```{r make VCV matrices, include = FALSE}
+## all data
+Vmat_lnRR_all <- make_VCV_matrix(data = data_all, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+Vmat_lnCVR_all <- make_VCV_matrix(data = data_all, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+
+## OF data
+Vmat_lnRR_OF <- make_VCV_matrix(data = data_OF, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+Vmat_lnCVR_OF <- make_VCV_matrix(data = data_OF, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+
+## MG data
+Vmat_lnRR_MG <- make_VCV_matrix(data = data_MG, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+Vmat_lnCVR_MG <- make_VCV_matrix(data = data_MG, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+
+#Vmat_lnRR_all #visual check
+```
+
+
+```{r select random factors, include = FALSE}
+
+## OF dataset
+
+MA_0 <- rma.mv(lnRR, VlnRR, data = data_OF, method = 'ML') 
+MA_1 <- rma.mv(lnRR, VlnRR, random = list(~1|Paper_ID, ~1|ES_ID), data = data_OF, method = 'ML') 
+anova(MA_0, MA_1) #simple comparison of two  models
+MA_2 <- rma.mv(lnRR, VlnRR, random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|ES_ID), data = data_OF, method = 'ML') 
+MA_3 <- rma.mv(lnRR, VlnRR, random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = 'ML') 
+MA_4 <- rma.mv(lnRR, VlnRR, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = 'ML') 
+MA_4_Vmat <- rma.mv(lnRR, Vmat_lnRR_OF, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = 'ML') #with VCV matrix
+MA_5_Vmat <- rma.mv(lnRR, Vmat_lnRR_OF, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = 'ML') #with VCV matrix and Rodent_Strain
+MA_6_Vmat <- rma.mv(lnRR, Vmat_lnRR_OF, random = list(~1|Rodent_Type, ~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = 'ML') #with VCV matrix and Rodent_Type
+MA_7_Vmat <- rma.mv(lnRR, Vmat_lnRR_OF, random = list(~1|Rodent_Type, ~1|Rodent_Strain, ~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = 'ML') #with VCV matrix and Rodent_Type and Rodent_Strain
+MA_8_Vmat <- rma.mv(lnRR, Vmat_lnRR_OF, random = list(~1|Rodent_Type, ~1|Rodent_Strain, ~1|Study_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = 'ML') #with VCV matrix and Rodent_Type and Rodent_Strain, without Cohort_ID
+MA_9_Vmat <- rma.mv(lnRR, Vmat_lnRR_OF, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = 'ML') #with VCV matrix and Rodent_Strain, without Cohort_ID and Rodent_Type 
+MA_10_Vmat <- rma.mv(lnRR, Vmat_lnRR_OF, random = list(~1|Rodent_Type, ~1|Study_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = 'ML') #with VCV matrix and Rodent_Strain, without Cohort_ID and Rodent_Strain
+
+#compare models using AIC:
+AICtab(MA_0, MA_1, MA_2, MA_3, MA_4, MA_4_Vmat, MA_5_Vmat, MA_6_Vmat, MA_7_Vmat, MA_8_Vmat, MA_9_Vmat, MA_10_Vmat) #MA_9_Vmat best, MA_5_Vmat and MA_8_Vmat very similar
+
+
+## MG dataset
+
+MA_0 <- rma.mv(lnRR, VlnRR, data = data_MG, method = 'ML') 
+MA_1 <- rma.mv(lnRR, VlnRR, random = list(~1|Paper_ID, ~1|ES_ID), data = data_MG, method = 'ML') 
+anova(MA_0, MA_1) #simple comparison of two  models
+MA_2 <- rma.mv(lnRR, VlnRR, random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|ES_ID), data = data_MG, method = 'ML') 
+MA_3 <- rma.mv(lnRR, VlnRR, random = list(~1|Paper_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = 'ML') 
+MA_4 <- rma.mv(lnRR, VlnRR, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = 'ML') 
+MA_4_Vmat <- rma.mv(lnRR, Vmat_lnRR_MG, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = 'ML')#with VCV matrix
+MA_5_Vmat <- rma.mv(lnRR, Vmat_lnRR_MG, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = 'ML') #with VCV matrix and Rodent_Strain
+MA_6_Vmat <- rma.mv(lnRR, Vmat_lnRR_MG, random = list(~1|Rodent_Type, ~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = 'ML') #with VCV matrix and Rodent_Type
+MA_7_Vmat <- rma.mv(lnRR, Vmat_lnRR_MG, random = list(~1|Rodent_Type, ~1|Rodent_Strain, ~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = 'ML') #with VCV matrix and Rodent_Type and Rodent_Strain
+MA_8_Vmat <- rma.mv(lnRR, Vmat_lnRR_MG, random = list(~1|Rodent_Type, ~1|Rodent_Strain, ~1|Study_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = 'ML') #with VCV matrix and Rodent_Type and Rodent_Strain, without Cohort_ID
+MA_9_Vmat <- rma.mv(lnRR, Vmat_lnRR_MG, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = 'ML') #with VCV matrix and Rodent_Strain, without Cohort_ID and Rodent_Type 
+MA_10_Vmat <- rma.mv(lnRR, Vmat_lnRR_MG, random = list(~1|Rodent_Type, ~1|Study_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = 'ML') #with VCV matrix and Rodent_Strain, without Cohort_ID and Rodent_Strain
+#compare models using AIC:
+AICtab(MA_0, MA_1, MA_2, MA_3, MA_4, MA_4_Vmat, MA_5_Vmat, MA_6_Vmat, MA_7_Vmat, MA_8_Vmat, MA_9_Vmat, MA_10_Vmat) #MA_9_Vmat and MA_10_Vmat and MA_4_Vmat best, but MA_5_Vmat and MA_6_Vmat and MA_8_Vmat very similar
+
+
+rm(MA_0, MA_1, MA_2, MA_3, MA_4, MA_4_Vmat, MA_5_Vmat, MA_6_Vmat, MA_7_Vmat)
+
+#use: random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|Trait, ~1|ES_ID) #MA_9_Vmat
+```
+
+
+## Main analyses     
+
+### Meta-analytic models (intercept-only)    
+
+Moedels run for lnRR and lnCVR effect sizes for OF and MG datasets separately      
+
+```{r MA main, include = TRUE}
+## OF data - lnRR random-effect model with VCV
+MA_OF_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MA_OF_lnRR)    
+I2(MA_OF_lnRR, method = "S")
+save(MA_OF_lnRR, file = "../Rdata/MA_OF_lnRR.Rdata")
+
+## OF data - lnCVR random-effect model with VCV
+MA_OF_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MA_OF_lnCVR)    
+I2(MA_OF_lnCVR, method = "S")
+save(MA_OF_lnCVR, file = "../Rdata/MA_OF_lnCVR.Rdata")
+
+## MG data - lnRR random-effect model with VCV
+MA_MG_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MA_MG_lnRR)    
+I2(MA_MG_lnRR, method = "S")
+save(MA_MG_lnRR, file = "../Rdata/MA_MG_lnRR.Rdata")
+
+## MG data - lnCvR random-effect model with VCV
+MA_MG_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MA_MG_lnCVR)    
+I2(MA_MG_lnCVR, method = "S")
+save(MA_MG_lnCVR, file = "../Rdata/MA_MG_lnCVR.Rdata")
+```
+
+### Meta-regression model on all data with Exposure_type (comapere MA intercepts)  
+
+```{r MR exposre type all data, include = TRUE, warning = FALSE}
+## lnRR
+MR_all_ExpT_lnRR <- rma.mv(lnRR, Vmat_lnRR_all, mods= ~Exposure_Type, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all, method = "REML") 
+summary(MR_all_ExpT_lnRR)    
+save(MR_all_ExpT_lnRR, file = "../Rdata/MR_all_ExpT_lnRR.Rdata")
+
+## lnRR - intercepts
+MR_all_ExpT_lnRRi <- rma.mv(lnRR, Vmat_lnRR_all, mods= ~Exposure_Type - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all, method = "REML") 
+summary(MR_all_ExpT_lnRRi)    
+save(MR_all_ExpT_lnRRi, file = "../Rdata/MR_all_ExpT_lnRRi.Rdata")
+
+R2(MR_all_ExpT_lnRR)
+
+## lnCVR
+MR_all_ExpT_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_all, mods= ~Exposure_Type, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all, method = "REML") 
+summary(MR_all_ExpT_lnCVR)    
+save(MR_all_ExpT_lnCVR, file = "../Rdata/MR_all_ExpT_lnCVR.Rdata")
+
+## lnCVR - intercepts
+MR_all_ExpT_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_all, mods= ~Exposure_Type - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all, method = "REML") 
+summary(MR_all_ExpT_lnCVRi)    
+save(MR_all_ExpT_lnCVRi, file = "../Rdata/MR_all_ExpT_lnCVRi.Rdata")
+
+R2(MR_all_ExpT_lnCVR)
+
+#funnel(MR_all_ExpT_lnRR, yaxis="seinv")
+#funnel(MR_all_ExpT_lnCVR, yaxis="seinv")
+#data_all %>% group_by(Exposure_Type) %>% count()
+```
+
+
+### Meta-regression model on OF and MG data with exposed F0 sex as moderator
+
+```{r MR F0_Parent_Exposed, include = TRUE, warning = FALSE}
+
+## OF lnRR - intercepts (both, female, male)
+MR_OF_ExpSex_lnRRi <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_ExpSex_lnRRi)    
+save(MR_OF_ExpSex_lnRRi, file = "../Rdata/MR_OF_ExpSex_lnRRi.Rdata")
+
+## OF lnRR - ref female
+MR_OF_ExpSex_lnRRf <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$F0_Parent_Exposed, ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_ExpSex_lnRRf)    
+save(MR_OF_ExpSex_lnRRf, file = "../Rdata/MR_OF_ExpSex_lnRRf.Rdata")
+
+## OF lnRR - ref male
+MR_OF_ExpSex_lnRRm <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$F0_Parent_Exposed, ref="Male"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_ExpSex_lnRRm)    
+save(MR_OF_ExpSex_lnRRm, file = "../Rdata/MR_OF_ExpSex_lnRRm.Rdata")
+
+R2(MR_OF_ExpSex_lnRRi)
+
+
+## OF lnCVR - intercepts (both, female, male)
+MR_OF_ExpSex_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_ExpSex_lnCVRi)    
+save(MR_OF_ExpSex_lnCVRi, file = "../Rdata/MR_OF_ExpSex_lnCVRi.Rdata")
+
+## OF lnCVR - ref female
+MR_OF_ExpSex_lnCVRf <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~relevel(data_OF$F0_Parent_Exposed, ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_ExpSex_lnCVRf)    
+save(MR_OF_ExpSex_lnCVRf, file = "../Rdata/MR_OF_ExpSex_lnCVRf.Rdata")
+
+## OF lnCVR - ref male
+MR_OF_ExpSex_lnCVRm <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~relevel(data_OF$F0_Parent_Exposed, ref="Male"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_ExpSex_lnCVRm)    
+save(MR_OF_ExpSex_lnCVRm, file = "../Rdata/MR_OF_ExpSex_lnCVRm.Rdata")
+
+R2(MR_OF_ExpSex_lnCVRi)
+
+
+## MG lnRR - intercepts (female, male)
+MR_MG_ExpSex_lnRRi <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_ExpSex_lnRRi)    
+save(MR_MG_ExpSex_lnRRi, file = "../Rdata/MR_MG_ExpSex_lnRRi.Rdata")
+
+## MG lnRR - ref female
+MR_MG_ExpSex_lnRRf <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~relevel(data_MG$F0_Parent_Exposed, ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_ExpSex_lnRRf)    
+save(MR_MG_ExpSex_lnRRf, file = "../Rdata/MR_MG_ExpSex_lnRRf.Rdata")
+
+R2(MR_MG_ExpSex_lnRRi)
+
+
+## MG lnCVR - intercepts (female, male)
+MR_MG_ExpSex_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_ExpSex_lnCVRi)    
+save(MR_MG_ExpSex_lnCVRi, file = "../Rdata/MR_MG_ExpSex_lnCVRi.Rdata")
+
+## MG lnCVR - ref female
+MR_MG_ExpSex_lnCVRf <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~relevel(data_MG$F0_Parent_Exposed, ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_ExpSex_lnCVRf)    
+save(MR_MG_ExpSex_lnCVRf, file = "../Rdata/MR_MG_ExpSex_lnCVRf.Rdata")
+
+R2(MR_MG_ExpSex_lnCVRi)
+```
+
+
+### Meta-regression model on OF and MG data with offspring sex (F2, F3) as moderator
+
+```{r MR Offspring_Sex, include = TRUE, warning = FALSE}
+
+## OF lnRR - intercepts (both, female, male)
+MR_OF_OffSex_lnRRi <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~Offspring_Sex - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_OffSex_lnRRi)    
+save(MR_OF_OffSex_lnRRi, file = "../Rdata/MR_OF_OffSex_lnRRi.Rdata")
+
+## OF lnRR - ref female
+MR_OF_OffSex_lnRRf <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Offspring_Sex, ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_OffSex_lnRRf)    
+save(MR_OF_OffSex_lnRRf, file = "../Rdata/MR_OF_OffSex_lnRRf.Rdata")
+
+## OF lnRR - ref male
+MR_OF_OffSex_lnRRm <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Offspring_Sex, ref="Male"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_OffSex_lnRRm)    
+save(MR_OF_OffSex_lnRRm, file = "../Rdata/MR_OF_OffSex_lnRRm.Rdata")
+
+R2(MR_OF_OffSex_lnRRi)
+
+
+## OF lnCVR - intercepts (both, female, male)
+MR_OF_OffSex_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~Offspring_Sex - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_OffSex_lnCVRi)    
+save(MR_OF_OffSex_lnCVRi, file = "../Rdata/MR_OF_OffSex_lnCVRi.Rdata")
+
+## OF lnCVR - ref female
+MR_OF_OffSex_lnCVRf <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~relevel(data_OF$Offspring_Sex, ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_OffSex_lnCVRf)    
+save(MR_OF_OffSex_lnCVRf, file = "../Rdata/MR_OF_OffSex_lnCVRf.Rdata")
+
+## OF lnCVR - ref male
+MR_OF_OffSex_lnCVRm <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~relevel(data_OF$Offspring_Sex, ref="Male"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_OffSex_lnCVRm)    
+save(MR_OF_OffSex_lnCVRm, file = "../Rdata/MR_OF_OffSex_lnCVRm.Rdata")
+
+R2(MR_OF_OffSex_lnCVRi)
+
+
+## MG lnRR - intercepts (both, female, male)
+MR_MG_OffSex_lnRRi <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~Offspring_Sex - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_OffSex_lnRRi)    
+save(MR_MG_OffSex_lnRRi, file = "../Rdata/MR_MG_OffSex_lnRRi.Rdata")
+
+## MG lnRR - ref female
+MR_MG_OffSex_lnRRf <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~relevel(data_MG$Offspring_Sex, ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_OffSex_lnRRf)    
+save(MR_MG_OffSex_lnRRf, file = "../Rdata/MR_MG_OffSex_lnRRf.Rdata")
+
+## MG lnRR - ref male
+MR_MG_OffSex_lnRRm <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~relevel(data_MG$Offspring_Sex, ref="Male"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_OffSex_lnRRm)    
+save(MR_MG_OffSex_lnRRm, file = "../Rdata/MR_MG_OffSex_lnRRm.Rdata")
+
+R2(MR_MG_OffSex_lnRRi)
+
+
+## MG lnCVR - intercepts (female, male)
+MR_MG_OffSex_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~Offspring_Sex - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_OffSex_lnCVRi)    
+save(MR_MG_OffSex_lnCVRi, file = "../Rdata/MR_MG_OffSex_lnCVRi.Rdata")
+
+## MG lnCVR - ref female
+MR_MG_OffSex_lnCVRf <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~relevel(data_MG$Offspring_Sex, ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_OffSex_lnCVRf)    
+save(MR_MG_OffSex_lnCVRf, file = "../Rdata/MR_MG_OffSex_lnCVRf.Rdata")
+
+## MG lnCVR - ref male
+MR_MG_OffSex_lnCVRm <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~relevel(data_MG$Offspring_Sex, ref="Male"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_OffSex_lnCVRm)    
+save(MR_MG_OffSex_lnCVRm, file = "../Rdata/MR_MG_OffSex_lnCVRm.Rdata")
+
+R2(MR_MG_OffSex_lnCVRi)
+```
+
+
+### Meta-regression model on OF and MG data with offspring Trait category as moderator
+
+```{r MR Trait, include = TRUE, warning = FALSE}
+
+## OF lnRR - intercepts (Adiposity, Body_Weight, Glucose_FBG, Glucose_TT, Insulin_FI, Insulin_TT, Leptin, Triglycerides)
+MR_OF_Trait_lnRRi <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~Trait - 1, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_Trait_lnRRi)    
+R2(MR_OF_Trait_lnRRi)
+save(MR_OF_Trait_lnRRi, file = "../Rdata/MR_OF_Trait_lnRRi.Rdata")
+
+#use a custom function compare_levels to relevel factor (Trait), update model and collect results:
+MR_OF_Trait_lnRR_releveled <- compare_levels(MR_OF_Trait_lnRRi, data_OF$Trait)
+save(MR_OF_Trait_lnRR_releveled, file = "../Rdata/MR_OF_Trait_lnRR_releveled.Rdata")
+#str(MR_OF_Trait_lnRR_releveled)
+#MR_OF_Trait_lnRR_releveled[["Leptin"]]
+#filter(MR_OF_Trait_lnRR_releveled[["Leptin"]],names=="intrcpt")
+
+
+# manual re-leveling example:
+# ## OF lnRR - ref Adiposity
+# MR_OF_Trait_lnRRa <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Trait, ref="Adiposity"), random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+# summary(MR_OF_Trait_lnRRa)    
+# save(MR_OF_Trait_lnRRa, file = "./Rdata/MR_OF_Trait_lnRRa.Rdata")
+# 
+# ## OF lnRR - ref Body_Weight
+# MR_OF_Trait_lnRRb <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Trait, ref="Body_Weight"), random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+# summary(MR_OF_Trait_lnRRb)    
+# save(MR_OF_Trait_lnRRb, file = "./Rdata/MR_OF_Trait_lnRRb.Rdata")
+# 
+# ## OF lnRR - ref Glucose_FBG
+# MR_OF_Trait_lnRRgf <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Trait, ref="Glucose_FBG"), random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+# summary(MR_OF_Trait_lnRRgf)    
+# save(MR_OF_Trait_lnRRgf, file = "./Rdata/MR_OF_Trait_lnRRgf.Rdata")
+# 
+# ## OF lnRR - ref Glucose_TT
+# MR_OF_Trait_lnRRgt <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Trait, ref="Glucose_TT"), random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+# summary(MR_OF_Trait_lnRRgt)    
+# save(MR_OF_Trait_lnRRgt, file = "./Rdata/MR_OF_Trait_lnRRgt.Rdata")
+# 
+# ## OF lnRR - ref Insulin_FI
+# MR_OF_Trait_lnRRif <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Trait, ref="Insulin_FI"), random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+# summary(MR_OF_Trait_lnRRif)    
+# save(MR_OF_Trait_lnRRif, file = "./Rdata/MR_OF_Trait_lnRRif.Rdata")
+# 
+# ## OF lnRR - ref Insulin_TT
+# MR_OF_Trait_lnRRit <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Trait, ref="Insulin_TT"), random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+# summary(MR_OF_Trait_lnRRit)    
+# save(MR_OF_Trait_lnRRit, file = "./Rdata/MR_OF_Trait_lnRRit.Rdata")
+# 
+# ## OF lnRR - ref Leptin
+# MR_OF_Trait_lnRRl <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Trait, ref="Leptin"), random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+# summary(MR_OF_Trait_lnRRl)    
+# save(MR_OF_Trait_lnRRl, file = "./Rdata/MR_OF_Trait_lnRRl.Rdata")
+ 
+
+
+
+## OF lnCVR - intercepts (Adiposity, Body_Weight, Glucose_FBG, Glucose_TT, Insulin_FI, Insulin_TT, Leptin, Triglycerides)
+MR_OF_Trait_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~Trait - 1, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_Trait_lnCVRi)    
+R2(MR_OF_Trait_lnCVRi)
+save(MR_OF_Trait_lnCVRi, file = "../Rdata/MR_OF_Trait_lnCVRi.Rdata")
+
+#use a custom function compare_levels to relevel factor (Trait), update model and collect results:
+MR_OF_Trait_lnCVR_releveled <- compare_levels(MR_OF_Trait_lnCVRi, data_OF$Trait)
+save(MR_OF_Trait_lnCVR_releveled, file = "../Rdata/MR_OF_Trait_lnCVR_releveled.Rdata")
+
+
+
+## MG lnRR - intercepts (Adiposity, Body_Weight, Glucose_FBG, Glucose_TT, Insulin_FI, Insulin_TT, Leptin, Triglycerides)
+MR_MG_Trait_lnRRi <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~Trait - 1, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_Trait_lnRRi)    
+R2(MR_MG_Trait_lnRRi)
+save(MR_MG_Trait_lnRRi, file = "../Rdata/MR_MG_Trait_lnRRi.Rdata")
+
+#use a custom function compare_levels to relevel factor (Trait), update model and collect results:
+MR_MG_Trait_lnRR_releveled <- compare_levels(MR_MG_Trait_lnRRi, data_MG$Trait)
+save(MR_MG_Trait_lnRR_releveled, file = "../Rdata/MR_MG_Trait_lnRR_releveled.Rdata")
+
+
+## MG lnCVR - intercepts (Adiposity, Body_Weight, Glucose_FBG, Glucose_TT, Insulin_FI, Insulin_TT, Leptin, Triglycerides)
+MR_MG_Trait_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~Trait - 1, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_Trait_lnCVRi)    
+R2(MR_MG_Trait_lnCVRi)
+save(MR_MG_Trait_lnCVRi, file = "../Rdata/MR_MG_Trait_lnCVRi.Rdata")
+
+#use a custom function compare_levels to relevel factor (Trait), update model and collect results:
+MR_MG_Trait_lnCVR_releveled <- compare_levels(MR_MG_Trait_lnCVRi, data_MG$Trait)
+save(MR_MG_Trait_lnCVR_releveled, file = "../Rdata/MR_MG_Trait_lnCVR_releveled.Rdata")
+```
+
+
+
+
+*NEXT: run main MA and MR using STEP3_EXTRA_MODELS.Rmd script* 

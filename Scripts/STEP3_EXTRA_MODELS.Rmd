@@ -1,0 +1,638 @@
+---
+title: "STEP3_EXTRA_MODELS"
+subtitle: "MA of transgenerational effects of obesogenic diets on rodents"
+author: "ML"
+date: "01/05/2020"
+output: html_document
+knit: (function(inputFile, encoding) {rmarkdown::render(inputFile, encoding = encoding, output_dir = "Knitted") })
+---
+
+Additonal (exploartory) models, publication biasand sensistivity analyses    
+[Note: run by chunks, do not knit]     
+
+### Setup
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+options(scipen=100)
+
+# Load packages
+# devtools::install_github("thomasp85/patchwork")
+pacman::p_load(tidyverse, # tidy family and related pacakges below
+               readxl,  #reding in Excel file
+               metafor, # calculating effect sizes
+               magrittr, # extending piping
+               ggplot2,  # nice plots
+               patchwork,  # arranging plots
+               MuMIn # for model selection
+)
+
+#pacman::p_load(tidyverse, magrittr, fulltext, rotl, ape, dplyr, tidyr, rotl, fulltext, metafor, car, robumeta, MuMIn, lme4, effects, MCMCglmm, multicomp)
+
+# Load custom functions
+
+#source("./Scripts/custom_functions.R") #load custom functions
+
+#Load environment
+
+load('myEnvironment.RData')
+```
+
+<!-- ### Load data     -->
+<!-- Processed data for analyses is stored in data_all_ES.csv and data_all_ES.RData fils.  -->
+<!-- It needs to be split into One-off and Multigenerational data.       -->
+
+<!-- ```{r load and subset data, include = FALSE} -->
+<!-- # Load preprocessed data with effect sizes -->
+<!-- data_all <- read.csv(file ="./Data/data_all_ES.csv") -->
+<!-- #load(data_all, file = "./Rdata/data_all_ES.RData") #alternative -->
+<!-- #str(data_all) -->
+
+<!-- # Subset by One off and Multigenerational -->
+<!-- data_MG <- filter(data_all, Exposure_Type == "Multigenerational") -->
+<!-- data_OF <- filter(data_all, Exposure_Type == "One-off") -->
+<!-- dim(data_MG) -->
+<!-- dim(data_OF) -->
+<!-- data_MG <- droplevels(data_MG) #adjust factor levels -->
+<!-- data_OF <- droplevels(data_OF) #adjust factor levels -->
+<!-- ``` -->
+
+<!-- Make VCV (variance-covariance matices.     -->
+
+<!-- ```{r make VCV matrices, include = FALSE} -->
+<!-- ## all data -->
+<!-- Vmat_lnRR_all <- make_VCV_matrix(data = data_all, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") -->
+<!-- Vmat_lnCVR_all <- make_VCV_matrix(data = data_all, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID") -->
+
+<!-- ## OF data -->
+<!-- Vmat_lnRR_OF <- make_VCV_matrix(data = data_OF, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") -->
+<!-- Vmat_lnCVR_OF <- make_VCV_matrix(data = data_OF, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID") -->
+
+<!-- ## MG data -->
+<!-- Vmat_lnRR_MG <- make_VCV_matrix(data = data_MG, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") -->
+<!-- Vmat_lnCVR_MG <- make_VCV_matrix(data = data_MG, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID") -->
+
+<!-- #Vmat_lnRR_all #visual check -->
+<!-- ``` -->
+
+
+
+## Full meta-regression (with 3 main moderators) in metafor
+
+```{r MR full metafor, include = TRUE, warning = FALSE}
+
+#OF lnRR
+MR_OF_Full_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_Full_lnRR)
+R2(MR_OF_Full_lnRR)
+save(MR_OF_Full_lnRR, file = "../Rdata/MR_OF_Full_lnRR.Rdata")
+#load(file = "../Rdata/MR_OF_Full_lnRR.Rdata")
+
+#OF lnCVR
+MR_OF_Full_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_Full_lnCVR)
+R2(MR_OF_Full_lnCVR)
+save(MR_OF_Full_lnCVR, file = "../Rdata/MR_OF_Full_lnCVR.Rdata")
+#load(file = "../Rdata/MR_OF_Full_lnCVR.Rdata")
+
+#MG lnRR
+MR_MG_Full_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_Full_lnRR)
+R2(MR_MG_Full_lnRR)
+save(MR_MG_Full_lnRR, file = "../Rdata/MR_MG_Full_lnRR.Rdata")
+#load(file = "../Rdata/MR_MG_Full_lnRR.Rdata")
+
+#MG lnCVR
+MR_MG_Full_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_Full_lnCVR)
+R2(MR_MG_Full_lnCVR)
+save(MR_MG_Full_lnCVR, file = "../Rdata/MR_MG_Full_lnCVR.Rdata")
+#load(file = "../Rdata/MR_MG_Full_lnCVR.Rdata")
+```
+
+
+## Model selection    
+
+```{r model selection, eval = FALSE, include = FLASE}
+eval(metafor:::.MuMIn)
+# re-run full models with method = "ML" so that we can compare AIC using dredge function from .MuMIn
+
+#OF lnRR
+MR_OF_Full_lnRR_ML <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "ML", test = "t") 
+summary(MR_OF_Full_lnRR_ML)
+R2(MR_OF_Full_lnRR_ML)
+save(MR_OF_Full_lnRR_ML, file = "../Rdata/MR_OF_Full_lnRR_ML.Rdata")
+#load(file = "./Rdata/MR_OF_Full_lnRR_ML.Rdata")
+#getCall(MR_OF_Full_lnRR_ML) # testing call of new function
+#update(mr_full) # update the new function to run in MuMIn
+MR_OF_Full_lnRR_ML_meta_AICc <- dredge(MR_OF_Full_lnRR_ML, trace=2) # using dredge to compare models
+MR_OF_Full_lnRR_ML_meta_AICc
+save(MR_OF_Full_lnRR_ML_meta_AICc, file = "../Rdata/MR_OF_Full_lnRR_ML_meta_AICc.Rdata")
+#load(file = "Rdata/MR_OF_Full_lnRR_ML_meta_AICc.Rdata")
+#par(mar = c(3,5,10,5))
+#plot(MR_OF_Full_lnRR_ML_meta_AICc, labAsExpr = TRUE)
+#subset only models within 2delta
+#sub_MR_OF_Full_lnRR_ML_meta_AICc <- subset(MR_OF_Full_lnRR_ML_meta_AICc, delta < 2)
+#sub_MR_OF_Full_lnRR_ML_meta_AICc
+#plot(sub_MR_OF_Full_lnRR_ML_meta_AICc, labAsExpr = TRUE)
+summary(model.avg(MR_OF_Full_lnRR_ML_meta_AICc)) # averaged model
+# coerce the object out.put into a data frame and tidy up
+sel.table <- as.data.frame(MR_OF_Full_lnRR_ML_meta_AICc)[5:9]
+sel.table[,2:3]<- round(sel.table[,2:3],2)
+sel.table[,4:5]<- round(sel.table[,4:5],3) 
+names(sel.table)[1] = "K" 
+sel.table$Model <- rownames(sel.table) 
+MR_OF_Full_lnRR_ML_meta_AICc # get the model specifications
+sel.table$Model <- c("Trait","Trait + Offspring Sex", "Trait + F0 Parent Exposed", "Trait + Offspring Sex + F0 Parent Exposed", "Intercept-only (no moderators)", "Offspring Sex", "F0 Parent Exposed", "F0 Parent Exposed + Offspring Sex") #manually setting model formulas
+sel.table
+importance(MR_OF_Full_lnRR_ML_meta_AICc) # importance of each predictor
+#Relative variable importance: 
+#                     Trait Offspring_Sex F0_Parent_Exposed
+#Sum of weights:      1.00  0.21          0.13             
+#N containing models:    4     4             4   
+summary(get.models(MR_OF_Full_lnRR_ML_meta_AICc, 1)[[1]]) #best model = with only Trait as a moderator
+write.csv(importance(MR_OF_Full_lnRR_ML_meta_AICc), file="../Tables/MR_OF_Full_lnRR_ML_meta_AICc_importance.csv")
+write.csv(sel.table, file="../Tables/MR_OF_Full_lnRR_ML_meta_AICc_selection.csv")
+save(sel.table, file = "../Rdata/MR_OF_Full_lnRR_ML_meta_AICc_seltable.Rdata")
+
+
+#OF lnCVR
+MR_OF_Full_lnCVR_ML <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF, method = "ML", test = "t") 
+summary(MR_OF_Full_lnCVR_ML)
+R2(MR_OF_Full_lnCVR_ML)
+save(MR_OF_Full_lnCVR_ML, file = "../Rdata/MR_OF_Full_lnCVR_ML.Rdata")
+#load(file = "./Rdata/MR_OF_Full_lnCVR_ML.Rdata")
+#getCall(MR_OF_Full_lnCVR_ML) # testing call of new function
+#update(mr_full) # update the new function to run in MuMIn
+MR_OF_Full_lnCVR_ML_meta_AICc <- dredge(MR_OF_Full_lnCVR_ML, trace=2) # using dredge to compare models
+MR_OF_Full_lnCVR_ML_meta_AICc
+save(MR_OF_Full_lnCVR_ML_meta_AICc, file = "../Rdata/MR_OF_Full_lnCVR_ML_meta_AICc.Rdata")
+#load(file = "./Rdata/MR_OF_Full_lnCVR_ML_meta_AICc.Rdata")
+#par(mar = c(3,5,10,5))
+#plot(MR_OF_Full_lnCVR_ML_meta_AICc, labAsExpr = TRUE)
+#subset only models within 2delta
+#sub_MR_OF_Full_lnCVR_ML_meta_AICc <- subset(MR_OF_Full_lnCVR_ML_meta_AICc, delta < 2)
+#sub_MR_OF_Full_lnCVR_ML_meta_AICc
+#plot(sub_MR_OF_Full_lnCVR_ML_meta_AICc, labAsExpr = TRUE)
+summary(model.avg(MR_OF_Full_lnCVR_ML_meta_AICc)) # averaged model
+# coerce the object out.put into a data frame and tidy up
+sel.table <- as.data.frame(MR_OF_Full_lnCVR_ML_meta_AICc)[5:9]
+sel.table[,2:3]<- round(sel.table[,2:3],2)
+sel.table[,4:5]<- round(sel.table[,4:5],3) 
+names(sel.table)[1] = "K" 
+sel.table$Model <- rownames(sel.table) 
+MR_OF_Full_lnCVR_ML_meta_AICc # get the model specifications
+sel.table$Model <- c("Intercept-only (no moderators)", "Trait", "F0 Parent Exposed", "Offspring Sex", "Trait + Offspring Sex", "Trait + F0 Parent Exposed", "F0 Parent Exposed + Offspring Sex", "Trait + Offspring Sex + F0 Parent Exposed") #manually setting model formulas
+sel.table
+importance(MR_OF_Full_lnCVR_ML_meta_AICc) # importance of each predictor
+#Relative variable importance: 
+#                     Trait F0_Parent_Exposed Offspring_Sex
+#Sum of weights:      0.166 0.149             0.139            
+#N containing models:    4     4             4   
+summary(get.models(MR_OF_Full_lnCVR_ML_meta_AICc, 1)[[1]]) #best model = with no moderators (intercept-only)
+write.csv(importance(MR_OF_Full_lnCVR_ML_meta_AICc), file="../Tables/MR_OF_Full_lnCVR_ML_meta_AICc_importance.csv")
+write.csv(sel.table, file="../Tables/MR_OF_Full_lnCVR_ML_meta_AICc_selection.csv")
+save(sel.table, file = "../Rdata/MR_OF_Full_lnCVR_ML_meta_AICc_seltable.Rdata")
+
+
+#MG lnRR
+MR_MG_Full_lnRR_ML <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_MG, method = "ML", test = "t") 
+summary(MR_MG_Full_lnRR_ML)
+R2(MR_MG_Full_lnRR_ML)
+save(MR_MG_Full_lnRR_ML, file = "../Rdata/MR_MG_Full_lnRR_ML.Rdata")
+#load(file = "./Rdata/MR_MG_Full_lnRR_ML.Rdata")
+#getCall(MR_MG_Full_lnRR_ML) # testing call of new function
+#update(mr_full) # update the new function to run in MuMIn
+MR_MG_Full_lnRR_ML_meta_AICc <- dredge(MR_MG_Full_lnRR_ML, trace=2) # using dredge to compare models
+MR_MG_Full_lnRR_ML_meta_AICc
+save(MR_MG_Full_lnRR_ML_meta_AICc, file = "../Rdata/MR_MG_Full_lnRR_ML_meta_AICc.Rdata")
+#load(file = "./Rdata/MR_MG_Full_lnRR_ML_meta_AICc.Rdata")
+#par(mar = c(3,5,10,5))
+#plot(MR_MG_Full_lnRR_ML_meta_AICc, labAsExpr = TRUE)
+#subset only models within 2delta
+#sub_MR_MG_Full_lnRR_ML_meta_AICc <- subset(MR_MG_Full_lnRR_ML_meta_AICc, delta < 2)
+#sub_MR_MG_Full_lnRR_ML_meta_AICc
+#plot(sub_MR_MG_Full_lnRR_ML_meta_AICc, labAsExpr = TRUE)
+summary(model.avg(MR_MG_Full_lnRR_ML_meta_AICc)) # averaged model
+# coerce the object out.put into a data frame and tidy up
+sel.table <- as.data.frame(MR_MG_Full_lnRR_ML_meta_AICc)[5:9]
+sel.table[,2:3]<- round(sel.table[,2:3],2)
+sel.table[,4:5]<- round(sel.table[,4:5],3) 
+names(sel.table)[1] = "K" 
+sel.table$Model <- rownames(sel.table) 
+MR_MG_Full_lnRR_ML_meta_AICc # get the model specifications
+sel.table$Model <- c("Trait + F0 Parent Exposed", "Trait", "Trait + Offspring Sex + F0 Parent Exposed", "Trait + Offspring Sex", "F0 Parent Exposed", "F0 Parent Exposed + Offspring Sex", "Intercept-only (no moderators)", "Offspring Sex") #manually setting model formulas
+sel.table
+importance(MR_MG_Full_lnRR_ML_meta_AICc) # importance of each predictor
+#Relative variable importance: 
+#                     Trait F0_Parent_Exposed Offspring_Sex
+#Sum of weights:      1.00  0.68              0.10             
+#N containing models:    4     4             4   
+summary(get.models(MR_MG_Full_lnRR_ML_meta_AICc, 1)[[1]]) #best model = with Trait and F0 Parent Exposed as moderators
+write.csv(importance(MR_MG_Full_lnRR_ML_meta_AICc), file="../Tables/MR_MG_Full_lnRR_ML_meta_AICc_importance.csv")
+write.csv(sel.table, file="../Tables/MR_MG_Full_lnRR_ML_meta_AICc_selection.csv")
+save(sel.table, file = "../Rdata/MR_MG_Full_lnRR_ML_meta_AICc_seltable.Rdata")
+
+#MG lnCVR
+MR_MG_Full_lnCVR_ML <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_MG, method = "ML", test = "t") 
+summary(MR_MG_Full_lnCVR_ML)
+R2(MR_MG_Full_lnCVR_ML)
+save(MR_MG_Full_lnCVR_ML, file = "../Rdata/MR_MG_Full_lnCVR_ML.Rdata")
+#load(file = "./Rdata/MR_MG_Full_lnCVR_ML.Rdata")
+#getCall(MR_MG_Full_lnCVR_ML) # testing call of new function
+#update(mr_full) # update the new function to run in MuMIn
+MR_MG_Full_lnCVR_ML_meta_AICc <- dredge(MR_MG_Full_lnCVR_ML, trace=2) # using dredge to compare models
+MR_MG_Full_lnCVR_ML_meta_AICc
+save(MR_MG_Full_lnCVR_ML_meta_AICc, file = "../Rdata/MR_MG_Full_lnCVR_ML_meta_AICc.Rdata")
+#load(file = "./Rdata/MR_MG_Full_lnCVR_ML_meta_AICc.Rdata")
+#par(mar = c(3,5,10,5))
+#plot(MR_MG_Full_lnCVR_ML_meta_AICc, labAsExpr = TRUE)
+#subset only models within 2delta
+#sub_MR_MG_Full_lnCVR_ML_meta_AICc <- subset(MR_MG_Full_lnCVR_ML_meta_AICc, delta < 2)
+#sub_MR_MG_Full_lnCVR_ML_meta_AICc
+#plot(sub_MR_MG_Full_lnCVR_ML_meta_AICc, labAsExpr = TRUE)
+summary(model.avg(MR_MG_Full_lnCVR_ML_meta_AICc)) # averaged model
+# coerce the object out.put into a data frame and tidy up
+sel.table <- as.data.frame(MR_MG_Full_lnCVR_ML_meta_AICc)[5:9]
+sel.table[,2:3]<- round(sel.table[,2:3],2)
+sel.table[,4:5]<- round(sel.table[,4:5],3) 
+names(sel.table)[1] = "K" 
+sel.table$Model <- rownames(sel.table) 
+MR_MG_Full_lnCVR_ML_meta_AICc # get the model specifications
+sel.table$Model <- c("Trait", "Intercept-only (no moderators)", "F0 Parent Exposed", "Trait + F0 Parent Exposed", "Offspring Sex", "Trait + Offspring Sex", "F0 Parent Exposed + Offspring Sex", "Trait + Offspring Sex + F0 Parent Exposed") #manually setting model formulas
+sel.table
+importance(MR_MG_Full_lnCVR_ML_meta_AICc) # importance of each predictor
+#Relative variable importance: 
+#                     Trait F0_Parent_Exposed Offspring_Sex
+#Sum of weights:      0.50  0.35              0.17             
+#N containing models:    4     4             4   
+summary(get.models(MR_MG_Full_lnCVR_ML_meta_AICc, 1)[[1]]) #best model = with only Trait as a moderator
+write.csv(importance(MR_MG_Full_lnCVR_ML_meta_AICc), file="../Tables/MR_MG_Full_lnCVR_ML_meta_AICc_importance.csv")
+write.csv(sel.table, file="../Tables/MR_MG_Full_lnCVR_ML_meta_AICc_selection.csv")
+save(sel.table, file = "../Rdata/MR_MG_Full_lnCVR_ML_meta_AICc_seltable.Rdata")
+```
+
+
+########################################         PUBLICATION BIAS       ####################################### 
+
+## Egger's test on full meta-regression residuals and trim-and-fill test
+
+Multivariate version of Egger’s regression. Evidence for publication bias if the sqrt(varlnRR) is significantly different from 0.
+
+```{r publiction bias, eval=FALSE, include=FALSE}
+
+# Egger's multivariate regressions (controlling ofr main 3 moderators) 
+PB_OF_Full_lnRR <- rma.mv(yi = lnRR, V = Vmat_lnRR_OF, mods = ~sqrt(VlnRR) + F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_OF, test = "t")
+PB_OF_Full_lnCVR <- rma.mv(yi = lnCVR, V = Vmat_lnCVR_OF, mods = ~sqrt(VlnCVR) + F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_OF, test = "t")
+PB_MG_Full_lnRR <- rma.mv(yi = lnRR, V = Vmat_lnRR_MG, mods = ~sqrt(VlnRR) + F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_MG, test = "t")
+PB_MG_Full_lnCVR <- rma.mv(yi = lnCVR, V = Vmat_lnCVR_MG, mods = ~sqrt(VlnCVR) + F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_MG, test = "t")
+save(PB_OF_Full_lnRR, PB_OF_Full_lnCVR, PB_MG_Full_lnRR, PB_MG_Full_lnCVR, file = "./Rdata/PB_OF_MG_Full.Rdata")
+
+#for funnel plot on residuals (RFP):
+RFP_OF_Full_lnRR <- rma.mv(yi = lnRR, V = Vmat_lnRR_OF, mods = ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_OF, test = "t")
+#funnel(RFP_OF_Full_lnRR, yaxis = "seinv", level = c(90, 95, 99), shade = c("white", "gray55", "gray75"), refline = 0, legend = FALSE)
+RFP_OF_Full_lnCVR <- rma.mv(yi = lnCVR, V = Vmat_lnCVR_OF, mods = ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_OF, test = "t")
+#funnel(RFP_OF_Full_lnCVR, yaxis = "seinv", level = c(90, 95, 99), shade = c("white", "gray55", "gray75"), refline = 0, legend = FALSE)
+RFP_MG_Full_lnRR <- rma.mv(yi = lnRR, V = Vmat_lnRR_MG, mods = ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_MG, test = "t")
+#funnel(RFP_MG_Full_lnRR, yaxis = "seinv", level = c(90, 95, 99), shade = c("white", "gray55", "gray75"), refline = 0, legend = FALSE)
+RFP_MG_Full_lnCVR <- rma.mv(yi = lnCVR, V = Vmat_lnCVR_MG, mods = ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_MG, test = "t")
+#funnel(RFP_MG_Full_lnCVR, yaxis = "seinv", level = c(90, 95, 99), shade = c("white", "gray55", "gray75"), refline = 0, legend = FALSE)
+save(RFP_OF_Full_lnRR, RFP_OF_Full_lnCVR, RFP_MG_Full_lnRR, RFP_MG_Full_lnCVR, file = "./Rdata/RFP_OF_MG_Full.Rdata")
+```
+
+
+### Time-lag bias (univariate MR)
+
+```{r time-lag bias, eval=FALSE, include=FLASE, warning=FALSE}
+
+### OF lnRR
+MR_OF_Year_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Year), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_Year_lnRR) # no signif slope 
+R2(MR_OF_Year_lnRR)
+save(MR_OF_Year_lnRR, file = "./Rdata/MR_OF_Year_lnRR.Rdata")
+
+### OF lnCVR
+MR_OF_Year_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Year), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_Year_lnCVR) # no signif slope 
+R2(MR_OF_Year_lnCVR)
+save(MR_OF_Year_lnCVR, file = "./Rdata/MR_OF_Year_lnCVR.Rdata")
+
+### MG lnRR
+MR_MG_Year_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Year), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_Year_lnRR) # no signif slope 
+R2(MR_MG_Year_lnRR)
+save(MR_MG_Year_lnRR, file = "./Rdata/MR_MG_Year_lnRR.Rdata")
+
+### MG lnCVR
+MR_MG_Year_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Year), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_Year_lnCVR) # no signif slope 
+R2(MR_MG_Year_lnCVR)
+save(MR_MG_Year_lnCVR, file = "./Rdata/MR_MG_Year_lnCVR.Rdata")
+```
+
+#####################################
+
+
+## Additional meta-regressions
+
+
+### Meta-regression model on OF and MG data with Treatment_Diet_Energy_kcal_g
+
+```{r MR Treatment_Diet_Energy_kcal_g, include = TRUE}
+
+## OF lnRR - slope 
+MR_OF_DietE_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Diet_Energy_kcal_g), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+#MR_OF_DietE_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Diet_Energy_kcal_g) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
+summary(MR_OF_DietE_lnRR)    
+save(MR_OF_DietE_lnRR, file = "./Rdata/MR_OF_DietE_lnRR.Rdata")
+
+## OF lnCVR - slope 
+MR_OF_DietE_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Diet_Energy_kcal_g), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
+#MR_OF_DietE_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Diet_Energy_kcal_g) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
+summary(MR_OF_DietE_lnCVR)    
+save(MR_OF_DietE_lnCVR, file = "./Rdata/MR_OF_DietE_lnCVR.Rdata")
+
+## MG lnRR - slope 
+MR_MG_DietE_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Diet_Energy_kcal_g), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+#MR_MG_DietE_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Diet_Energy_kcal_g) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
+summary(MR_MG_DietE_lnRR)   # signif slope
+save(MR_MG_DietE_lnRR, file = "./Rdata/MR_MG_DietE_lnRR.Rdata")
+
+## MG lnCVR - slope 
+MR_MG_DietE_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Diet_Energy_kcal_g), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+#MR_MG_DietE_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Diet_Energy_kcal_g) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+summary(MR_MG_DietE_lnCVR)    
+save(MR_MG_DietE_lnCVR, file = "./Rdata/MR_MG_DietE_lnCVR.Rdata")
+
+# MR_MG_DietE_lnRR - positive slope in MG - more effect for diets with higher total energy
+#par(mfrow=c(1,1))
+#plot(data_MG$Treatment_Diet_Energy_kcal_g, data_MG$lnCVR)
+```
+
+
+### Meta-regression model on OF and MG data with Treatment_Diet_PNP_ratio
+
+```{r MR Treatment_Diet_PNP_ratio, include = TRUE}
+
+## OF lnRR - slope 
+MR_OF_DietPNP_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Diet_PNP_ratio), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
+#MR_OF_DietPNP_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Diet_PNP_ratio) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
+summary(MR_OF_DietPNP_lnRR)    
+save(MR_OF_DietPNP_lnRR, file = "./Rdata/MR_OF_DietPNP_lnRR.Rdata")
+
+## OF lnCVR - slope 
+MR_OF_DietPNP_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Diet_PNP_ratio), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
+#MR_OF_DietPNP_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Diet_PNP_ratio) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
+summary(MR_OF_DietPNP_lnCVR)    
+save(MR_OF_DietPNP_lnCVR, file = "./Rdata/MR_OF_DietPNP_lnCVR.Rdata")
+
+## MG lnRR - slope 
+MR_MG_DietPNP_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Diet_PNP_ratio), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+#MR_MG_DietPNP_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Diet_PNP_ratio) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
+summary(MR_MG_DietPNP_lnRR)    
+save(MR_MG_DietPNP_lnRR, file = "./Rdata/MR_MG_DietPNP_lnRR.Rdata")
+
+## MG lnCVR - slope 
+MR_MG_DietPNP_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Diet_PNP_ratio), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+#MR_MG_DietPNP_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Diet_PNP_ratio) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
+summary(MR_MG_DietPNP_lnCVR)    
+save(MR_MG_DietPNP_lnCVR, file = "./Rdata/MR_MG_DietPNP_lnCVR.Rdata")
+```
+
+
+### Meta-regression model on OF and MG data with exposure duration
+
+```{r MR Treatment_Duration_F0, include = TRUE}
+
+## OF lnRR - slope 
+MR_OF_TDur_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Duration_F0), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
+#MR_OF_TDur_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Duration_F0) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
+summary(MR_OF_TDur_lnRR)    
+save(MR_OF_TDur_lnRR, file = "./Rdata/MR_OF_TDur_lnRR.Rdata")
+
+## OF lnCVR - slope 
+MR_OF_TDur_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Duration_F0), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
+#MR_OF_TDur_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Duration_F0) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
+summary(MR_OF_TDur_lnCVR)    
+save(MR_OF_TDur_lnCVR, file = "./Rdata/MR_OF_TDur_lnCVR.Rdata")
+
+## MG lnRR - slope 
+MR_MG_TDur_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Duration_F0), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+#MR_MG_TDur_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Duration_F0) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
+summary(MR_MG_TDur_lnRR)    
+save(MR_MG_TDur_lnRR, file = "./Rdata/MR_MG_TDur_lnRR.Rdata")
+
+## MG lnCVR - slope 
+MR_MG_TDur_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Duration_F0), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+#MR_MG_TDur_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Duration_F0) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
+summary(MR_MG_TDur_lnCVR)    
+save(MR_MG_TDur_lnCVR, file = "./Rdata/MR_MG_TDur_lnCVR.Rdata")
+```
+
+
+### Meta-regression model on OF and MG data with offspring generation (F2, F3)
+
+```{r MR Offspring_Generation, include = TRUE}
+
+## OF lnRR 
+MR_OF_OffGen_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~Offspring_Generation, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
+summary(MR_OF_OffGen_lnRR)    
+save(MR_OF_OffGen_lnRR, file = "./Rdata/MR_OF_OffGen_lnRR.Rdata")
+
+MR_OF_OffGen_lnRRi <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~Offspring_Generation -1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
+summary(MR_OF_OffGen_lnRRi)    
+save(MR_OF_OffGen_lnRRi, file = "./Rdata/MR_OF_OffGen_lnRRi.Rdata")
+
+## OF lnCVR 
+MR_OF_OffGen_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~Offspring_Generation, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
+summary(MR_OF_OffGen_lnCVR)    
+save(MR_OF_OffGen_lnCVR, file = "./Rdata/MR_OF_OffGen_lnCVR.Rdata")
+
+MR_OF_OffGen_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~Offspring_Generation -1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
+summary(MR_OF_OffGen_lnCVRi)    
+save(MR_OF_OffGen_lnCVRi, file = "./Rdata/MR_OF_OffGen_lnCVRi.Rdata")
+
+## MG lnRR 
+MR_MG_OffGen_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~Offspring_Generation, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+summary(MR_MG_OffGen_lnRR)    
+save(MR_MG_OffGen_lnRR, file = "./Rdata/MR_MG_OffGen_lnRR.Rdata")
+
+MR_MG_OffGen_lnRRi <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~Offspring_Generation -1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+summary(MR_MG_OffGen_lnRRi)    
+save(MR_MG_OffGen_lnRRi, file = "./Rdata/MR_MG_OffGen_lnRRi.Rdata")
+
+## MG lnCVR
+MR_MG_OffGen_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~Offspring_Generation, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+summary(MR_MG_OffGen_lnCVR)    
+save(MR_MG_OffGen_lnCVR, file = "./Rdata/MR_MG_OffGen_lnCVR.Rdata")
+
+MR_MG_OffGen_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~Offspring_Generation -1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
+summary(MR_MG_OffGen_lnCVRi)    
+save(MR_MG_OffGen_lnCVRi, file = "./Rdata/MR_MG_OffGen_lnCVRi.Rdata")
+```
+
+
+## compare weight gain of F0 with that of F2 
+
+```{r MR F0 body weights, include = FALSE}
+## Load and preprocess F0 data
+data_F0 <- read_excel("./Data/ALL_TRAITS_20200514.xlsx", sheet = "F0")
+str(data_F0) #27 effect sizes
+length(table(data_F0$Study_ID)) #from 17 studies
+table(data_F0$F0_Sex) #20 female and 7 male F0 bw
+range(data_F0$Age_Days) #28 270
+
+#add first colum with ID for each row (to be used as ID for each clculated effect size)
+add_column(data_F0, ES_ID = paste("ES_",c(1:dim(data_F0)[1]),sep=""), .before = 1) -> data_F0
+# Change all character columns into factors
+data_F0 %>% type.convert() -> data_F0 
+names(data_F0)
+
+## Calculate Effect Sizes
+# Calculate lnRR and its variance for each row
+data_F0 <- escalc(measure="ROM", m1i=F0_Treatment_Mean, sd1i=F0_Treatment_SD, n1i=F0_Treatment_n, m2i=F0_Control_Mean, sd2i=F0_Control_SD, n2i=F0_Control_n, var.names=c("lnRR","VlnRR"), data=data_F0)
+# Calculate lnCVR and its variance for each row
+data_F0 <- escalc(measure="CVR", m1i=F0_Treatment_Mean, sd1i=F0_Treatment_SD, n1i=F0_Treatment_n, m2i=F0_Control_Mean, sd2i=F0_Control_SD, n2i=F0_Control_n, var.names=c("lnCVR","VlnCVR"), data=data_F0)
+
+#hist(data_F0$lnRR)
+#hist(data_F0$VlnRR)
+#hist(data_F0$lnCVR)
+#hist(data_F0$VlnCVR)
+
+# Save data with effect sizes
+write.csv(data_F0, file ="./Data/data_F0_ES.csv")
+save(data_F0, file = "./Rdata/data_F0_ES.RData")
+
+## Make VCV matrice
+Vmat_lnRR_F0_bw <- make_VCV_matrix(data = data_F0, V = "VlnRR", cluster = "Cohort_ID", obs = "ES_ID")
+
+## Run MA model for F0 body weights with VCV
+MA_F0 <- rma.mv(lnRR, Vmat_lnRR_F0_bw, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_F0, method = "REML")
+summary(MA_F0)
+forest(MA_F0)
+funnel(MA_F0)
+
+## Run MR model for F0 body weights with F0_Sex as a moderator
+MR_F0 <- rma.mv(lnRR, Vmat_lnRR_F0_bw, mods = ~F0_Sex, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_F0, method = "REML")
+summary(MR_F0) #ns diff but males tend to be less affected
+
+hist(data_F0$Age_Days, breaks=10) # most body weight measurements around 100 days (usually at the end of treatment: mating - after end of gestation)
+
+## Run MR model for F0 body weights with F0 Age_Days as a moderator
+MR_F0_age <- rma.mv(lnRR, Vmat_lnRR_F0_bw, mods = ~Age_Days, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_F0, method = "REML")
+summary(MR_F0_age) #small positive slope
+save(MR_F0_age, file = "./Rdata/MR_F0_age.Rdata")
+
+## Make prediction of the effect size at specific age:
+#prediction_F0 <- predict(MR_F0_age, newmods = c(50, 100, 150))
+prediction_F0 <- predict(MR_F0_age, newmods = c(100)) #most of our data is around 100 days old, with 0 being birth day
+prediction_F0
+save(prediction_F0, file = "./Rdata/prediction_F0.Rdata")
+
+### compare to grand-offspring body weights
+## filter out bodyweight data
+data_OF_bw <- filter(data_OF, Trait == "Body_Weight")
+data_MG_bw <- filter(data_MG, Trait == "Body_Weight")
+## Make VCV matrices
+Vmat_lnRR_OF_bw <- make_VCV_matrix(data = data_OF_bw, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+Vmat_lnRR_MG_bw <- make_VCV_matrix(data = data_MG_bw, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+
+## OF - Run MR model for OF body weights with Age_at_Measurement_Days as a moderator
+#hist(data_OF_bw$Age_at_Measurement_Days, breaks=10)
+MR_OF_age <- rma.mv(lnRR, Vmat_lnRR_OF_bw, mods = ~Age_at_Measurement_Days, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF_bw, method = "REML")
+summary(MR_OF_age) #ns slope
+save(MR_OF_age, file = "./Rdata/MR_OF_age.Rdata")
+
+## Make prediction of the effect size at specific age:
+#prediction_OF <- predict(MR_OF_age, newmods = c(50, 100, 150))
+prediction_OF <- predict(MR_OF_age, newmods = c(100+21)) #most of our data is around 100 days old, with 0 being conception day (day -21)
+prediction_OF
+save(prediction_OF, file = "./Rdata/prediction_OF.Rdata")
+
+## MG - Run MR model for MG body weights with Age_at_Measurement_Days as a moderator
+#hist(data_MG_bw$Age_at_Measurement_Days, breaks=10)
+MR_MG_age <- rma.mv(lnRR, Vmat_lnRR_MG_bw, mods = ~Age_at_Measurement_Days, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_MG_bw, method = "REML")
+summary(MR_MG_age) #small positive slope
+save(MR_MG_age, file = "./Rdata/MR_MG_age.Rdata")
+
+## Make prediction of the effect size at specific age:
+#prediction_MG <- predict(MR_MG_age, newmods = c(50, 100, 150))
+prediction_MG <- predict(MR_MG_age, newmods = c(100+21)) #most of our data is around 100 days old, with 0 being conception day (day -21)
+prediction_MG
+save(prediction_MG, file = "./Rdata/prediction_MG.Rdata")
+
+#Express predictions as percentages difference: 
+(exp(prediction_F0$pred)-1)*100 # 14.9% incresed bw in F0 treatment group at around 100 days old
+(exp(prediction_OF$pred)-1)*100 # 6.7% incresed bw in F2/3 OF treatment group at around 100 days old
+(exp(prediction_MG$pred)-1)*100 # 16.9% incresed bw in F2/3 MG treatment group at around 100 days old
+```
+
+
+## re-run Exposure_Type and other MR models with only "pure" female and male exposure lineages (f-f- or m-m- where other sex used for breeding was from control lineages) [NOT INCLUDED in THE MS] 
+
+```{r MR Offspring_Generation, include = FALSE}
+## all data
+table(data_all$Lineage_HFD)
+data_all_purelinages <- data_all %>% filter(Lineage_HFD == "f-f-f" | Lineage_HFD == "f-f-f-m" | Lineage_HFD == "f-f-f-fm" | Lineage_HFD == "f-f-fm" | Lineage_HFD == "f-f-m"| Lineage_HFD == "m-m-f" | Lineage_HFD == "m-m-m" | Lineage_HFD == "m-m-m-f" | Lineage_HFD == "m-m-m-m")
+data_all_purelinages <- droplevels(data_all_purelinages)
+table(data_all_purelinages$Lineage_HFD)
+
+## re-run Exposure_Type MR models
+
+Vmat_lnRR_all_pure <- make_VCV_matrix(data = data_all_purelinages, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+Vmat_lnCVR_all_pure <- make_VCV_matrix(data = data_all_purelinages, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+
+### lnRR
+MR_all_ExpT_lnRR_pure <- rma.mv(lnRR, Vmat_lnRR_all_pure, mods= ~Exposure_Type, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all_purelinages, method = "REML") 
+summary(MR_all_ExpT_lnRR_pure)    
+save(MR_all_ExpT_lnRR_pure, file = "./Rdata/MR_all_ExpT_lnRR_pure.Rdata")
+
+### lnCVR
+MR_all_ExpT_lnCVR_pure <- rma.mv(lnCVR, Vmat_lnCVR_all_pure, mods= ~Exposure_Type, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all_purelinages, method = "REML") 
+summary(MR_all_ExpT_lnCVR_pure)    
+save(MR_all_ExpT_lnCVR_pure, file = "./Rdata/MR_all_ExpT_lnCVR_pure.Rdata")
+
+
+## re-run Exposed_F0_Sex models
+
+### OF
+table(data_OF$Lineage_HFD)
+data_OF_purelinages <- data_OF %>% filter(Lineage_HFD == "f-f-f" | Lineage_HFD == "f-f-f-m" | Lineage_HFD == "f-f-fm" | Lineage_HFD == "f-f-m"| Lineage_HFD == "m-m-f" | Lineage_HFD == "m-m-m" | Lineage_HFD == "m-m-m-f" | Lineage_HFD == "m-m-m-m")
+data_OF_purelinages <- droplevels(data_OF_purelinages)
+table(data_OF_purelinages$Lineage_HFD)
+
+## OF lnRR -(female, male)
+Vmat_lnRR_OF_pure <- make_VCV_matrix(data = data_OF_purelinages, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+MR_OF_ExpSex_lnRR_pure <- rma.mv(lnRR, Vmat_lnRR_OF_pure, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF_purelinages, method = "REML") 
+summary(MR_OF_ExpSex_lnRR_pure)    
+save(MR_OF_ExpSex_lnRR_pure, file = "./Rdata/MR_OF_ExpSex_lnRR_pure.Rdata")
+
+## OF lnCVR - (female, male)
+Vmat_lnCVR_OF_pure <- make_VCV_matrix(data = data_OF_purelinages, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+MR_OF_ExpSex_lnCVR_pure <- rma.mv(lnCVR, Vmat_lnCVR_OF_pure, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF_purelinages, method = "REML") 
+summary(MR_OF_ExpSex_lnCVR_pure)    
+save(MR_OF_ExpSex_lnCVR_pure, file = "./Rdata/MR_OF_ExpSex_lnCVR_pure.Rdata")
+
+
+### MG
+table(data_MG$Lineage_HFD)
+data_MG_purelinages <- data_MG %>% filter(Lineage_HFD == "f-f-f" | Lineage_HFD == "f-f-f-fm" | Lineage_HFD == "f-f-fm" | Lineage_HFD == "f-f-m"| Lineage_HFD == "m-m-f" | Lineage_HFD == "m-m-m" | Lineage_HFD == "m-m-m-f" | Lineage_HFD == "m-m-m-m")
+data_MG_purelinages <- droplevels(data_MG_purelinages)
+table(data_MG_purelinages$Lineage_HFD)
+
+## MG lnRR -(female, male)
+Vmat_lnRR_MG_pure <- make_VCV_matrix(data = data_MG_purelinages, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+MR_MG_ExpSex_lnRR_pure <- rma.mv(lnRR, Vmat_lnRR_MG_pure, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG_purelinages, method = "REML") 
+summary(MR_MG_ExpSex_lnRR_pure)    
+save(MR_MG_ExpSex_lnRR_pure, file = "./Rdata/MR_MG_ExpSex_lnRR_pure.Rdata")
+
+## MG lnCVR - (female, male)
+Vmat_lnCVR_MG_pure <- make_VCV_matrix(data = data_MG_purelinages, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+MR_MG_ExpSex_lnCVR_pure <- rma.mv(lnCVR, Vmat_lnCVR_MG_pure, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG_purelinages, method = "REML") 
+summary(MR_MG_ExpSex_lnCVR_pure)    
+save(MR_MG_ExpSex_lnCVR_pure, file = "./Rdata/MR_MG_ExpSex_lnCVR_pure.Rdata")
+```
+
+
+*NEXT: make plots using STEP4_PLOTS.Rmd script* 

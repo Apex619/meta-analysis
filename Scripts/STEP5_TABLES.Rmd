@@ -1,0 +1,1075 @@
+---
+title: "STEP5_TABLES"
+subtitle: "MA of transgenerational effects of obesogenic diets on rodents"
+author: "ML"
+date: "01/05/2020"
+output: html_document
+knit: (function(inputFile, encoding) {rmarkdown::render(inputFile, encoding = encoding, output_dir = "Knitted") })
+---
+
+Create tables presenting results of statistical analyses in SI.
+[Do not knit. New formatted tables are saved as .csv files in /Tables folder (.xlsx file is just a format template)]
+
+```{r setup, include=FALSE}
+
+options(scipen=100)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE, # no warnings
+  cache = TRUE,# Cacheing to save time when kniting
+  tidy = TRUE
+  #fig.width = 9
+  )
+
+#options(knitr.table.format = "latex") 
+#fancy table on landscape page, etc: https://www.rdocumentation.org/packages/kableExtra/versions/0.5.2/vignettes/awesome_table_in_pdf.Rmd
+
+# loading packages
+# devtools::install_github("thomasp85/patchwork")
+pacman::p_load(tidyverse, # tidy family and related pacakges below
+               kableExtra, 
+               grid,        # graphic layout manipulation
+               #gridExtra, # may not use this
+               purrr,
+               magrittr, # extending piping
+               pander,   # nice tables
+               metafor,  # package for meta-analysis
+               #MCMCglmm,  # Bayeisan mixed model package
+               ggbeeswarm, # making bee-swarm plots possible
+               #plotly,     # interactive plots using ggplot2
+               #MuMIn,  # multi-model inference
+               #lme4,   # lmm & glmm (models)
+               #broom.mixed, # getting estimates from lmer + glmer objects
+               #performance, # getting R2 from lmer + glmer objects
+               png,         # reading png files
+               patchwork,    # putting ggplots together - you need to install via devtool
+               formatR, # provides a function tidy_source() to format R source automatically
+               #lmerTest   # more functions for lme4
+               #mi,      # missing data analysis
+               #betareg   # dependance of the above
+               metafor, 
+               readxl
+)
+
+# Load custom functions
+#source("./Scripts/custom_functions.R") #load custom functions
+```
+
+<!-- ### Load data     -->
+<!-- Processed data for analyses is stored in data_all_ES.csv and data_all_ES.RData fils.  -->
+<!-- It needs to be split into One-off and Multigenerational data.       -->
+
+<!-- ```{r load and subset data, include = FALSE} -->
+
+<!-- # Load preprocessed data with effect sizes -->
+<!-- data_all <- read.csv(file ="../Data/data_all_ES.csv") -->
+<!-- #load(data_all, file = "../Rdata/data_all_ES.RData") #alternative -->
+<!-- #str(data_all) -->
+
+<!-- # Subset by One off and Multigenerational -->
+<!-- data_MG <- filter(data_all, Exposure_Type == "Multigenerational") -->
+<!-- data_OF <- filter(data_all, Exposure_Type == "One-off") -->
+<!-- dim(data_MG) -->
+<!-- dim(data_OF) -->
+<!-- data_MG <- droplevels(data_MG) #adjust factor levels -->
+<!-- data_OF <- droplevels(data_OF) #adjust factor levels -->
+<!-- ``` -->
+
+
+## Supplementary Tables  
+
+### Table S1        
+Search keywords strings for the main database searches.    
+[insert manually in Word - this is painfult o include in Rmarkdown due to multiple quatations and bracket symbols...]    
+
+### Table S2      
+List of excluded studies with main reasons for exclusion.   
+[will be also inserted manually in Word ufter updating the search / otherwise first update csv file]   
+```{r TableS2, include = FALSE, warnings = FALSE}
+#for html use:
+#read_csv("../Data/Excluded_fulltext_papers_list.csv", na = "NA", col_names = c("Ref_short",	"Title",	"Main_reason")) %>%  mutate_if(is.character, as.factor) %>%  kable("html") %>% kable_styling("striped", position = "left")
+#%>% kable_as_image() #use for Word documents?
+
+#for Word try:
+pander(read_csv("../Tables/Excluded_fulltext_papers_list.csv", na = "NA", col_names = c("Ref_short",	"Title",	 "Main_reason")), split.cells = c(10, 30, 10), justify = 'left')
+```
+
+### Table S3    
+List of the main variables extracted from included studies, with descriptions.    
+[insert manually in Word from existing file]     
+
+
+### Table S4     
+lnRR and lnCVR MA models for OF and MG datasets, with I2 values.
+
+```{r Table MA}
+#list.files("./Rdata/")
+
+# # for TableS
+# load(file = "./Rdata/MA_OF_lnRR.Rdata")
+# load(file = "./Rdata/MA_OF_lnCVR.Rdata")
+# load(file = "./Rdata/MA_MG_lnRR.Rdata")
+# load(file = "./Rdata/MA_MG_lnCVR.Rdata")
+
+# calculate I2 values for each MA:
+MA_OF_lnRR_I2 <- I2(MA_OF_lnRR, method = "S")
+MA_OF_lnCVR_I2 <- I2(MA_OF_lnCVR, method = "S")
+MA_MG_lnRR_I2 <- I2(MA_MG_lnRR, method = "S")
+MA_MG_lnCVR_I2 <- I2(MA_MG_lnCVR, method = "S")
+
+t4 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = "TableS4") # loading table template for updating MA results
+
+pos <- c(3,9,15,21) # saving initial row position for each model
+
+# adding results from the models to the table
+t4$`Fixed effects`[pos] <- round(c(MA_OF_lnRR$b,
+                                   MA_OF_lnCVR$b,
+                                   MA_MG_lnRR$b,
+                                   MA_MG_lnCVR$b), 3)
+
+t4$...4[pos] <- round(c(MA_OF_lnRR$ci.lb,
+                                   MA_OF_lnCVR$ci.lb,
+                                   MA_MG_lnRR$ci.lb,
+                                   MA_MG_lnCVR$ci.lb), 3)
+
+t4$...5[pos] <- round(c(MA_OF_lnRR$ci.ub,
+                                   MA_OF_lnCVR$ci.ub,
+                                   MA_MG_lnRR$ci.ub,
+                                   MA_MG_lnCVR$ci.ub), 3)
+
+t4$...6[pos] <- round(c(MA_OF_lnRR$pval,
+                                   MA_OF_lnCVR$pval,
+                                   MA_MG_lnRR$pval,
+                                   MA_MG_lnCVR$pval), 3)
+
+t4$`Random effects`[pos] <- round(c(MA_OF_lnRR_I2[1]*100,
+                                   MA_OF_lnCVR_I2[1]*100,
+                                   MA_MG_lnRR_I2[1]*100,
+                                   MA_MG_lnCVR_I2[1]*100), 1)
+
+t4$`Random effects`[pos + 1] <- round(c(MA_OF_lnRR_I2[2]*100,
+                                   MA_OF_lnCVR_I2[2]*100,
+                                   MA_MG_lnRR_I2[2]*100,
+                                   MA_MG_lnCVR_I2[2]*100), 1)
+
+t4$`Random effects`[pos + 2] <- round(c(MA_OF_lnRR_I2[3]*100,
+                                   MA_OF_lnCVR_I2[3]*100,
+                                   MA_MG_lnRR_I2[3]*100,
+                                   MA_MG_lnCVR_I2[3]*100), 1)
+
+t4$`Random effects`[pos + 3] <- round(c(MA_OF_lnRR_I2[4]*100,
+                                   MA_OF_lnCVR_I2[4]*100,
+                                   MA_MG_lnRR_I2[4]*100,
+                                   MA_MG_lnCVR_I2[4]*100), 1)
+
+t4$`Random effects`[pos + 4] <- round(c(MA_OF_lnRR_I2[5]*100,
+                                   MA_OF_lnCVR_I2[5]*100,
+                                   MA_MG_lnRR_I2[5]*100,
+                                   MA_MG_lnCVR_I2[5]*100), 1)
+
+t4$`Random effects`[pos + 5] <- round(c(MA_OF_lnRR_I2[6]*100,
+                                   MA_OF_lnCVR_I2[6]*100,
+                                   MA_MG_lnRR_I2[6]*100,
+                                   MA_MG_lnCVR_I2[6]*100), 1)
+
+t4$...9[pos] <- round(c(MA_OF_lnRR$k.all,
+                                   MA_OF_lnCVR$k.all,
+                                   MA_MG_lnRR$k.all,
+                                   MA_MG_lnCVR$k.all), 3)
+
+t4$...9[pos+1] <- round(c(MA_OF_lnRR$s.nlevels[1],
+                                   MA_OF_lnCVR$s.nlevels[1],
+                                   MA_MG_lnRR$s.nlevels[1],
+                                   MA_MG_lnCVR$s.nlevels[1]), 3)
+
+t4$...9[pos+2] <- round(c(MA_OF_lnRR$s.nlevels[2],
+                                   MA_OF_lnCVR$s.nlevels[2],
+                                   MA_MG_lnRR$s.nlevels[2],
+                                   MA_MG_lnCVR$s.nlevels[2]), 3)
+
+t4$...9[pos+3] <- round(c(MA_OF_lnRR$s.nlevels[3],
+                                   MA_OF_lnCVR$s.nlevels[3],
+                                   MA_MG_lnRR$s.nlevels[3],
+                                   MA_MG_lnCVR$s.nlevels[3]), 3)
+
+t4$...9[pos+4] <- round(c(MA_OF_lnRR$s.nlevels[4],
+                                   MA_OF_lnCVR$s.nlevels[4],
+                                   MA_MG_lnRR$s.nlevels[4],
+                                   MA_MG_lnCVR$s.nlevels[4]), 3)
+
+write.csv(t4, file = "../Tables/Table_S4_MA.csv", row.names = F, na = "")
+```
+
+
+### Table S5    
+lnRR and lnCVR MR models for OF and MG datasets merged, with exposure type as a moderator.   
+
+```{r Table MR univ Exposure Type}
+# #list.files("./Rdata/")
+# load(file = "./Rdata/MR_all_ExpT_lnRRi.Rdata")
+# load(file = "./Rdata/MR_all_ExpT_lnCVRi.Rdata")
+# load(file = "./Rdata/MR_all_ExpT_lnRR.Rdata")
+# load(file = "./Rdata/MR_all_ExpT_lnCVR.Rdata")
+
+# loading empty table
+t5 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 2)
+
+# saving row position for estimates
+pos <- c(2:4, 6:8)
+
+t5$`Mean`[pos] <- round(c(
+  MR_all_ExpT_lnRRi$b[2:1], 
+  MR_all_ExpT_lnRR$b[2],
+  MR_all_ExpT_lnCVRi$b[2:1], 
+  MR_all_ExpT_lnCVR$b[2]), 3) 
+  
+t5$CI.lb[pos] <- round(c(
+  MR_all_ExpT_lnRRi$ci.lb[2:1], 
+  MR_all_ExpT_lnRR$ci.lb[2],
+  MR_all_ExpT_lnCVRi$ci.lb[2:1], 
+  MR_all_ExpT_lnCVR$ci.lb[2]), 3) 
+
+t5$CI.ub[pos] <- round(c(
+  MR_all_ExpT_lnRRi$ci.ub[2:1], 
+  MR_all_ExpT_lnRR$ci.ub[2],
+  MR_all_ExpT_lnCVRi$ci.ub[2:1], 
+  MR_all_ExpT_lnCVR$ci.ub[2]), 3) 
+
+t5$k[pos] <- c(
+  rev(table(data_all$Exposure_Type)), 
+  rep(NA, 1),
+  rev(table(data_all$Exposure_Type)), 
+  rep(NA, 1)
+  ) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1,5) #row positions
+t5$`R2`[posR2] <- round(c(R2(MR_all_ExpT_lnRR)[1], R2(MR_all_ExpT_lnCVR)[1]),3)
+
+write.csv(t5, file = "../Tables/Table_S5.csv", row.names = F, na = "")    
+```
+
+
+### Table S6    
+lnRR and lnCVR MR models for OF and MG datasets, with sex of exposed F0 grandparents as a moderator.   
+
+```{r Table MR univ F0 Sex}
+#list.files("./Rdata/")
+# load(file = "./Rdata/MR_OF_ExpSex_lnRRi.Rdata")
+# load(file = "./Rdata/MR_OF_ExpSex_lnRRf.Rdata")
+# load(file = "./Rdata/MR_OF_ExpSex_lnRRm.Rdata")
+# load(file = "./Rdata/MR_OF_ExpSex_lnCVRi.Rdata")
+# load(file = "./Rdata/MR_OF_ExpSex_lnCVRf.Rdata")
+# load(file = "./Rdata/MR_OF_ExpSex_lnCVRm.Rdata")
+# load(file = "./Rdata/MR_MG_ExpSex_lnRRi.Rdata")
+# load(file = "./Rdata/MR_MG_ExpSex_lnRRf.Rdata")
+# load(file = "./Rdata/MR_MG_ExpSex_lnCVRi.Rdata")
+# load(file = "./Rdata/MR_MG_ExpSex_lnCVRf.Rdata")
+
+
+# loading empty table
+t6 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 3)
+
+# saving row position for estimates
+pos <- c(2:7, 9:14, 16:18, 20:22)
+
+t6$`Mean`[pos] <- round(c(
+  MR_OF_ExpSex_lnRRi$b[2:3], 
+  MR_OF_ExpSex_lnRRi$b[1],
+  MR_OF_ExpSex_lnRRf$b[3:2], 
+  MR_OF_ExpSex_lnRRm$b[2],
+  MR_OF_ExpSex_lnCVRi$b[2:3], 
+  MR_OF_ExpSex_lnCVRi$b[1],
+  MR_OF_ExpSex_lnCVRf$b[3:2], 
+  MR_OF_ExpSex_lnCVRm$b[2],
+  MR_MG_ExpSex_lnRRi$b[1:2], 
+  MR_MG_ExpSex_lnRRf$b[2],
+  MR_MG_ExpSex_lnCVRi$b[1:2], 
+  MR_MG_ExpSex_lnCVRf$b[2]), 3) 
+  
+t6$CI.lb[pos] <- round(c(
+  MR_OF_ExpSex_lnRRi$ci.lb[2:3], 
+  MR_OF_ExpSex_lnRRi$ci.lb[1],
+  MR_OF_ExpSex_lnRRf$ci.lb[3:2], 
+  MR_OF_ExpSex_lnRRm$ci.lb[2],
+  MR_OF_ExpSex_lnCVRi$ci.lb[2:3], 
+  MR_OF_ExpSex_lnCVRi$ci.lb[1],
+  MR_OF_ExpSex_lnCVRf$ci.lb[3:2], 
+  MR_OF_ExpSex_lnCVRm$ci.lb[2],
+  MR_MG_ExpSex_lnRRi$ci.lb[1:2], 
+  MR_MG_ExpSex_lnRRf$ci.lb[2],
+  MR_MG_ExpSex_lnCVRi$ci.lb[1:2], 
+  MR_MG_ExpSex_lnCVRf$ci.lb[2]), 3) 
+
+t6$CI.ub[pos] <- round(c(
+  MR_OF_ExpSex_lnRRi$ci.ub[2:3], 
+  MR_OF_ExpSex_lnRRi$ci.ub[1],
+  MR_OF_ExpSex_lnRRf$ci.ub[3:2], 
+  MR_OF_ExpSex_lnRRm$ci.ub[2],
+  MR_OF_ExpSex_lnCVRi$ci.ub[2:3], 
+  MR_OF_ExpSex_lnCVRi$ci.ub[1],
+  MR_OF_ExpSex_lnCVRf$ci.ub[3:2], 
+  MR_OF_ExpSex_lnCVRm$ci.ub[2],
+  MR_MG_ExpSex_lnRRi$ci.ub[1:2], 
+  MR_MG_ExpSex_lnRRf$ci.ub[2],
+  MR_MG_ExpSex_lnCVRi$ci.ub[1:2], 
+  MR_MG_ExpSex_lnCVRf$ci.ub[2]), 3) 
+
+t6$k[pos] <- c(
+  table(data_OF$F0_Parent_Exposed)[c(2,3,1)], 
+  rep(NA, 3),
+  table(data_OF$F0_Parent_Exposed)[c(2,3,1)], 
+  rep(NA, 3),
+  table(data_MG$F0_Parent_Exposed)[c(1,2)], 
+  rep(NA, 1),
+  table(data_MG$F0_Parent_Exposed)[c(1,2)], 
+  rep(NA, 1)) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1,8,15,19) #row positions
+t6$`R2`[posR2] <- round(c(R2(MR_OF_ExpSex_lnRRi)[1], R2(MR_OF_ExpSex_lnCVRi)[1], R2(MR_MG_ExpSex_lnRRi)[1], R2(MR_MG_ExpSex_lnCVRi)[1]),3)
+
+write.csv(t6, file = "../Tables/Table_S6.csv", row.names = F, na = "")    
+```
+
+
+## Table S7    
+lnRR and lnCVR MR models for OF and MG datasets, with sex of measured grand-offspring as a moderator.   
+
+```{r Table MR univ Offspr Sex}
+# #list.files("./Rdata/")
+# load(file = "./Rdata/MR_OF_OffSex_lnRRi.Rdata")
+# load(file = "./Rdata/MR_OF_OffSex_lnRRf.Rdata")
+# load(file = "./Rdata/MR_OF_OffSex_lnRRm.Rdata")
+# load(file = "./Rdata/MR_OF_OffSex_lnCVRi.Rdata")
+# load(file = "./Rdata/MR_OF_OffSex_lnCVRf.Rdata")
+# load(file = "./Rdata/MR_OF_OffSex_lnCVRm.Rdata")
+# load(file = "./Rdata/MR_MG_OffSex_lnRRi.Rdata")
+# load(file = "./Rdata/MR_MG_OffSex_lnRRf.Rdata")
+# load(file = "./Rdata/MR_MG_OffSex_lnRRm.Rdata")
+# load(file = "./Rdata/MR_MG_OffSex_lnCVRi.Rdata")
+# load(file = "./Rdata/MR_MG_OffSex_lnCVRf.Rdata")
+# load(file = "./Rdata/MR_MG_OffSex_lnCVRm.Rdata")
+
+# loading empty table
+t7 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 4)
+
+# saving row position for estimates
+pos <- c(2:7, 9:14, 16:21, 23:28)
+
+t7$`Mean`[pos] <- round(c(
+  MR_OF_OffSex_lnRRi$b[2:3], 
+  MR_OF_OffSex_lnRRi$b[1],
+  MR_OF_OffSex_lnRRf$b[3:2], 
+  MR_OF_OffSex_lnRRm$b[2],
+  MR_OF_OffSex_lnCVRi$b[2:3], 
+  MR_OF_OffSex_lnCVRi$b[1],
+  MR_OF_OffSex_lnCVRf$b[3:2], 
+  MR_OF_OffSex_lnCVRm$b[2],
+  MR_MG_OffSex_lnRRi$b[2:3], 
+  MR_MG_OffSex_lnRRi$b[1],
+  MR_MG_OffSex_lnRRf$b[3:2], 
+  MR_MG_OffSex_lnRRm$b[2],
+  MR_MG_OffSex_lnCVRi$b[2:3], 
+  MR_MG_OffSex_lnCVRi$b[1],
+  MR_MG_OffSex_lnCVRf$b[3:2], 
+  MR_MG_OffSex_lnCVRm$b[2]),3) 
+  
+t7$CI.lb[pos] <- round(c(
+  MR_OF_OffSex_lnRRi$ci.lb[2:3], 
+  MR_OF_OffSex_lnRRi$ci.lb[1],
+  MR_OF_OffSex_lnRRf$ci.lb[3:2], 
+  MR_OF_OffSex_lnRRm$ci.lb[2],
+  MR_OF_OffSex_lnCVRi$ci.lb[2:3], 
+  MR_OF_OffSex_lnCVRi$ci.lb[1],
+  MR_OF_OffSex_lnCVRf$ci.lb[3:2], 
+  MR_OF_OffSex_lnCVRm$ci.lb[2],
+  MR_MG_OffSex_lnRRi$ci.lb[2:3], 
+  MR_MG_OffSex_lnRRi$ci.lb[1],
+  MR_MG_OffSex_lnRRf$ci.lb[3:2], 
+  MR_MG_OffSex_lnRRm$ci.lb[2],
+  MR_MG_OffSex_lnCVRi$ci.lb[2:3], 
+  MR_MG_OffSex_lnCVRi$ci.lb[1],
+  MR_MG_OffSex_lnCVRf$ci.lb[3:2], 
+  MR_MG_OffSex_lnCVRm$ci.lb[2]),3) 
+
+t7$CI.ub[pos] <- round(c(
+  MR_OF_OffSex_lnRRi$ci.ub[2:3], 
+  MR_OF_OffSex_lnRRi$ci.ub[1],
+  MR_OF_OffSex_lnRRf$ci.ub[3:2], 
+  MR_OF_OffSex_lnRRm$ci.ub[2],
+  MR_OF_OffSex_lnCVRi$ci.ub[2:3], 
+  MR_OF_OffSex_lnCVRi$ci.ub[1],
+  MR_OF_OffSex_lnCVRf$ci.ub[3:2], 
+  MR_OF_OffSex_lnCVRm$ci.ub[2],
+  MR_MG_OffSex_lnRRi$ci.ub[2:3], 
+  MR_MG_OffSex_lnRRi$ci.ub[1],
+  MR_MG_OffSex_lnRRf$ci.ub[3:2], 
+  MR_MG_OffSex_lnRRm$ci.ub[2],
+  MR_MG_OffSex_lnCVRi$ci.ub[2:3], 
+  MR_MG_OffSex_lnCVRi$ci.ub[1],
+  MR_MG_OffSex_lnCVRf$ci.ub[3:2], 
+  MR_MG_OffSex_lnCVRm$ci.ub[2]),3) 
+
+t7$k[pos] <- c(
+  table(data_OF$Offspring_Sex)[c(2,3,1)], 
+  rep(NA, 3),
+  table(data_OF$Offspring_Sex)[c(2,3,1)], 
+  rep(NA, 3),
+  table(data_MG$Offspring_Sex)[c(2,3,1)], 
+  rep(NA, 3),
+  table(data_MG$Offspring_Sex)[c(2,3,1)], 
+  rep(NA, 3)) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1,8,15,22) #row positions
+t7$`R2`[posR2] <- round(c(R2(MR_OF_OffSex_lnRRi)[1], R2(MR_OF_OffSex_lnCVRi)[1], R2(MR_MG_OffSex_lnRRi)[1], R2(MR_MG_OffSex_lnCVRi)[1]),3)
+
+write.csv(t7, file = "../Tables/Table_S7.csv", row.names = F, na = "")    
+```
+
+
+### Table S8    
+lnRR and lnCVR MR models for OF and MG datasets, with trait type of measured grand-offspring as a moderator.   
+
+```{r Table MR univ Trait Type}
+#list.files("./Rdata/")
+# load(file = "./Rdata/MR_OF_Trait_lnRRi.Rdata")
+# load(file = "./Rdata/MR_OF_Trait_lnCVRi.Rdata")
+# load(file = "./Rdata/MR_MG_Trait_lnRRi.Rdata")
+# load(file = "./Rdata/MR_MG_Trait_lnCVRi.Rdata")
+# 
+# load(file = "./Rdata/MR_OF_Trait_lnRR_releveled.Rdata")
+# load(file = "./Rdata/MR_OF_Trait_lnCVR_releveled.Rdata")
+# load(file = "./Rdata/MR_MG_Trait_lnRR_releveled.Rdata")
+# load(file = "./Rdata/MR_MG_Trait_lnCVR_releveled.Rdata")
+
+#cont_gen(levels(data_OF$Trait)) #list of potential contrasts
+#write.csv(cont_gen(levels(data_OF$Trait)), file = "./Tables/Trait_contrasts.csv", row.names = F, na = "")  
+
+# loading empty table
+t8 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 5)
+
+# saving row position for estimates
+pos <- c(2:37, 39:74, 76:111, 113:148)
+
+t8$`Mean`[pos] <- round(c(
+  MR_OF_Trait_lnRRi$b, 
+  MR_OF_Trait_lnRR_releveled[[1]]$estimate[2:8],
+  MR_OF_Trait_lnRR_releveled[[2]]$estimate[3:8], 
+  MR_OF_Trait_lnRR_releveled[[3]]$estimate[4:8], 
+  MR_OF_Trait_lnRR_releveled[[4]]$estimate[5:8], 
+  MR_OF_Trait_lnRR_releveled[[5]]$estimate[6:8], 
+  MR_OF_Trait_lnRR_releveled[[6]]$estimate[7:8], 
+  MR_OF_Trait_lnRR_releveled[[7]]$estimate[8],
+    MR_OF_Trait_lnCVRi$b, 
+  MR_OF_Trait_lnCVR_releveled[[1]]$estimate[2:8],
+  MR_OF_Trait_lnCVR_releveled[[2]]$estimate[3:8], 
+  MR_OF_Trait_lnCVR_releveled[[3]]$estimate[4:8], 
+  MR_OF_Trait_lnCVR_releveled[[4]]$estimate[5:8], 
+  MR_OF_Trait_lnCVR_releveled[[5]]$estimate[6:8], 
+  MR_OF_Trait_lnCVR_releveled[[6]]$estimate[7:8], 
+  MR_OF_Trait_lnCVR_releveled[[7]]$estimate[8],
+    MR_MG_Trait_lnRRi$b, 
+  MR_MG_Trait_lnRR_releveled[[1]]$estimate[2:8],
+  MR_MG_Trait_lnRR_releveled[[2]]$estimate[3:8], 
+  MR_MG_Trait_lnRR_releveled[[3]]$estimate[4:8], 
+  MR_MG_Trait_lnRR_releveled[[4]]$estimate[5:8], 
+  MR_MG_Trait_lnRR_releveled[[5]]$estimate[6:8], 
+  MR_MG_Trait_lnRR_releveled[[6]]$estimate[7:8], 
+  MR_MG_Trait_lnRR_releveled[[7]]$estimate[8],
+    MR_MG_Trait_lnCVRi$b, 
+  MR_MG_Trait_lnCVR_releveled[[1]]$estimate[2:8],
+  MR_MG_Trait_lnCVR_releveled[[2]]$estimate[3:8], 
+  MR_MG_Trait_lnCVR_releveled[[3]]$estimate[4:8], 
+  MR_MG_Trait_lnCVR_releveled[[4]]$estimate[5:8], 
+  MR_MG_Trait_lnCVR_releveled[[5]]$estimate[6:8], 
+  MR_MG_Trait_lnCVR_releveled[[6]]$estimate[7:8], 
+  MR_MG_Trait_lnCVR_releveled[[7]]$estimate[8] ),3) 
+
+t8$CI.lb[pos] <- round(c(
+  MR_OF_Trait_lnRRi$ci.lb, 
+  MR_OF_Trait_lnRR_releveled[[1]]$ci.lb[2:8],
+  MR_OF_Trait_lnRR_releveled[[2]]$ci.lb[3:8], 
+  MR_OF_Trait_lnRR_releveled[[3]]$ci.lb[4:8], 
+  MR_OF_Trait_lnRR_releveled[[4]]$ci.lb[5:8], 
+  MR_OF_Trait_lnRR_releveled[[5]]$ci.lb[6:8], 
+  MR_OF_Trait_lnRR_releveled[[6]]$ci.lb[7:8], 
+  MR_OF_Trait_lnRR_releveled[[7]]$ci.lb[8],
+    MR_OF_Trait_lnCVRi$ci.lb, 
+  MR_OF_Trait_lnCVR_releveled[[1]]$ci.lb[2:8],
+  MR_OF_Trait_lnCVR_releveled[[2]]$ci.lb[3:8], 
+  MR_OF_Trait_lnCVR_releveled[[3]]$ci.lb[4:8], 
+  MR_OF_Trait_lnCVR_releveled[[4]]$ci.lb[5:8], 
+  MR_OF_Trait_lnCVR_releveled[[5]]$ci.lb[6:8], 
+  MR_OF_Trait_lnCVR_releveled[[6]]$ci.lb[7:8], 
+  MR_OF_Trait_lnCVR_releveled[[7]]$ci.lb[8],
+    MR_MG_Trait_lnRRi$ci.lb, 
+  MR_MG_Trait_lnRR_releveled[[1]]$ci.lb[2:8],
+  MR_MG_Trait_lnRR_releveled[[2]]$ci.lb[3:8], 
+  MR_MG_Trait_lnRR_releveled[[3]]$ci.lb[4:8], 
+  MR_MG_Trait_lnRR_releveled[[4]]$ci.lb[5:8], 
+  MR_MG_Trait_lnRR_releveled[[5]]$ci.lb[6:8], 
+  MR_MG_Trait_lnRR_releveled[[6]]$ci.lb[7:8], 
+  MR_MG_Trait_lnRR_releveled[[7]]$ci.lb[8],
+    MR_MG_Trait_lnCVRi$ci.lb, 
+  MR_MG_Trait_lnCVR_releveled[[1]]$ci.lb[2:8],
+  MR_MG_Trait_lnCVR_releveled[[2]]$ci.lb[3:8], 
+  MR_MG_Trait_lnCVR_releveled[[3]]$ci.lb[4:8], 
+  MR_MG_Trait_lnCVR_releveled[[4]]$ci.lb[5:8], 
+  MR_MG_Trait_lnCVR_releveled[[5]]$ci.lb[6:8], 
+  MR_MG_Trait_lnCVR_releveled[[6]]$ci.lb[7:8], 
+  MR_MG_Trait_lnCVR_releveled[[7]]$ci.lb[8] ),3) 
+
+t8$CI.ub[pos] <- round(c(
+  MR_OF_Trait_lnRRi$ci.ub, 
+  MR_OF_Trait_lnRR_releveled[[1]]$ci.ub[2:8],
+  MR_OF_Trait_lnRR_releveled[[2]]$ci.ub[3:8], 
+  MR_OF_Trait_lnRR_releveled[[3]]$ci.ub[4:8], 
+  MR_OF_Trait_lnRR_releveled[[4]]$ci.ub[5:8], 
+  MR_OF_Trait_lnRR_releveled[[5]]$ci.ub[6:8], 
+  MR_OF_Trait_lnRR_releveled[[6]]$ci.ub[7:8], 
+  MR_OF_Trait_lnRR_releveled[[7]]$ci.ub[8],
+    MR_OF_Trait_lnCVRi$ci.ub, 
+  MR_OF_Trait_lnCVR_releveled[[1]]$ci.ub[2:8],
+  MR_OF_Trait_lnCVR_releveled[[2]]$ci.ub[3:8], 
+  MR_OF_Trait_lnCVR_releveled[[3]]$ci.ub[4:8], 
+  MR_OF_Trait_lnCVR_releveled[[4]]$ci.ub[5:8], 
+  MR_OF_Trait_lnCVR_releveled[[5]]$ci.ub[6:8], 
+  MR_OF_Trait_lnCVR_releveled[[6]]$ci.ub[7:8], 
+  MR_OF_Trait_lnCVR_releveled[[7]]$ci.ub[8],
+    MR_MG_Trait_lnRRi$ci.ub, 
+  MR_MG_Trait_lnRR_releveled[[1]]$ci.ub[2:8],
+  MR_MG_Trait_lnRR_releveled[[2]]$ci.ub[3:8], 
+  MR_MG_Trait_lnRR_releveled[[3]]$ci.ub[4:8], 
+  MR_MG_Trait_lnRR_releveled[[4]]$ci.ub[5:8], 
+  MR_MG_Trait_lnRR_releveled[[5]]$ci.ub[6:8], 
+  MR_MG_Trait_lnRR_releveled[[6]]$ci.ub[7:8], 
+  MR_MG_Trait_lnRR_releveled[[7]]$ci.ub[8],
+    MR_MG_Trait_lnCVRi$ci.ub, 
+  MR_MG_Trait_lnCVR_releveled[[1]]$ci.ub[2:8],
+  MR_MG_Trait_lnCVR_releveled[[2]]$ci.ub[3:8], 
+  MR_MG_Trait_lnCVR_releveled[[3]]$ci.ub[4:8], 
+  MR_MG_Trait_lnCVR_releveled[[4]]$ci.ub[5:8], 
+  MR_MG_Trait_lnCVR_releveled[[5]]$ci.ub[6:8], 
+  MR_MG_Trait_lnCVR_releveled[[6]]$ci.ub[7:8], 
+  MR_MG_Trait_lnCVR_releveled[[7]]$ci.ub[8] ),3) 
+
+t8$k[pos] <- c(
+  table(data_OF$Trait), 
+  rep(NA, 28),
+  table(data_OF$Trait), 
+  rep(NA, 28),
+  table(data_MG$Trait), 
+  rep(NA, 28),
+  table(data_MG$Trait), 
+  rep(NA, 28)) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1,38,75,112) #row positions
+t8$`R2`[posR2] <- round(c(R2(MR_OF_Trait_lnRRi)[1], R2(MR_OF_Trait_lnCVRi)[1], R2(MR_MG_Trait_lnRRi)[1], R2(MR_MG_Trait_lnCVRi)[1]),3)
+
+write.csv(t8, file = "../Tables/Table_S8.csv", row.names = F, na = "")    
+```
+
+
+### Table S9    
+Full MR models for lnRR and lnCVR on OF and MG datasets 
+
+```{r Table MR univ Exposure Type}
+#list.files("./Rdata/")
+# load(file = "./Rdata/MR_OF_Full_lnRR.Rdata")
+# load(file = "./Rdata/MR_OF_Full_lnCVR.Rdata")
+# load(file = "./Rdata/MR_MG_Full_lnRR.Rdata")
+# load(file = "./Rdata/MR_MG_Full_lnCVR.Rdata")
+
+# loading empty table
+t9 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 6)
+
+# saving row position for estimates
+pos <- c(2:13, 15:26, 28:38, 40:50)
+
+t9$`Mean`[pos] <- round(c(
+  MR_OF_Full_lnRR$b, 
+  MR_OF_Full_lnCVR$b,
+  MR_MG_Full_lnRR$b, 
+  MR_MG_Full_lnCVR$b), 3) 
+  
+t9$CI.lb[pos] <- round(c(
+  MR_OF_Full_lnRR$ci.lb, 
+  MR_OF_Full_lnCVR$ci.lb,
+  MR_MG_Full_lnRR$ci.lb, 
+  MR_MG_Full_lnCVR$ci.lb), 3) 
+
+t9$CI.ub[pos] <- round(c(
+  MR_OF_Full_lnRR$ci.ub, 
+  MR_OF_Full_lnCVR$ci.ub,
+  MR_MG_Full_lnRR$ci.ub, 
+  MR_MG_Full_lnCVR$ci.ub), 3) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1, 14, 27, 39) #row positions
+t9$`R2`[posR2] <- round(c(R2(MR_all_ExpT_lnRR)[1], R2(MR_all_ExpT_lnCVR)[1]),3)
+# adding model k values to the table
+t9$k[posR2] <- c( rep(dim(data_OF)[1],2), rep(dim(data_MG)[1],2) ) 
+
+write.csv(t9, file = "../Tables/Table_S9.csv", row.names = F, na = "")    
+```
+
+
+### Table S10 
+MR model selection analysis for lnRR and lnCVR on OF and MG datasets 
+
+```{r Table model selection}
+#list.files("./Rdata/")
+#loading data
+load(file = "../Rdata/MR_OF_Full_lnRR_ML_meta_AICc_seltable.Rdata")
+MR_OF_Full_lnRRst <- sel.table
+load(file = "../Rdata/MR_OF_Full_lnCVR_ML_meta_AICc_seltable.Rdata")
+MR_OF_Full_lnCVRst <- sel.table
+load(file = "../Rdata/MR_MG_Full_lnRR_ML_meta_AICc_seltable.Rdata")
+MR_MG_Full_lnRRst <- sel.table
+load(file = "../Rdata/MR_MG_Full_lnCVR_ML_meta_AICc_seltable.Rdata")
+MR_MG_Full_lnCVRst <- sel.table
+
+# loading table template
+t10 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 7)
+
+# saving row position
+pos <- c(2:9, 11:18, 20:27, 29:36)
+
+t10$`Model`[pos] <- c(MR_OF_Full_lnRRst$Model, MR_OF_Full_lnCVRst$Model, MR_MG_Full_lnRRst$Model, MR_MG_Full_lnCVRst$Model)
+t10$`K`[pos] <- c(MR_OF_Full_lnRRst$K, MR_OF_Full_lnCVRst$K, MR_MG_Full_lnRRst$K, MR_MG_Full_lnCVRst$K)
+t10$`logLik`[pos] <- round(c(MR_OF_Full_lnRRst$logLik, MR_OF_Full_lnCVRst$logLik, MR_MG_Full_lnRRst$logLik, MR_MG_Full_lnCVRst$logLik),2)
+t10$`AICc`[pos] <- round(c(MR_OF_Full_lnRRst$AICc, MR_OF_Full_lnCVRst$AICc, MR_MG_Full_lnRRst$AICc, MR_MG_Full_lnCVRst$AICc),2)
+t10$`delta`[pos] <- round(c(MR_OF_Full_lnRRst$delta, MR_OF_Full_lnCVRst$delta, MR_MG_Full_lnRRst$delta, MR_MG_Full_lnCVRst$delta),2)
+t10$`weight`[pos] <- round(c(MR_OF_Full_lnRRst$weight, MR_OF_Full_lnCVRst$weight, MR_MG_Full_lnRRst$weight, MR_MG_Full_lnCVRst$weight),2)
+
+write.csv(t10, file = "../Tables/Table_S10_modelselection.csv", row.names = F, na = "")    
+```
+
+
+### Table S11 
+Publication bias analysis for lnRR and lnCVR on OF and MG datasets - multivariate Egger's regression
+
+```{r publiction bias, eval=FALSE, include=FALSE}
+# load(file = "./Rdata/PB_OF_MG_Full.Rdata") #contains: PB_OF_Full_lnRR, PB_OF_Full_lnCVR, PB_MG_Full_lnRR, PB_MG_Full_lnCVR
+
+# loading empty table
+t11 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 8)
+
+# saving row positions for estimates
+pos <- c(2:14, 16:28, 30:41, 43:54)
+
+t11$`Mean`[pos] <- round(c(
+  PB_OF_Full_lnRR$b, 
+  PB_OF_Full_lnCVR$b,
+  PB_MG_Full_lnRR$b, 
+  PB_MG_Full_lnCVR$b), 3) 
+  
+t11$CI.lb[pos] <- round(c(
+  PB_OF_Full_lnRR$ci.lb, 
+  PB_OF_Full_lnCVR$ci.lb,
+  PB_MG_Full_lnRR$ci.lb, 
+  PB_MG_Full_lnCVR$ci.lb), 3) 
+
+t11$CI.ub[pos] <- round(c(
+  PB_OF_Full_lnRR$ci.ub, 
+  PB_OF_Full_lnCVR$ci.ub,
+  PB_MG_Full_lnRR$ci.ub, 
+  PB_MG_Full_lnCVR$ci.ub), 3) 
+
+t11$p[pos] <- round(c(
+  PB_OF_Full_lnRR$pval, 
+  PB_OF_Full_lnCVR$pval,
+  PB_MG_Full_lnRR$pval, 
+  PB_MG_Full_lnCVR$pval), 3) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1, 15, 29, 42) #row positions
+t11$`R2`[posR2] <- round(c(R2(PB_OF_Full_lnRR)[1], R2(PB_OF_Full_lnCVR)[1], R2(PB_MG_Full_lnRR)[1], R2(PB_MG_Full_lnCVR)[1]),3)
+
+write.csv(t11, file = "../Tables/Table_S11.csv", row.names = F, na = "")    
+```
+
+
+### Table S12 
+lnRR and lnCVR MR models for OF and MG datasets, with study publication year as a moderator (part if pubication bias analyses)      
+```{r publiction year, eval=FALSE, include=FALSE}
+load(file = "../Rdata/MR_OF_Year_lnRR.Rdata")
+load(file = "../Rdata/MR_OF_Year_lnCVR.Rdata")
+load(file = "../Rdata/MR_MG_Year_lnRR.Rdata")
+load(file = "../Rdata/MR_MG_Year_lnCVR.Rdata")
+
+# loading empty table
+t12 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 9)
+
+# saving row positions for estimates
+pos <- c(2:3, 5:6, 8:9, 11:12)
+
+t12$`Mean`[pos] <- round(c(
+  MR_OF_Year_lnRR$b, 
+  MR_OF_Year_lnCVR$b,
+  MR_MG_Year_lnRR$b, 
+  MR_MG_Year_lnCVR$b), 3) 
+  
+t12$CI.lb[pos] <- round(c(
+  MR_OF_Year_lnRR$ci.lb, 
+  MR_OF_Year_lnCVR$ci.lb,
+  MR_MG_Year_lnRR$ci.lb, 
+  MR_MG_Year_lnCVR$ci.lb), 3) 
+
+t12$CI.ub[pos] <- round(c(
+  MR_OF_Year_lnRR$ci.ub, 
+  MR_OF_Year_lnCVR$ci.ub,
+  MR_MG_Year_lnRR$ci.ub, 
+  MR_MG_Year_lnCVR$ci.ub), 3) 
+
+t12$p[pos] <- round(c(
+  MR_OF_Year_lnRR$pval, 
+  MR_OF_Year_lnCVR$pval,
+  MR_MG_Year_lnRR$pval, 
+  MR_MG_Year_lnCVR$pval), 3) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1, 4, 7, 10) #row positions
+t12$`R2`[posR2] <- round(c(R2(MR_OF_Year_lnRR)[1], R2(MR_OF_Year_lnCVR)[1], R2(MR_MG_Year_lnRR)[1], R2(MR_MG_Year_lnCVR)[1]),3)
+
+write.csv(t12, file = "../Tables/Table_S12.csv", row.names = F, na = "")    
+```
+
+
+### Table S13    
+lnRR and lnCVR MR models for OF and MG datasets, with total energy content of obesogenic diet as a moderator    
+
+```{r total energy content, eval=FALSE, include=FALSE}
+load(file = "../Rdata/MR_OF_DietE_lnRR.Rdata")
+load(file = "../Rdata/MR_OF_DietE_lnCVR.Rdata")
+load(file = "../Rdata/MR_MG_DietE_lnRR.Rdata")
+load(file = "../Rdata/MR_MG_DietE_lnCVR.Rdata")
+
+# loading empty table
+t13 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 10)
+
+# saving row positions for estimates
+pos <- c(2:3, 5:6, 8:9, 11:12)
+
+t13$`Mean`[pos] <- round(c(
+  MR_OF_DietE_lnRR$b, 
+  MR_OF_DietE_lnCVR$b,
+  MR_MG_DietE_lnRR$b, 
+  MR_MG_DietE_lnCVR$b), 3) 
+  
+t13$CI.lb[pos] <- round(c(
+  MR_OF_DietE_lnRR$ci.lb, 
+  MR_OF_DietE_lnCVR$ci.lb,
+  MR_MG_DietE_lnRR$ci.lb, 
+  MR_MG_DietE_lnCVR$ci.lb), 3) 
+
+t13$CI.ub[pos] <- round(c(
+  MR_OF_DietE_lnRR$ci.ub, 
+  MR_OF_DietE_lnCVR$ci.ub,
+  MR_MG_DietE_lnRR$ci.ub, 
+  MR_MG_DietE_lnCVR$ci.ub), 3) 
+
+t13$p[pos] <- round(c(
+  MR_OF_DietE_lnRR$pval, 
+  MR_OF_DietE_lnCVR$pval,
+  MR_MG_DietE_lnRR$pval, 
+  MR_MG_DietE_lnCVR$pval), 3) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1, 4, 7, 10) #row positions
+t13$`R2`[posR2] <- round(c(R2(MR_OF_DietE_lnRR)[1], R2(MR_OF_DietE_lnCVR)[1], R2(MR_MG_DietE_lnRR)[1], R2(MR_MG_DietE_lnCVR)[1]),3)
+
+write.csv(t13, file = "../Tables/Table_S13.csv", row.names = F, na = "")    
+```
+
+
+### Table S14    
+lnRR and lnCVR MR models for OF and MG datasets, with relative protein content of the obesogenic diet as a moderator 
+
+```{r relative protein content, eval=FALSE, include=FALSE}
+load(file = "../Rdata/MR_OF_DietPNP_lnRR.Rdata")
+load(file = "../Rdata/MR_OF_DietPNP_lnCVR.Rdata")
+load(file = "../Rdata/MR_MG_DietPNP_lnRR.Rdata")
+load(file = "../Rdata/MR_MG_DietPNP_lnCVR.Rdata")
+
+# loading empty table
+t14 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 11)
+
+# saving row positions for estimates
+pos <- c(2:3, 5:6, 8:9, 11:12)
+
+t14$`Mean`[pos] <- round(c(
+  MR_OF_DietPNP_lnRR$b, 
+  MR_OF_DietPNP_lnCVR$b,
+  MR_MG_DietPNP_lnRR$b, 
+  MR_MG_DietPNP_lnCVR$b), 3) 
+  
+t14$CI.lb[pos] <- round(c(
+  MR_OF_DietPNP_lnRR$ci.lb, 
+  MR_OF_DietPNP_lnCVR$ci.lb,
+  MR_MG_DietPNP_lnRR$ci.lb, 
+  MR_MG_DietPNP_lnCVR$ci.lb), 3) 
+
+t14$CI.ub[pos] <- round(c(
+  MR_OF_DietPNP_lnRR$ci.ub, 
+  MR_OF_DietPNP_lnCVR$ci.ub,
+  MR_MG_DietPNP_lnRR$ci.ub, 
+  MR_MG_DietPNP_lnCVR$ci.ub), 3) 
+
+t14$p[pos] <- round(c(
+  MR_OF_DietPNP_lnRR$pval, 
+  MR_OF_DietPNP_lnCVR$pval,
+  MR_MG_DietPNP_lnRR$pval, 
+  MR_MG_DietPNP_lnCVR$pval), 3) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1, 4, 7, 10) #row positions
+t14$`R2`[posR2] <- round(c(R2(MR_OF_DietPNP_lnRR)[1], R2(MR_OF_DietPNP_lnCVR)[1], R2(MR_MG_DietPNP_lnRR)[1], R2(MR_MG_DietPNP_lnCVR)[1]),3)
+
+write.csv(t14, file = "../Tables/Table_S14.csv", row.names = F, na = "")    
+```
+
+
+### Table S15     
+lnRR and lnCVR MR models for OF and MG datasets, with duration of the exposure of the grandparents to obesogenic diet as a moderator    
+
+```{r F0 exposure duration, eval=FALSE, include=FALSE}
+load(file = "../Rdata/MR_OF_TDur_lnRR.Rdata")
+load(file = "../Rdata/MR_OF_TDur_lnCVR.Rdata")
+load(file = "../Rdata/MR_MG_TDur_lnRR.Rdata")
+load(file = "../Rdata/MR_MG_TDur_lnCVR.Rdata")
+
+# loading empty table
+t15 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 12)
+
+# saving row positions for estimates
+pos <- c(2:3, 5:6, 8:9, 11:12)
+
+t15$`Mean`[pos] <- round(c(
+  MR_OF_TDur_lnRR$b, 
+  MR_OF_TDur_lnCVR$b,
+  MR_MG_TDur_lnRR$b, 
+  MR_MG_TDur_lnCVR$b), 3) 
+  
+t15$CI.lb[pos] <- round(c(
+  MR_OF_TDur_lnRR$ci.lb, 
+  MR_OF_TDur_lnCVR$ci.lb,
+  MR_MG_TDur_lnRR$ci.lb, 
+  MR_MG_TDur_lnCVR$ci.lb), 3) 
+
+t15$CI.ub[pos] <- round(c(
+  MR_OF_TDur_lnRR$ci.ub, 
+  MR_OF_TDur_lnCVR$ci.ub,
+  MR_MG_TDur_lnRR$ci.ub, 
+  MR_MG_TDur_lnCVR$ci.ub), 3) 
+
+t15$p[pos] <- round(c(
+  MR_OF_TDur_lnRR$pval, 
+  MR_OF_TDur_lnCVR$pval,
+  MR_MG_TDur_lnRR$pval, 
+  MR_MG_TDur_lnCVR$pval), 3) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1, 4, 7, 10) #row positions
+t15$`R2`[posR2] <- round(c(R2(MR_OF_TDur_lnRR)[1], R2(MR_OF_TDur_lnCVR)[1], R2(MR_MG_TDur_lnRR)[1], R2(MR_MG_TDur_lnCVR)[1]),3)
+
+write.csv(t15, file = "../Tables/Table_S15.csv", row.names = F, na = "")    
+```
+
+### Table S16    
+lnRR and lnCVR MR models for OF and MG datasets, with grand-offspring generation as a moderator    
+
+```{r MR Offspring_Generation, include = TRUE}
+load(file = "../Rdata/MR_OF_OffGen_lnRR.Rdata")
+load(file = "../Rdata/MR_OF_OffGen_lnRRi.Rdata")
+load(file = "../Rdata/MR_OF_OffGen_lnCVR.Rdata")
+load(file = "../Rdata/MR_OF_OffGen_lnCVRi.Rdata")
+load(file = "../Rdata/MR_MG_OffGen_lnRR.Rdata")
+load(file = "../Rdata/MR_MG_OffGen_lnRRi.Rdata")
+load(file = "../Rdata/MR_MG_OffGen_lnRR.Rdata")
+load(file = "../Rdata/MR_MG_OffGen_lnCVRi.Rdata")
+
+# loading empty table
+t16 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 13)
+
+# saving row positions for estimates
+pos <- c(2:4, 6:8, 10:12, 14:16)
+
+t16$`Mean`[pos] <- round(c(
+  MR_OF_OffGen_lnRRi$b, 
+  MR_OF_OffGen_lnRR$b[2],
+  MR_OF_OffGen_lnCVRi$b, 
+  MR_OF_OffGen_lnCVR$b[2],
+  MR_MG_OffGen_lnRRi$b, 
+  MR_MG_OffGen_lnRR$b[2],
+  MR_MG_OffGen_lnCVRi$b, 
+  MR_MG_OffGen_lnCVR$b[2]), 3) 
+  
+t16$CI.lb[pos] <- round(c(
+  MR_OF_OffGen_lnRRi$ci.lb, 
+  MR_OF_OffGen_lnRR$ci.lb[2],
+  MR_OF_OffGen_lnCVRi$ci.lb, 
+  MR_OF_OffGen_lnCVR$ci.lb[2],
+  MR_MG_OffGen_lnRRi$ci.lb, 
+  MR_MG_OffGen_lnRR$ci.lb[2],
+  MR_MG_OffGen_lnCVRi$ci.lb, 
+  MR_MG_OffGen_lnCVR$ci.lb[2]), 3) 
+
+t16$CI.ub[pos] <- round(c(
+  MR_OF_OffGen_lnRRi$ci.ub, 
+  MR_OF_OffGen_lnRR$ci.ub[2],
+  MR_OF_OffGen_lnCVRi$ci.ub, 
+  MR_OF_OffGen_lnCVR$ci.ub[2],
+  MR_MG_OffGen_lnRRi$ci.ub, 
+  MR_MG_OffGen_lnRR$ci.ub[2],
+  MR_MG_OffGen_lnCVRi$ci.ub, 
+  MR_MG_OffGen_lnCVR$ci.ub[2]), 3) 
+
+t16$k[pos] <- c(
+  rev(table(data_all$Offspring_Generation)), 
+  rep(NA, 1),
+  rev(table(data_all$Offspring_Generation)), 
+  rep(NA, 1),
+  rev(table(data_all$Offspring_Generation)), 
+  rep(NA, 1),
+  rev(table(data_all$Offspring_Generation)), 
+  rep(NA, 1)
+  ) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1, 5, 9, 13) #row positions
+t16$`R2`[posR2] <- round(c(R2(MR_OF_OffGen_lnRR)[1], R2(MR_OF_OffGen_lnCVR)[1], R2(MR_MG_OffGen_lnRR)[1], R2(MR_MG_OffGen_lnCVR)[1]),3)
+
+write.csv(t16, file = "../Tables/Table_S16.csv", row.names = F, na = "")    
+```
+
+
+### Table S17    
+lnRR MR models for body weights of F0, OF and MG datasets, with age at measurement as a moderator    
+
+```{r MR Body_weight, include = TRUE}
+load(file = "../Rdata/MR_F0_age.Rdata")
+load(file = "../Rdata/MR_OF_age.Rdata")
+load(file = "../Rdata/MR_MG_age.Rdata")
+
+# loading empty table
+t17 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 14)
+
+# saving row positions for estimates
+pos <- c(2:3, 5:6, 8:9)
+
+t17$`Mean`[pos] <- round(c(
+  MR_F0_age$b[1:2], 
+  MR_OF_age$b[1:2], 
+  MR_MG_age$b[1:2]), 3)
+  
+t17$CI.lb[pos] <- round(c(
+  MR_F0_age$ci.lb, 
+  MR_OF_age$ci.lb, 
+  MR_MG_age$ci.lb), 3) 
+
+t17$CI.ub[pos] <- round(c(
+  MR_F0_age$ci.ub, 
+  MR_OF_age$ci.ub, 
+  MR_MG_age$ci.ub), 3) 
+
+t17$p[pos] <- round(c(
+  MR_F0_age$pval, 
+  MR_OF_age$pval, 
+  MR_MG_age$pval), 3) 
+
+# adding model R2 estimates to the table
+posR2 <- c(1, 4, 7) #row positions
+t17$`R2`[posR2] <- round(c(R2(MR_F0_age)[1], R2(MR_OF_age)[1], R2(MR_MG_age)[1]),3)
+
+write.csv(t17, file = "../Tables/Table_S17.csv", row.names = F, na = "")    
+```
+
+
+### Table S18    
+Predict %difference in body weights of F0, OF and MG datasets at 100 days   
+
+```{r predict Body_weight at 100 days, include = TRUE}
+load(file = "../Rdata/prediction_F0.Rdata")
+load(file = "../Rdata/prediction_OF.Rdata")
+load(file = "../Rdata/prediction_MG.Rdata")
+
+# loading empty table
+t18 <- read_excel("../Tables/Results_Tables_templates.xlsx", sheet = 15)
+
+# saving row positions for estimates
+pos <- c(1:3)
+
+t18$`Mean`[pos] <- round(c(
+  prediction_F0$pred, 
+  prediction_OF$pred, 
+  prediction_MG$pred), 3)
+
+t18$SE[pos] <- round(c(
+  prediction_F0$se, 
+  prediction_OF$se, 
+  prediction_MG$se), 3)
+  
+t18$CI.lb[pos] <- round(c(
+  prediction_F0$ci.lb, 
+  prediction_OF$ci.lb, 
+  prediction_MG$ci.lb), 3) 
+
+t18$CI.ub[pos] <- round(c(
+  prediction_F0$ci.ub, 
+  prediction_OF$ci.ub, 
+  prediction_MG$ci.ub), 3) 
+
+t18$PI.lb[pos] <- round(c(
+  prediction_F0$cr.lb, 
+  prediction_OF$cr.lb, 
+  prediction_MG$cr.lb), 3) 
+
+t18$PI.ub[pos] <- round(c(
+  prediction_F0$cr.ub, 
+  prediction_OF$cr.ub, 
+  prediction_MG$cr.ub), 3) 
+
+write.csv(t18, file = "../Tables/Table_S18.csv", row.names = F, na = "")    
+```
+
+
+## Supplementary Figures    
+
+```{r FigureS1, out.width = "400px"}
+knitr::include_graphics("../Plots/SI_PRISMA_v2.pdf")
+```
+### Figure S1.    
+PRISMA flow diagram summarising the literature search and screening process.        
+[can be also inserted manually ufter updating the search]    
+
+
+```{r FigureS2, out.width = "400px"}
+knitr::include_graphics("../Plots/SI_Figure_DecisionTree_abstracts_v0.pdf")
+```
+### Figure S2.    
+Decision tree used to screen titles and abstracts from bibliometric records of found studies.       
+
+
+```{r FigureS3, out.width = "400px"}
+knitr::include_graphics("../Plots/SI_Figure_DecisionTree_fulltexts_v0.pdf")
+```
+### Figure S3.     
+Decision tree used to screen full-text papers.    
+
+
+### Figure S4.     
+insert Figure_diets_Rplot_v0.pdf
+
+
+### Figure S5.     
+insert Figure_exposure_Rplot_v0.pdf
+
+
+### Figure S6.     
+insert Figure_funnels_Rplot_v0.pdf

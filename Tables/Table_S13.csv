@@ -1,0 +1,13 @@
+"Data","Obesogenic diet total energy","Mean","CI.lb","CI.ub","p","R2","row"
+"One-off lnRR",,,,,,0,1
+,"Intercept",0.081,-0.082,0.244,0.332,,2
+,"Slope",-0.001,-0.024,0.022,0.95,,3
+"One-off lnCVR",,,,,,0.003,4
+,"Intercept",0.019,-0.15,0.188,0.825,,5
+,"Slope",-0.022,-0.135,0.091,0.701,,6
+"Multigenerational lnRR",,,,,,0.153,7
+,"Intercept",0.347,0.088,0.606,0.009,,8
+,"Slope",0.188,0.062,0.313,0.003,,9
+"Multigenerational lnCVR",,,,,,0.018,10
+,"Intercept",-0.072,-0.294,0.15,0.527,,11
+,"Slope",-0.068,-0.224,0.087,0.389,,12

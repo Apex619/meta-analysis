@@ -1,0 +1,149 @@
+"Data","Grand-offspring trait type","Mean","CI.lb","CI.ub","k","R2","row"
+"One-off lnRR",,,,,,0.085,1
+,"Adiposity",0.177,0.019,0.335,52,,2
+,"Body weight",0.035,-0.115,0.186,108,,3
+,"Glucose fasting",0.022,-0.144,0.188,7,,4
+,"Glusoce tolerance",0.055,-0.1,0.21,25,,5
+,"Insulin fasting",0.092,-0.072,0.255,22,,6
+,"Insulin tolerance",0.025,-0.141,0.19,12,,7
+,"Leptin",0.185,0,0.37,7,,8
+,"Triglicerides",0.13,-0.027,0.287,31,,9
+,"Adiposity – Body weight",-0.142,-0.197,-0.086,,,10
+,"Adiposity – Glucose fasting",-0.155,-0.244,-0.066,,,11
+,"Adiposity – Glucose tolerance",-0.122,-0.187,-0.058,,,12
+,"Adiposity – Insulin fasting",-0.085,-0.168,-0.003,,,13
+,"Adiposity – Insulin tolerance",-0.152,-0.243,-0.062,,,14
+,"Adiposity – Leptin",0.008,-0.11,0.126,,,15
+,"Adiposity – Triglycerides",-0.047,-0.109,0.015,,,16
+,"Body weight – Glucose fasting",-0.013,-0.093,0.066,,,17
+,"Body weight – Glucose tolerance",0.019,-0.028,0.067,,,18
+,"Body weight – Insulin fasting",0.056,-0.013,0.126,,,19
+,"Body weight – Insulin tolerance",-0.011,-0.089,0.068,,,20
+,"Body weight – Leptin",0.15,0.038,0.261,,,21
+,"Body weight – Triglycerides",0.094,0.043,0.146,,,22
+,"Glucose fasting – Glucose tolerance",0.033,-0.052,0.118,,,23
+,"Glucose fasting – Insulin fasting",0.07,-0.026,0.166,,,24
+,"Glucose fasting – Insulin tolerance",0.003,-0.106,0.111,,,25
+,"Glucose fasting – Leptin",0.163,0.03,0.296,,,26
+,"Glucose fasting – Triglycerides",0.108,0.019,0.197,,,27
+,"Glucose tolerance – Insulin fasting",0.037,-0.041,0.115,,,28
+,"Glucose tolerance – Insulin tolerance",-0.03,-0.116,0.056,,,29
+,"Glucose tolerance – Leptin",0.13,0.014,0.247,,,30
+,"Glucose tolerance – Triglycerides",0.075,0.012,0.137,,,31
+,"Insulin fasting – Insulin tolerance",-0.067,-0.167,0.033,,,32
+,"Insulin fasting – Leptin",0.093,-0.032,0.218,,,33
+,"Insulin fasting – Triglycerides",0.038,-0.042,0.118,,,34
+,"Insulin tolerance – Leptin",0.16,0.029,0.291,,,35
+,"Insulin tolerance – Triglycerides",0.105,0.016,0.194,,,36
+,"Leptin – Triglycerides",-0.055,-0.172,0.061,,,37
+"One-off lnCVR",,,,,,0.064,38
+,"Adiposity intercept",-0.079,-0.294,0.137,52,,39
+,"Body weight intercept",0.035,-0.13,0.2,108,,40
+,"Glucose fasting",0.204,-0.186,0.595,7,,41
+,"Glusoce tolerance",0.18,-0.071,0.43,25,,42
+,"Insulin fasting",-0.213,-0.475,0.049,22,,43
+,"Insulin tolerance",0.254,-0.083,0.59,12,,44
+,"Leptin",0.087,-0.317,0.491,7,,45
+,"Triglicerides",0.013,-0.224,0.249,31,,46
+,"Adiposity – Body weight",0.114,-0.073,0.3,,,47
+,"Adiposity – Glucose fasting",0.283,-0.118,0.684,,,48
+,"Adiposity – Glucose tolerance",0.258,0.002,0.514,,,49
+,"Adiposity – Insulin fasting",-0.135,-0.412,0.143,,,50
+,"Adiposity – Insulin tolerance",0.332,-0.01,0.675,,,51
+,"Adiposity – Leptin",0.165,-0.246,0.577,,,52
+,"Adiposity – Triglycerides",0.091,-0.14,0.322,,,53
+,"Body weight – Glucose fasting",0.169,-0.207,0.546,,,54
+,"Body weight – Glucose tolerance",0.144,-0.078,0.367,,,55
+,"Body weight – Insulin fasting",-0.249,-0.488,-0.009,,,56
+,"Body weight – Insulin tolerance",0.218,-0.102,0.539,,,57
+,"Body weight – Leptin",0.052,-0.343,0.447,,,58
+,"Body weight – Triglycerides",-0.023,-0.232,0.187,,,59
+,"Glucose fasting – Glucose tolerance",-0.025,-0.438,0.389,,,60
+,"Glucose fasting – Insulin fasting",-0.418,-0.841,0.006,,,61
+,"Glucose fasting – Insulin tolerance",0.049,-0.431,0.529,,,62
+,"Glucose fasting – Leptin",-0.117,-0.647,0.412,,,63
+,"Glucose fasting – Triglycerides",-0.192,-0.604,0.221,,,64
+,"Glucose tolerance – Insulin fasting",-0.393,-0.697,-0.089,,,65
+,"Glucose tolerance – Insulin tolerance",0.074,-0.293,0.441,,,66
+,"Glucose tolerance – Leptin",-0.093,-0.526,0.341,,,67
+,"Glucose tolerance – Triglycerides",-0.167,-0.441,0.107,,,68
+,"Insulin fasting – Insulin tolerance",0.467,0.089,0.845,,,69
+,"Insulin fasting – Leptin",0.3,-0.138,0.738,,,70
+,"Insulin fasting – Triglycerides",0.226,-0.065,0.517,,,71
+,"Insulin tolerance – Leptin",-0.167,-0.651,0.317,,,72
+,"Insulin tolerance – Triglycerides",-0.241,-0.599,0.117,,,73
+,"Leptin – Triglycerides",-0.074,-0.494,0.346,,,74
+"Multigenerational lnRR",,,,,,0.37,75
+,"Adiposity intercept",0.794,0.578,1.01,19,,76
+,"Body weight intercept",0.1,-0.062,0.262,64,,77
+,"Glucose fasting",0.082,-0.154,0.319,10,,78
+,"Glusoce tolerance",0.134,-0.12,0.389,9,,79
+,"Insulin fasting",0.457,0.138,0.776,7,,80
+,"Insulin tolerance",0.171,-0.095,0.438,9,,81
+,"Leptin",0.872,0.577,1.168,7,,82
+,"Triglicerides",0.34,0.088,0.592,10,,83
+,"Adiposity – Body weight",-0.694,-0.873,-0.514,,,84
+,"Adiposity – Glucose fasting",-0.711,-0.951,-0.472,,,85
+,"Adiposity – Glucose tolerance",-0.659,-0.923,-0.396,,,86
+,"Adiposity – Insulin fasting",-0.337,-0.657,-0.017,,,87
+,"Adiposity – Insulin tolerance",-0.623,-0.901,-0.345,,,88
+,"Adiposity – Leptin",0.078,-0.209,0.366,,,89
+,"Adiposity – Triglycerides",-0.454,-0.701,-0.207,,,90
+,"Body weight – Glucose fasting",-0.018,-0.226,0.19,,,91
+,"Body weight – Glucose tolerance",0.034,-0.182,0.25,,,92
+,"Body weight – Insulin fasting",0.357,0.064,0.649,,,93
+,"Body weight – Insulin tolerance",0.071,-0.161,0.303,,,94
+,"Body weight – Leptin",0.772,0.501,1.043,,,95
+,"Body weight – Triglycerides",0.24,0.019,0.461,,,96
+,"Glucose fasting – Glucose tolerance",0.052,-0.235,0.339,,,97
+,"Glucose fasting – Insulin fasting",0.374,0.028,0.721,,,98
+,"Glucose fasting – Insulin tolerance",0.089,-0.211,0.388,,,99
+,"Glucose fasting – Leptin",0.79,0.473,1.106,,,100
+,"Glucose fasting – Triglycerides",0.258,-0.013,0.529,,,101
+,"Glucose tolerance – Insulin fasting",0.322,-0.029,0.674,,,102
+,"Glucose tolerance – Insulin tolerance",0.037,-0.238,0.311,,,103
+,"Glucose tolerance – Leptin",0.738,0.41,1.066,,,104
+,"Glucose tolerance – Triglycerides",0.206,-0.086,0.497,,,105
+,"Insulin fasting – Insulin tolerance",-0.286,-0.65,0.078,,,106
+,"Insulin fasting – Leptin",0.415,0.05,0.781,,,107
+,"Insulin fasting – Triglycerides",-0.117,-0.464,0.23,,,108
+,"Insulin tolerance – Leptin",0.701,0.36,1.042,,,109
+,"Insulin tolerance – Triglycerides",0.169,-0.136,0.474,,,110
+,"Leptin – Triglycerides",-0.532,-0.847,-0.217,,,111
+"Multigenerational lnCVR",,,,,,0.166,112
+,"Adiposity intercept",-0.013,-0.299,0.273,19,,113
+,"Body weight intercept",0.147,-0.007,0.3,64,,114
+,"Glucose fasting",-0.179,-0.537,0.18,10,,115
+,"Glusoce tolerance",0.021,-0.406,0.448,9,,116
+,"Insulin fasting",-0.329,-0.788,0.129,7,,117
+,"Insulin tolerance",0.237,-0.185,0.66,9,,118
+,"Leptin",-0.427,-0.863,0.009,7,,119
+,"Triglicerides",-0.388,-0.756,-0.02,10,,120
+,"Adiposity – Body weight",0.159,-0.149,0.467,,,121
+,"Adiposity – Glucose fasting",-0.166,-0.608,0.276,,,122
+,"Adiposity – Glucose tolerance",0.034,-0.464,0.532,,,123
+,"Adiposity – Insulin fasting",-0.317,-0.835,0.202,,,124
+,"Adiposity – Insulin tolerance",0.25,-0.247,0.747,,,125
+,"Adiposity – Leptin",-0.415,-0.906,0.077,,,126
+,"Adiposity – Triglycerides",-0.375,-0.814,0.064,,,127
+,"Body weight – Glucose fasting",-0.325,-0.702,0.051,,,128
+,"Body weight – Glucose tolerance",-0.125,-0.556,0.305,,,129
+,"Body weight – Insulin fasting",-0.476,-0.938,-0.014,,,130
+,"Body weight – Insulin tolerance",0.091,-0.336,0.517,,,131
+,"Body weight – Leptin",-0.574,-1.023,-0.125,,,132
+,"Body weight – Triglycerides",-0.534,-0.914,-0.155,,,133
+,"Glucose fasting – Glucose tolerance",0.2,-0.351,0.75,,,134
+,"Glucose fasting – Insulin fasting",-0.151,-0.722,0.421,,,135
+,"Glucose fasting – Insulin tolerance",0.416,-0.132,0.964,,,136
+,"Glucose fasting – Leptin",-0.249,-0.794,0.297,,,137
+,"Glucose fasting – Triglycerides",-0.209,-0.701,0.282,,,138
+,"Glucose tolerance – Insulin fasting",-0.35,-0.961,0.26,,,139
+,"Glucose tolerance – Insulin tolerance",0.216,-0.323,0.755,,,140
+,"Glucose tolerance – Leptin",-0.448,-1.035,0.138,,,141
+,"Glucose tolerance – Triglycerides",-0.409,-0.949,0.131,,,142
+,"Insulin fasting – Insulin tolerance",0.567,-0.042,1.176,,,143
+,"Insulin fasting – Leptin",-0.098,-0.706,0.51,,,144
+,"Insulin fasting – Triglycerides",-0.059,-0.629,0.512,,,145
+,"Insulin tolerance – Leptin",-0.665,-1.253,-0.076,,,146
+,"Insulin tolerance – Triglycerides",-0.625,-1.168,-0.082,,,147
+,"Leptin – Triglycerides",0.039,-0.5,0.579,,,148

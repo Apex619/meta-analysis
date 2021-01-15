@@ -1,0 +1,51 @@
+"Data","Fixed effects","Mean","CI.lb","CI.ub","k","R2","row"
+"One-off lnRR",,,,,264,0.096,1
+,"Grandparents both sexes exposed, Grand-offspring both sexes measured, Adiposity (intercept)",0.123,-0.077,0.323,,,2
+,"Sex of exposed grandparents: Both - Female",-0.008,-0.086,0.07,,,3
+,"Sex of exposed grandparents: Both - Male",-0.038,-0.125,0.049,,,4
+,"Sex of grand-offsprings: Both - Female",0.079,-0.054,0.213,,,5
+,"Sex of grand-offsprings: Both - Male",0.09,-0.043,0.223,,,6
+,"Trait: Adiposity – Body weight",-0.143,-0.2,-0.086,,,7
+,"Trait: Adiposity – Glucose fasting",-0.155,-0.246,-0.064,,,8
+,"Trait: Adiposity – Glucose tolerance",-0.125,-0.191,-0.059,,,9
+,"Trait: Adiposity – Insulin fasting",-0.086,-0.17,-0.003,,,10
+,"Trait: Adiposity – Insulin tolerance",-0.157,-0.249,-0.065,,,11
+,"Trait: Adiposity – Leptin",0.002,-0.118,0.121,,,12
+,"Trait: Adiposity – Triglicerides",-0.049,-0.111,0.014,,,13
+"One-off lnCVR",,,,,264,0.001,14
+,"Grandparents both sexes exposed, Grand-offspring both sexes measured, Adiposity (intercept)",-0.116,-0.852,0.62,,,15
+,"Sex of exposed grandparents: Both - Female",-0.163,-0.551,0.226,,,16
+,"Sex of exposed grandparents: Both - Male",-0.196,-0.619,0.227,,,17
+,"Sex of grand-offsprings: Both - Female",0.184,-0.418,0.786,,,18
+,"Sex of grand-offsprings: Both - Male",0.234,-0.367,0.835,,,19
+,"Trait: Adiposity – Body weight",0.112,-0.076,0.3,,,20
+,"Trait: Adiposity – Glucose fasting",0.282,-0.12,0.685,,,21
+,"Trait: Adiposity – Glucose tolerance",0.262,0.006,0.519,,,22
+,"Trait: Adiposity – Insulin fasting",-0.142,-0.422,0.137,,,23
+,"Trait: Adiposity – Insulin tolerance",0.346,0,0.691,,,24
+,"Trait: Adiposity – Leptin",0.167,-0.246,0.579,,,25
+,"Trait: Adiposity – Triglicerides",0.095,-0.137,0.326,,,26
+"Multigenerational lnRR",,,,,135,0.096,27
+,"Grandparents female sex exposed, Grand-offspring both sexes measured, Adiposity (intercept)",0.8,0.443,1.157,,,28
+,"Sex of exposed grandparents:  Female - Male",-0.253,-0.517,0.01,,,29
+,"Sex of grand-offsprings: Both - Female",0.07,-0.299,0.438,,,30
+,"Sex of grand-offsprings: Both - Male",0.044,-0.333,0.421,,,31
+,"Trait: Adiposity – Body weight",-0.673,-0.854,-0.492,,,32
+,"Trait: Adiposity – Glucose fasting",-0.697,-0.939,-0.456,,,33
+,"Trait: Adiposity – Glucose tolerance",-0.667,-0.93,-0.405,,,34
+,"Trait: Adiposity – Insulin fasting",-0.289,-0.611,0.033,,,35
+,"Trait: Adiposity – Insulin tolerance",-0.617,-0.894,-0.34,,,36
+,"Trait: Adiposity – Leptin",0.047,-0.24,0.335,,,37
+,"Trait: Adiposity – Triglicerides",-0.473,-0.72,-0.225,,,38
+"Multigenerational lnCVR",,,,,135,0.001,39
+,"Grandparents female sex exposed, Grand-offspring both sexes measured, Adiposity (intercept)",0.086,-0.366,0.538,,,40
+,"Sex of exposed grandparents:  Female - Male",-0.076,-0.366,0.215,,,41
+,"Sex of grand-offsprings: Both - Female",0.003,-0.392,0.398,,,42
+,"Sex of grand-offsprings: Both - Male",-0.116,-0.523,0.291,,,43
+,"Trait: Adiposity – Body weight",0.13,-0.184,0.445,,,44
+,"Trait: Adiposity – Glucose fasting",-0.18,-0.636,0.276,,,45
+,"Trait: Adiposity – Glucose tolerance",-0.001,-0.505,0.504,,,46
+,"Trait: Adiposity – Insulin fasting",-0.322,-0.844,0.2,,,47
+,"Trait: Adiposity – Insulin tolerance",0.216,-0.289,0.72,,,48
+,"Trait: Adiposity – Leptin",-0.429,-0.924,0.066,,,49
+,"Trait: Adiposity – Triglicerides",-0.38,-0.821,0.061,,,50

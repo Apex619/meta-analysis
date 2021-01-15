@@ -1,0 +1,174 @@
+---
+title: "STEP6_RESULTS"
+subtitle: "MA of transgenerational effects of obesogenic diets on rodents"
+author: "ML"
+date: "01/05/2020"
+output: html_document
+knit: (function(inputFile, encoding) {rmarkdown::render(inputFile, encoding = encoding, output_dir = "Knitted") })
+---
+
+Create most of the results section. 
+[Note: do knit]    
+
+### Setup
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+
+
+knitr::opts_chunk$set(
+echo = FALSE,
+message = FALSE,
+warning = FALSE, # no warnings
+cache = TRUE,# Cacheing to save time when kniting
+tidy = TRUE
+#fig.width = 9
+)
+
+options(scipen=100)
+
+# Load packages
+# devtools::install_github("thomasp85/patchwork")
+pacman::p_load(tidyverse, # tidy family and related pacakges below
+               metafor, # calculating effect sizes
+               magrittr # extending piping
+               #ggplot2,  # nice plots
+               #patchwork,  # arranging plots
+               #orchaRd #orchard plots, !!! actually using custom function - modified version with new argument k = FALSE !!!
+)
+
+# Load custom functions
+#source("../Scripts/custom_functions.R") #load custom functions
+```
+
+<!-- ### Load data     -->
+<!-- Processed data for analyses is stored in data_all_ES.csv and data_all_ES.RData fils.  -->
+<!-- It needs to be split into One-off and Multigenerational data.       -->
+
+<!-- ```{r load and subset data, include = FALSE} -->
+
+<!-- # Load preprocessed data with effect sizes -->
+<!-- data_all <- read.csv(file ="../Data/data_all_ES.csv")   -->
+<!-- #load(data_all, file = "../Rdata/data_all_ES.RData") #alternative -->
+<!-- #str(data_all) -->
+
+
+<!-- # Subset by One off and Multigenerational -->
+<!-- data_MG <- filter(data_all, Exposure_Type == "Multigenerational") -->
+<!-- data_OF <- filter(data_all, Exposure_Type == "One-off") -->
+<!-- dim(data_MG) -->
+<!-- dim(data_OF) -->
+<!-- data_MG <- droplevels(data_MG) #adjust factor levels -->
+<!-- data_OF <- droplevels(data_OF) #adjust factor levels -->
+<!-- ``` -->
+
+
+<!-- ```{r load summaries and models, include = FALSE} -->
+<!-- # for dataset summary #A FIDDLY LINE! (may not knit - shift up/down save, re-knit) -->
+<!-- load(file = "../Rdata/data_summaries.Rdata") #this should load data objects: N_unique_animals_Treatment, N_unique_animals_Control,N_papers_Exposure, N_papers_Rodent_Type, N_papers_F0_Parent_Exposed, N_papers_Offspring_Generation, N_papers_Offspring_Sex, N_papers_Trait -->
+
+<!-- # for meta-analytic models -->
+<!-- load(file = "../Rdata/MA_OF_lnRR.Rdata") -->
+<!-- load(file = "../Rdata/MA_OF_lnCVR.Rdata") -->
+<!-- load(file = "../Rdata/MA_MG_lnRR.Rdata") -->
+<!-- load(file = "../Rdata/MA_MG_lnCVR.Rdata") -->
+
+<!-- # for Exposure_Type analyses -->
+<!-- load(file = "../Rdata/MR_all_ExpT_lnRRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_all_ExpT_lnCVRi.Rdata") -->
+
+<!-- # for F0 exposed sex analyses -->
+<!-- load(file = "../Rdata/MR_OF_ExpSex_lnRRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_OF_ExpSex_lnRRf.Rdata") -->
+<!-- load(file = "../Rdata/MR_OF_ExpSex_lnRRm.Rdata") -->
+<!-- load(file = "../Rdata/MR_OF_ExpSex_lnCVRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_ExpSex_lnRRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_ExpSex_lnRRf.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_ExpSex_lnCVRi.Rdata") -->
+
+<!-- # for Offspring_Sex analyses -->
+<!-- load(file = "../Rdata/MR_OF_OffSex_lnRRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_OF_OffSex_lnRRf.Rdata") -->
+<!-- load(file = "../Rdata/MR_OF_OffSex_lnCVRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_OF_OffSex_lnCVRf.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_OffSex_lnRRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_OffSex_lnRRf.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_OffSex_lnCVRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_OffSex_lnCVRf.Rdata") -->
+
+<!-- # for Trait analyses -->
+<!-- load(file = "../Rdata/MR_OF_Trait_lnRRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_OF_Trait_lnCVRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_Trait_lnRRi.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_Trait_lnCVRi.Rdata") -->
+
+<!-- # for Full Model analyses -->
+<!-- load(file = "../Rdata/MR_OF_Full_lnRR.Rdata") -->
+<!-- load(file = "../Rdata/MR_OF_Full_lnCVR.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_Full_lnRR.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_Full_lnCVR.Rdata") -->
+
+<!-- # for Publication Bias analyses -->
+
+<!-- # for Additional Models analyses -->
+<!-- load(file = "../Rdata/MR_OF_DietE_lnRR.Rdata") -->
+<!-- load(file = "../Rdata/MR_OF_DietE_lnCVR.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_DietE_lnRR.Rdata") -->
+<!-- load(file = "../Rdata/MR_MG_DietE_lnCVR.Rdata") -->
+
+<!-- load(file = "../Rdata/prediction_F0.Rdata") -->
+<!-- load(file = "../Rdata/prediction_OF.Rdata") -->
+<!-- load(file = "../Rdata/prediction_MG.Rdata") -->
+
+<!-- ``` -->
+
+
+*Note:* Positive lnRR effect sizes indicate higher mean trait values in grand-offspring of exposed F0 parents, whereas positive lnCVR effect sizes indicate greater trait variance in grand-offspring of F0-exposed parents, relatively to offspring of non-exposed F0 parents. Conversely, negative effect sizes indicate lower mean trait values (lnRR) and lower variance (lnCVR) in grand-offspring of F0-exposed parents, relatively to offspring of non-exposed F0 parents.     
+
+*Note:* Text below to be used as in the MS results section.    
+
+**Results**    
+
+*Literature search*    
+Our literature search is summarized in the PRISMA diagram presented in Figure S1. Details of the methodology and complete results from database searches and screening can be found in the Supporting Information (Supplementary Methods, Figures S2 – S3, Tables S1 – S3). The search of two main databases, run in 2018, yielded a total of 761. We performed snowballing (looking at backwards and forward references) and searched in other sources (Google Scholar) to find additional studies. Following abstract screening of all found references, we screened full texts of 59 studies. We excluded 34 studies (mainly due to not being a transgenerational study, not using an obesogenic diet treatment or using mutant rodents) and remained with 25 publications eligible for quantitative synthesis. The update of our literature search, performed in 2020 using a similar procedure, increased the total number of included publications to 31.    
+
+*Dataset description*    
+
+From the `r n_distinct(data_all$Paper_ID)` included articles (Table 1), we obtained `r dim(data_all)[1]` effect sizes representing pairwise comparisons of control and treatment groups pertaining to body weight, adiposity, glucose, insulin, leptin and triglycerides in grand-offspring generations F2 and F3. Individual articles contributed between `r min(table(data_all$Paper_ID))` and `r max(table(data_all$Paper_ID))` effect sizes. The measurements were taken from `r N_unique_animals[1]` unique grand-offspring from treatment groups and `r N_unique_animals[2]` unique grand-offspring from control groups.   
+
+We found `r N_papers_Exposure["One-off"]` articles with one-off exposure type (`r table(data_all$Exposure_Type)["One-off"]` effect sizes) and `r N_papers_Exposure["Multigenerational"]` articles with multigenerational exposure experiments (`r table(data_all$Exposure_Type)["Multigenerational"]` effect sizes; some articles includes both types of exposure). A few articles presented data from the same or very similar experiments, and were thus categorised these as representing same study - in total there were 19 one-off exposure and 12 multigenerational exposure studies in our data set.   
+
+In terms of rodent species used, the dataset comprised `r table(data_all$Rodent_Type)["Mouse"]` effect sizes from mice (from `r N_papers_Rodent_Type["Mouse"]` articles), and `r table(data_all$Rodent_Type)["Rat"]` from rats (from `r N_papers_Rodent_Type["Rat"]` articles), representing `r n_distinct(data_all$Rodent_Strain)` laboratory strains in total. The dataset was dominated by experiments where females were the sex exposed in F0 generation (F0 exposed females: `r table(data_all$F0_Parent_Exposed)["Female"]` effect sizes from `r N_papers_F0_Parent_Exposed["Female"]` studies, F0 exposed males: `r table(data_all$F0_Parent_Exposed)["Male"]` effect sizes from `r N_papers_F0_Parent_Exposed["Male"]` studies; we had only one study where both females and males were exposed and then bred together). Transgenerational data came mainly from F2 grand-offspring (`r table(data_all$Offspring_Generation)["F2"]` effect sizes from `r N_papers_Offspring_Generation["F2"]` studies), as opposed to F3 grand-offspring (`r table(data_all$Offspring_Generation)["F3"]` effect sizes from `r N_papers_Offspring_Generation["F3"]` studies). Grand-offspring measurements were distributed evenly between the sexes (females: `r table(data_all$Offspring_Sex)["Female"]` effect sizes from `r N_papers_Offspring_Sex["Female"]` studies, males: `r table(data_all$Offspring_Sex)["Male"]` effect sizes from `r N_papers_Offspring_Sex["Male"]` studies, mixed-sex groups: `r table(data_all$Offspring_Sex)["Both"]` effect sizes from `r N_papers_Offspring_Sex["Both"]` studies).    
+
+Body weight was the best-represented offspring trait (`r table(data_all$Trait)["Body_Weight"]` effect sizes from all `r N_papers_Trait["Body_Weight"]` studies), followed by adiposity (`r table(data_all$Trait)["Adiposity"]` effect sizes from  `r N_papers_Trait["Adiposity"]` studies). We had fewer data points for triglycerides (`r table(data_all$Trait)["Triglycerides"]` effect sizes from  `r N_papers_Trait["Triglycerides"]` studies), glucose tolerance test (`r table(data_all$Trait)["Glucose_TT"]` effect sizes from  `r N_papers_Trait["Glucose_TT"]` studies), fasting glucose (`r table(data_all$Trait)["Glucose_FBG"]` effect sizes from  `r N_papers_Trait["Glucose_FBG"]` studies), fasting insulin (`r table(data_all$Trait)["Insulin_FI"]` effect sizes from  `r N_papers_Trait["Insulin_FI"]` studies), insulin tolerance test (`r table(data_all$Trait)["Insulin_TT"]` effect sizes from  `r N_papers_Trait["Insulin_TT"]` studies), and leptin (`r table(data_all$Trait)["Leptin"]` effect sizes from  `r N_papers_Trait["Leptin"]` studies). Figure 1 presents summary of numbers of effects sizes in One-off and Multigenerational datasets by the exposed grandparent sex (b), grand-offspring sex (c) and grand-offspring trait type (d).    
+
+The included studies varied also in terms of the types and timings of the obesogenic diet treatments. Energetic value of the obesogenic diets ranged from `r round(range(data_all$Treatment_Diet_Energy_kcal_g)[1],1)` to `r round(range(data_all$Treatment_Diet_Energy_kcal_g)[2],1)` kcal/g, with protein to non-protein ratio (by weight) ranging from `r round(range(data_all$Treatment_Diet_PNP_ratio)[1],2)` to `r round(range(data_all$Treatment_Diet_PNP_ratio)[2],2)`. These diet parameters were similarly distributed among the data points included in One-off and Multigenerational datasets (Figure S4). The duration of grandparental exposure to obesogenic diets ranged from `r range(data_all$Treatment_Duration_F0)[1]` to `r range(data_all$Treatment_Duration_F0)[2]` days, for males uaually finishing at mating (day 0), for females often extending into gestation or even lactation. The distributions of the timing of exposures were generally similar between One-off and Multigenerational datasets (Figure S5).
+
+*Effects of exposure type*    
+Our overall analyses examined effects of grandparental (F0) exposure to an obesogenic diet on body size and physiology in grand-offspring (F2 and F3), separately for One-off and Multigenerational exposure data. One-off exposure of grandparents had on average a small and statistically non-significant effect in expected direction (*lnRR* = `r round(MA_OF_lnRR$b,3)`, *CI* = `r round(MA_OF_lnRR$ci.lb,3)` to `r round(MA_OF_lnRR$ci.ub,3)`, *p* = `r round(MA_OF_lnRR$pval,3)`; Figure 2a; Table S4). Multigenerational exposure on average had a moderate and statistically significant effect on mean trait values of the offspring (*lnRR* = `r round(MA_MG_lnRR$b,3)`, *CI* = `r round(MA_MG_lnRR$ci.lb,3)` to `r round(MA_MG_lnRR$ci.ub,3)`, *p* = `r round(MA_MG_lnRR$pval,3)`; Table S3). The difference between average effects of two exposure types was small, but statistically significant (meta-regression model on merged data sets with exposure type as a moderator: *lnRR* _difference_ = `r round(MR_all_ExpT_lnRRi$b[2],3)`, *CI* = `r round(MR_all_ExpT_lnRRi$ci.lb[2],3)` to `r round(MR_all_ExpT_lnRRi$ci.ub[2],3)`, *p* = `r round(MR_all_ExpT_lnRRi$pval[2],3)`, *R^2^* = `r round(R2(MR_all_ExpT_lnRRi)["R2_marginal"],3)`; Table S5). Total data heterogeneity was high for both One-off and Multigenerational data (*I^2^* = `r round(I2(MA_OF_lnRR)[1],3)*100`% and `r round(I2(MA_MG_lnRR)[1],3)*100`%, respectively; Table S4), warranting analyses of moderators to explain the variation in the effect sizes for effects on mean trait values.    
+
+The average effects on trait variability for both exposure types were small and statistically non-significant (One-off data: *lnCVR* = `r round(MA_OF_lnCVR$b,3)`, *CI* = `r round(MA_OF_lnCVR$ci.lb,3)` to `r round(MA_OF_lnCVR$ci.ub,3)`, *p* = `r round(MA_OF_lnCVR$pval,3)`; Multigenerational data: *lnCVR* = `r round(MA_MG_lnCVR$b,3)`, *CI* = `r round(MA_MG_lnCVR$ci.lb,3)` to `r round(MA_MG_lnCVR$ci.ub,3)`, *p* = `r round(MA_MG_lnCVR$pval,3)`; Figure 2b; Table S4; *lnCVR* _difference_= `r round(MR_all_ExpT_lnCVRi$b[2],3)`, *CI* = `r round(MR_all_ExpT_lnCVRi$ci.lb[2],3)` to `r round(MR_all_ExpT_lnCVRi$ci.ub[2],3)`, *p* = `r round(MR_all_ExpT_lnCVRi$pval[2],3)`, *R^2^* = `r round(R2(MR_all_ExpT_lnCVRi)["R2_marginal"],3)`; Table S5). Total data heterogeneity was also moderately high for both One-off and Multigenerational data (*I^2^* = `r round(I2(MA_OF_lnCVR)[1],3)*100`% and `r round(I2(MA_MG_lnCVR)[1],3)*100`%, respectively; Table S4).    
+
+*Effects of sex of exposed grandparents (F0)*     
+In One-off exposure experiments, we found no clear effect of the gender of exposed grandparents on mean trait values of grand-offspring (_lnRR_) and the meta-regression model explained less than 1% of variation among effect sizes (Figure3a; Table S6). Similarly, effects on variability of grand-offspring traits (_lnCVR_) were indistinguishable between grand-maternal and grand-paternal One-off exposure liness (*R^2^* = `r round(R2(MR_OF_ExpSex_lnCVRi)["R2_marginal"],3)`; Figure 3c; Table S6).      
+
+In Multigenerational exposure experiments, grand-maternal exposure associated with a moderate and statistically significant effect on mean trait values of grand-offspring (grandmothers: *lnRR* = `r round(MR_MG_ExpSex_lnRRi$b[1],3)`, *CI* = `r round(MR_MG_ExpSex_lnRRi$ci.lb[1],3)` to `r round(MR_MG_ExpSex_lnRRi$ci.ub[1],3)`, *p* = `r round(MR_MG_ExpSex_lnRRi$pval[1],3)`; Figure 3b; Table S6). Grand-paternal exposure resulted in a small and statistically non-significant effect on mean trait values of grand-offspring (grandfathers: *lnRR* = `r round(MR_MG_ExpSex_lnRRi$b[2],3)`, *CI* = `r round(MR_MG_ExpSex_lnRRi$ci.lb[2],3)` to `r round(MR_MG_ExpSex_lnRRi$ci.ub[2],3)`, *p* = `r round(MR_MG_ExpSex_lnRRi$pval[2],3)`; *lnRR*_difference_ = `r round(MR_MG_ExpSex_lnRRf$b[2])`, *CI* = `r round(MR_MG_ExpSex_lnRRf$ci.lb[2],3)` to `r round(MR_MG_ExpSex_lnRRf$ci.ub[2],3)`, *p* = `r round(MR_MG_ExpSex_lnRRf$pval[2],3)`). This meta-regression model explained `r round(R2(MR_MG_ExpSex_lnRRf)["R2_marginal"],3)*100`% of variation among effect sizes. The effect on variability of grand-offspring traits was indistinguishable from zero for both grandmaternal and grandpaternal exposures, with no statistically significant difference between them (*R^2^* = `r round(R2(MR_MG_ExpSex_lnCVRi)["R2_marginal"],3)`; Figure 3d; Table S6).     
+
+*Effects of sex of grand-offspring*    
+For One-off exposures, the effects in both granddaughters and grandsons mean trait values were small and statistically not different from zero, or each other (granddaughters: *lnRR* = `r round(MR_OF_OffSex_lnRRi$b[2],3)`, *CI* = `r round(MR_OF_OffSex_lnRRi$ci.lb[2],3)` to `r round(MR_OF_OffSex_lnRRi$ci.ub[2],3)`, *p* = `r round(MR_OF_OffSex_lnRRi$pval[2],3)`; grandsons: *lnRR* = `r round(MR_OF_OffSex_lnRRi$b[3],3)`, *CI* = `r round(MR_OF_OffSex_lnRRi$ci.lb[3],3)` to `r round(MR_OF_OffSex_lnRRi$ci.ub[3],3)`, *p* = `r round(MR_OF_OffSex_lnRRi$pval[3],3)`; Figure 4a; Table S7). The meta-regression model explained only `r round(R2(MR_OF_OffSex_lnRRi)["R2_marginal"],3)*100`% of variation among effect sizes. There was also no effect of grand-offspring sex on the variability of the traits (Figure 4c; Table S7).    
+
+For Multigenerational exposures, the effects on granddaughters and grandsons mean trait values were moderate and statistically different from zero (granddaughters: *lnRR* = `r round(MR_MG_OffSex_lnRRi$b[2],3)`, *CI* = `r round(MR_MG_OffSex_lnRRi$ci.lb[2],3)` to `r round(MR_MG_OffSex_lnRRi$ci.ub[2],3)`, *p* = `r round(MR_MG_OffSex_lnRRi$pval[2],3)`; grandsons: *lnRR* = `r round(MR_MG_OffSex_lnRRi$b[3],3)`, *CI* = `r round(MR_MG_OffSex_lnRRi$ci.lb[3],3)` to `r round(MR_MG_OffSex_lnRRi$ci.ub[3],3)`, *p* = `r round(MR_MG_OffSex_lnRRi$pval[3],)`; Figure 4b; Table S7). On average, there was no statistically significant difference between effects on granddaughters and grandsons (lnRR _difference_ = `r round(MR_MG_OffSex_lnRRf$b[2],3)`, *CI* = `r round(MR_MG_OffSex_lnRRf$ci.lb[2],3)` to `r round(MR_MG_OffSex_lnRRf$ci.ub[2],3)`, *p* = `r round(MR_MG_OffSex_lnRRf$pval[2],3)`; *R^2^* = `r round(R2(MR_MG_OffSex_lnRRf)["R2_marginal"],3)`). There was also no clear differences between granddaughters and grandsons in the average effect on variability of the traits (*R^2^* = `r round(R2(MR_MG_OffSex_lnRRf)["R2_marginal"],3)`; Figure 4d; Table S7).    
+
+*Effects of offspring trait category*    
+FFor One-off exposures, grand-offspring of grandparents exposed to obesogenic diets were on average more obese than offspring from unexposed lines, although the effect was small (lnRR = `r round(MR_OF_Trait_lnRRi$b[1],3)`, CI = `r round(MR_OF_Trait_lnRRi$ci.lb[1],3)` to `r round(MR_OF_Trait_lnRRi$ci.ub[1],3)`, p = `r round(MR_OF_Trait_lnRRi$pval[1],3)`; *R^2^* = `r round(R2(MR_OF_Trait_lnRRi)["R2_marginal"],3)`Figure5a; TableSX). While statistically non-significant, and also small, the average levels of blood leptin also tended to be increased in grand-offspring of grandparents fed obesogenic diets  (*lnRR* = `r round(MR_OF_Trait_lnRRi$b[7],3)`, *CI* = `r round(MR_OF_Trait_lnRRi$ci.lb[7],3)` to `r round(MR_OF_Trait_lnRRi$ci.ub[7],3)`, *p* = `r round(MR_OF_Trait_lnRRi$pval[7],3)`). Average effects on adiposity and leptin levels were significantly larger from these in the remaining trait categoriess (*lnCVR* *R^2^* = `r round(R2(MR_OF_Trait_lnCVRi)["R2_marginal"],3)`; Table S8). The effects on trait variability were usually small and statistically not different from zero for all trait categories (Figure 5c, Table S8).    
+
+Similarly to what we observed in One-off exposures, after Multigenerational exposure to obesogenic diets, grand-offspring had significantly higher mean levels of adiposity, but with large effect, on average (*lnRR* = `r round(MR_MG_Trait_lnRRi$b[1],3)`, *CI* = `r round(MR_MG_Trait_lnRRi$ci.lb[1],3)` to `r round(MR_MG_Trait_lnRRi$ci.ub[1],3)`, *p* = `r round(MR_MG_Trait_lnRRi$pval[1],3)`; Figure 5b; Table S8). They also had higher levels of fasting insulin (*lnRR* = `r round(MR_MG_Trait_lnRRi$b[5],3)`, *CI* = `r round(MR_MG_Trait_lnRRi$ci.lb[5],3)` to `r round(MR_MG_Trait_lnRRi$ci.ub[5],3)`, *p* = `r round(MR_MG_Trait_lnRRi$pval[5],3)`), leptins (*lnRR* = `r round(MR_MG_Trait_lnRRi$b[7],3)`, *CI* = `r round(MR_MG_Trait_lnRRi$ci.lb[7],3)` to `r round(MR_MG_Trait_lnRRi$ci.ub[7],3)`, *p* = `r round(MR_MG_Trait_lnRRi$pval[7],3)`) and triglycerides (*lnRR* = `r round(MR_MG_Trait_lnRRi$b[8],3)`, *CI* = `r round(MR_MG_Trait_lnRRi$ci.lb[8],3)` to `r round(MR_MG_Trait_lnRRi$ci.ub[8],3)`, *p* = `r round(MR_MG_Trait_lnRRi$pval[8],3)`). The effect sizes for these trait categories were moderate, and the average effects on adiposity and leptin levels were significantly larger from these on the remaining traits (*R^2^* = 0.370; Table S8). The effects of Multigenerational exposure on grand-offspring trait variability were usually small and statistically non-significant for all traits except one (Figure 5d, Table S8). Namely, grand-offspring of parents exposed to obesogenic diets across at least two generations usually had less variable levels of blood triglycerides than their non-exposed counterparts (*lnCVR* = `r round(MR_MG_Trait_lnCVRi$b[8],3)`, *CI* = `r round(MR_MG_Trait_lnCVRi$ci.lb[8],3)` to `r round(MR_MG_Trait_lnCVRi$ci.ub[8],3)`, *p* = `r round(MR_MG_Trait_lnCVRi$pval[8],3)`; *R^2^* = `r round(R2(MR_MG_Trait_lnCVRi)["R2_marginal"],3)`).    
+  
+*Full model and model selection analysis*   
+The full meta-regression model included sex of exposed grandparents, sex of measured grand-offspring and measured trait type (Table S9). These three moderators jointly explained `r round(R2(MR_OF_Full_lnRR)[1],3)*100`% of variation in the effects on mean trait values for One-off exposure data, `r round(R2(MR_MG_Full_lnRR)[1],3)*100`% in Multigenerational data, and `r round(R2(MR_OF_Full_lnCVR)[1],3)*100`% of the effects on trait variability, in both datasets. Model selection analysis indicated that trait type was the most influential moderator of average effect sizes on the trait means in One-off data, and for both trait means and variabilities in Multigenerational data (Table S10).   
+
+*Publication bias analyses*    
+Investigations of publication bias analyses included: 1) contour-enhanced funnel plots of residuals, 2) a multivariate variant of Egger’s regression, and 3) a regression-based time-lag bias test. Visual inspection of enhanced-contour funnel plots of residuals did not show clear data distribution skewness indicative of publication bias (Figure S6). Egger’s regression test on the residuals from full models indicated significant funnel plot asymmetry only for the Multigenerational lnRR dataset (Table S11). Finally, the slope of linear regression between publication year and effect size was not significantly different from zero for all data sets (Table S12).    
+
+*Additional analyses*   
+Diets with higher total energy content associated with larger effects on mean grand-offspring trait values after multigenerational exposure (*lnRR* slope = `r round(MR_MG_DietE_lnRR$b[2],3)`, *CI* = `r round(MR_MG_DietE_lnRR$ci.lb[2],3)` to `r round(MR_MG_DietE_lnRR$ci.ub[2],3)`, *p* = `r round(MR_MG_DietE_lnRR$pval[2],3)`; *R^2^* = `r round(R2(MR_MG_DietE_lnRR)["R2_marginal"],3)`; Table S13). Neither relative protein content of the obesogenic diet, nor the duration of the exposure of the grandparents to the obesogenic diet, appear to significantly influence the magnitude of effect sizes in any of the datasets and effect measures (Table S14 and Table S15). Moreover, we found no difference between the average magnitudes of the effects between grand-offspring from F2 and F3 generations (Table S16).    
+
+Finally, exposed grandparents were, on average, `r (exp(prediction_F0$pred)-1)*100`% heavier than their non-exposed counterparts. For comparison, predicted difference between their grand-offspring at similar age (around 100 days old) would be around `r (exp(prediction_OF$pred)-1)*100`% in One-off experiments, and around `r (exp(prediction_MG$pred)-1)*100`% after Multigenerational experiments (but note very wide confidence and prediction intervals; Table S17, Table S18).
