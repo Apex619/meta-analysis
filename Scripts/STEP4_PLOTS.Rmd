@@ -194,7 +194,8 @@ p1 <- orchard_plot(MR_all_ExpT_lnRRi, mod = "Exposure_Type", xlab = "lnRR", tran
   geom_text(x=3, y=2.2, label = paste("k =", colSums(MR_all_ExpT_lnRRi$X)["Exposure_TypeOne-off"]), fontface = "italic", size = 3) +
   geom_text(x=3, y=1.2, label = paste("k =", colSums(MR_all_ExpT_lnRRi$X)["Exposure_TypeMultigenerational"]), fontface = "italic", size = 3) +
   theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt")) +
-  labs(y = "Exposure type", angle = 90)
+  labs(y = "Exposure type", angle = 90)+
+  annotate('text', x = 4, y = 0.9, label="*", fontface="bold", size=6)
 
 ## lnCVR
 p2 <- orchard_plot(MR_all_ExpT_lnCVRi, mod = "Exposure_Type", xlab = "lnCVR", transfm = "none", alpha = 0.3, angle = 45, cb = FALSE, k = FALSE) +
@@ -256,7 +257,9 @@ p3 <- orchard_plot(MR_MG_ExpSex_lnRRi, mod = "F0_Parent_Exposed", xlab = "lnRR",
   geom_text(x=3, y=1.2, label = paste("k =", colSums(MR_MG_ExpSex_lnRRi$X)["F0_Parent_ExposedFemale"]), fontface = "italic", size = 3) +
   geom_text(x=3, y=2.2, label = paste("k =", colSums(MR_MG_ExpSex_lnRRi$X)["F0_Parent_ExposedMale"]), fontface = "italic", size = 3) + 
   geom_text(x=-2, y=2.4, label = "Multigenerational", fontface = "bold", size = 4, color = "#E69F00") +
-  theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt")) #+
+  theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt"))+
+  annotate('text', x = 4, y = 0.9, label="*", fontface="bold", size=6)
+  #+
   #labs(y = "Exposed F0 sex", angle = 90)
 
 ## MG lnCVR
@@ -321,7 +324,9 @@ p3 <- orchard_plot(MR_MG_OffSex_lnRRi, mod = "Offspring_Sex", xlab = "lnRR", tra
   geom_text(x=3, y=2.2, label = paste("k =", colSums(MR_MG_OffSex_lnRRi$X)["Offspring_SexFemale"]), fontface = "italic", size = 3) +
   geom_text(x=3, y=3.2, label = paste("k =", colSums(MR_MG_OffSex_lnRRi$X)["Offspring_SexMale"]), fontface = "italic", size = 3) + 
   geom_text(x=-2, y=3.4, label = "Multigenerational", fontface = "bold", size = 4, color = "#E69F00") +
-  theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt")) #+
+  theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt"))+
+    annotate('text', x = 4, y = 3, label="*", fontface="bold", size=6)+
+    annotate('text', x = 4, y = 2, label="*", fontface="bold", size=6)#+
   #labs(y = "Grand-offspring sex", angle = 90)
 
 ## MG lnCVR
@@ -365,7 +370,8 @@ p1 <- orchard_plot(MR_OF_Trait_lnRRi, mod = "Trait", xlab = "lnRR", transfm = "n
   geom_text(x=3, y=8.2, label = paste("k =", colSums(MR_OF_Trait_lnRRi$X)["TraitTriglycerides"]), fontface = "italic", size = 3) +  
   geom_text(x=-2, y=8.4, label = "One-off", fontface = "bold", size = 4, color = "#56B4E9") +
   theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt")) +
-  labs(y = "Grand-offspring trait", angle = 90)
+  labs(y = "Grand-offspring trait", angle = 90)+
+  annotate('text', x = 4, y = 1, label="*", fontface="bold", size=6)
 
 ## OF lnCVR
 p2 <- orchard_plot(MR_OF_Trait_lnCVRi, mod = "Trait", xlab = "lnCVR", transfm = "none", alpha = 0.3, angle = 0, cb = FALSE, k = FALSE) +
@@ -402,7 +408,11 @@ p3 <- orchard_plot(MR_MG_Trait_lnRRi, mod = "Trait", xlab = "lnRR", transfm = "n
   geom_text(x=3, y=7.2, label = paste("k =", colSums(MR_MG_Trait_lnRRi$X)["TraitLeptin"]), fontface = "italic", size = 3) +
   geom_text(x=3, y=8.2, label = paste("k =", colSums(MR_MG_Trait_lnRRi$X)["TraitTriglycerides"]), fontface = "italic", size = 3) +  
   geom_text(x=-1.8, y=8.4, label = "Multigenerational", fontface = "bold", size = 4, color = "#E69F00") +
-  theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt")) #+
+  theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt"))+
+  annotate('text', x = 4, y = 1, label="*", fontface="bold", size=6)+
+  annotate('text', x = 4, y = 7, label="*", fontface="bold", size=6)+
+  annotate('text', x = 4, y = 8, label="*", fontface="bold", size=6)+
+  annotate('text', x = 4, y = 5, label="*", fontface="bold", size=6)#+
   #labs(y = "Grand-offspring trait", angle = 90)
 
 ## MG lnCVR
@@ -421,77 +431,12 @@ p4 <- orchard_plot(MR_MG_Trait_lnCVRi, mod = "Trait", xlab = "lnCVR", transfm = 
   geom_text(x=3, y=7.2, label = paste("k =", colSums(MR_MG_Trait_lnCVRi$X)["TraitLeptin"]), fontface = "italic", size = 3) +
   geom_text(x=3, y=8.2, label = paste("k =", colSums(MR_MG_Trait_lnCVRi$X)["TraitTriglycerides"]), fontface = "italic", size = 3) +  
   geom_text(x=-1.8, y=8.4, label = "Multigenerational", fontface = "bold", size = 4, color = "#E69F00") +
-  theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt")) #+
+  theme(legend.position = "none", plot.margin = margin(30, 2, 2, 2, unit = "pt"))+
+  annotate('text', x = 4, y = 8, label="*", fontface="bold", size=6)#+
   #labs(y = "Grand-offspring trait", angle = 90)
 
 p1 + p3 + p2 + p4 + plot_layout(ncol = 2)  #assemble plot panels
 ggsave("../Plots/Figure5_Rplot_v0.pdf", width = 16, height = 14, units = "cm", dpi = 300, scale = 1.6)
-```
-
-
-## Figures for SI
-
-
-### FigureS4 - diet plots (OF, MG)
-
-```{r diets plots, include = TRUE}
-
-## OF dataset
-p_OF_T_diet_E <- data_OF %>%
-  ggplot( aes(x=Treatment_Diet_Energy_kcal_g, fill=F0_Parent_Exposed)) +
-    geom_histogram(color="#e9ecef", alpha=1, position = 'stack', breaks=seq(4, 6, by=0.2)) +
-    scale_fill_manual(values=c("#404080", "#CCFFE5", "#69b3a2")) +
-    theme_bw() +
-    theme(legend.position="none") +
-    labs(x = "Treatment diet energy [kcal/g]", y = "count ES", title = "a. One-off")
-
-p_OF_T_diet_PNP <- data_OF %>%
-  ggplot( aes(x=Treatment_Diet_PNP_ratio, fill=F0_Parent_Exposed)) +
-    geom_histogram(color="#e9ecef", alpha=1, position = 'stack', breaks=seq(0, 0.5, by=0.05)) + 
-    scale_fill_manual(values=c("#404080", "#CCFFE5", "#69b3a2")) +
-    theme_bw() +
-    theme(legend.position="top") +
-    labs(fill="") +
-    labs(x = "Treatment diet P:NP", y = "", title = "")
-
-p_OF_T_fat_E <- data_OF %>%
-  ggplot( aes(x=Treatment_Diet_Fat_pE, fill=F0_Parent_Exposed)) +
-    geom_histogram(color="#e9ecef", alpha=1, position = 'stack', breaks=seq(30, 80, by=5)) + 
-    scale_fill_manual(values=c("#404080", "#CCFFE5", "#69b3a2")) +
-    theme_bw() +
-    theme(legend.position="none") +
-    labs(x = "Treatment diet fat [%E]", y = "", title = "")
-
-## MG dataset
-p_MG_T_diet_E <- data_MG %>%
-  ggplot( aes(x=Treatment_Diet_Energy_kcal_g, fill=F0_Parent_Exposed)) +
-    geom_histogram(color="#e9ecef", alpha=1, position = 'stack', breaks=seq(4, 6, by=0.2)) +
-    scale_fill_manual(values=c("#CCFFE5", "#69b3a2")) +
-    theme_bw() +
-    theme(legend.position="none") +
-    labs(x = "Treatment diet energy [kcal/g]", y = "count ES", title = "b. Multigenerational")
-
-p_MG_T_diet_PNP <- data_MG %>%
-  ggplot( aes(x=Treatment_Diet_PNP_ratio, fill=F0_Parent_Exposed)) +
-    geom_histogram(color="#e9ecef", alpha=1, position = 'stack', breaks=seq(0, 0.5, by=0.05)) + 
-    scale_fill_manual(values=c( "#CCFFE5", "#69b3a2")) +
-    theme_bw() +
-    theme(legend.position="top") +
-    labs(fill="") +
-    labs(x = "Treatment diet P:NP", y = "", title = "")
-
-p_MG_T_fat_E <- data_MG %>%
-  ggplot( aes(x=Treatment_Diet_Fat_pE, fill=F0_Parent_Exposed)) +
-    geom_histogram(color="#e9ecef", alpha=1, position = 'stack', breaks=seq(30, 80, by=5)) + 
-    scale_fill_manual(values=c("#CCFFE5", "#69b3a2")) +
-    theme_bw() +
-    theme(legend.position="none") +
-    labs(x = "Treatment diet fat [%E]", y = "", title = "")
-
-
-p_OF_T_diet_E / p_OF_T_diet_PNP / p_OF_T_fat_E / p_MG_T_diet_E / p_MG_T_diet_PNP / p_MG_T_fat_E + plot_layout(ncol=3, nrow=2)
-
-ggsave(file = "../Plots/Figure_diets_Rplot_v0.pdf", width = 18, height = 16, units = "cm", dpi = 300, scale = 1.2)
 ```
 
 ### FigureS4 - F0 treatment start/end/duration plots (OF, MG)
