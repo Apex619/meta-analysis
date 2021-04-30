@@ -22,12 +22,13 @@ pacman::p_load(tidyverse, # tidy family and related pacakges below
                magrittr, # extending piping
                ggplot2,  # nice plots
                patchwork,  # arranging plots
-               bbmle # for AICtab
+               bbmle, # for AICtab
+               here, # help loading and saving
 )
 
 #Load environment
 
-load('myEnvironment.RData')
+load(here('myEnvironment.RData'))
 
 # Load custom functions
 #source("./Scripts/custom_functions.R") #load custom functions
@@ -39,7 +40,7 @@ It needs to be split into One-off and Multigenerational data.
 
 ```{r load and subset data, include = FALSE}
 # Load preprocessed data with effect sizes
-data_all <- read.csv(file ="../Data/data_all_ES.csv")
+data_all <- read.csv(file =here("Data", "data_all_ES.csv"))
 #load(data_all, file = "./Rdata/data_all_ES.RData") #alternative
 #str(data_all)
 
@@ -129,25 +130,57 @@ Moedels run for lnRR and lnCVR effect sizes for OF and MG datasets separately
 MA_OF_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
 summary(MA_OF_lnRR)    
 I2(MA_OF_lnRR, method = "S")
-save(MA_OF_lnRR, file = "../Rdata/MA_OF_lnRR.Rdata")
+save(MA_OF_lnRR, file = here("Rdata/MA_OF_lnRR.Rdata"))
 
 ## OF data - lnCVR random-effect model with VCV
 MA_OF_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
 summary(MA_OF_lnCVR)    
 I2(MA_OF_lnCVR, method = "S")
-save(MA_OF_lnCVR, file = "../Rdata/MA_OF_lnCVR.Rdata")
+save(MA_OF_lnCVR, file = here("Rdata/MA_OF_lnCVR.Rdata"))
 
 ## MG data - lnRR random-effect model with VCV
 MA_MG_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
 summary(MA_MG_lnRR)    
 I2(MA_MG_lnRR, method = "S")
-save(MA_MG_lnRR, file = "../Rdata/MA_MG_lnRR.Rdata")
+save(MA_MG_lnRR, file = here("Rdata/MA_MG_lnRR.Rdata"))
 
 ## MG data - lnCvR random-effect model with VCV
 MA_MG_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
 summary(MA_MG_lnCVR)    
 I2(MA_MG_lnCVR, method = "S")
-save(MA_MG_lnCVR, file = "../Rdata/MA_MG_lnCVR.Rdata")
+save(MA_MG_lnCVR, file = here("Rdata/MA_MG_lnCVR.Rdata"))
+```
+
+### Meta-regression model on all data with Rodent_type (comapere MA intercepts)  
+
+```{r MR exposre type all data, include = TRUE, warning = FALSE}
+## lnRR
+MR_all_RodT_lnRR <- rma.mv(lnRR, Vmat_lnRR_all, mods= ~Rodent_Type, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all, method = "REML") 
+summary(MR_all_RodT_lnRR)    
+save(MR_all_RodT_lnRR, file = "./Rdata/MR_all_RodT_lnRR.Rdata")
+
+## lnRR - intercepts
+MR_all_RodT_lnRRi <- rma.mv(lnRR, Vmat_lnRR_all, mods= ~Rodent_Type -1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all, method = "REML") 
+summary(MR_all_RodT_lnRRi)    
+save(MR_all_RodT_lnRRi, file = "./Rdata/MR_all_RodT_lnRRi.Rdata")
+
+R2(MR_all_ExpT_lnRR)
+
+## lnCVR
+MR_all_RodT_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_all, mods= ~Rodent_Type, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all, method = "REML") 
+summary(MR_all_RodT_lnCVR)    
+save(MR_all_RodT_lnCVR, file = "./Rdata/MR_all_RodT_lnCVR.Rdata")
+
+## lnCVR - intercepts
+MR_all_RodT_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_all, mods= ~Rodent_Type - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all, method = "REML") 
+summary(MR_all_RodT_lnCVRi)    
+save(MR_all_RodT_lnCVRi, file = "./Rdata/MR_all_RodT_lnCVRi.Rdata")
+
+R2(MR_all_RodT_lnCVR)
+
+#funnel(MR_all_ExpT_lnRR, yaxis="seinv")
+#funnel(MR_all_ExpT_lnCVR, yaxis="seinv")
+#data_all %>% group_by(Exposure_Type) %>% count()
 ```
 
 ### Meta-regression model on all data with Exposure_type (comapere MA intercepts)  
