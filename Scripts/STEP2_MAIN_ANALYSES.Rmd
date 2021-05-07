@@ -223,14 +223,9 @@ summary(MR_OF_Rodent_lnRRi)
 save(MR_OF_Rodent_lnRRi, file = here("Rdata/MR_OF_Rodent_lnRRi.Rdata"))
 
 ## OF lnRR - ref rat
-MR_OF_Rodent_lnRRf <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Rodent_Type, ref="Rat"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
-summary(MR_OF_Rodent_lnRRf)    
-save(MR_OF_Rodent_lnRRf, file = here("Rdata/MR_OF_Rodent_lnRRf.Rdata"))
-
-## OF lnRR - ref mouse
-MR_OF_Rodent_lnRRm <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Rodent_Type, ref="Mouse"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
-summary(MR_OF_Rodent_lnRRm)    
-save(MR_OF_Rodent_lnRRm, file = here("Rdata/MR_OF_Rodent_lnRRm.Rdata"))
+MR_OF_Rodent_lnRRr <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$Rodent_Type, ref="Rat"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_Rodent_lnRRr)    
+save(MR_OF_Rodent_lnRRr, file = here("Rdata/MR_OF_Rodent_lnRRr.Rdata"))
 
 R2(MR_OF_Rodent_lnRRi)
 
@@ -240,14 +235,9 @@ summary(MR_OF_Rodent_lnCVRi)
 save(MR_OF_Rodent_lnCVRi, file = here("Rdata/MR_OF_Rodent_lnCVRi.Rdata"))
 
 ## OF lnCVR - ref rat
-MR_OF_Rodent_lnCVRf <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~relevel(data_OF$Rodent_Type, ref="Rat"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
-summary(MR_OF_Rodent_lnCVRf)    
-save(MR_OF_Rodent_lnCVRf, file = here("Rdata/MR_OF_Rodent_lnCVRf.Rdata"))
-
-## OF lnCVR - ref mouse
-MR_OF_Rodent_lnCVRm <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~relevel(data_OF$Rodent_Type, ref="Mouse"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
-summary(MR_OF_Rodent_lnCVRm)    
-save(MR_OF_Rodent_lnCVRm, file = here("Rdata/MR_OF_Rodent_lnCVRm.Rdata"))
+MR_OF_Rodent_lnCVRr <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~relevel(data_OF$Rodent_Type, ref="Rat"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
+summary(MR_OF_Rodent_lnCVRr)    
+save(MR_OF_Rodent_lnCVRr, file = here("Rdata/MR_OF_Rodent_lnCVRr.Rdata"))
 
 R2(MR_OF_Rodent_lnCVRi)
 
@@ -257,9 +247,9 @@ summary(MR_MG_Rodent_lnRRi)
 save(MR_MG_Rodent_lnRRi, file = here("Rdata/MR_MG_Rodent_lnRRi.Rdata"))
 
 ## MG lnRR - ref Rat
-MR_MG_Rodent_lnRRf <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~relevel(data_MG$Rodent_Type, ref="Rat"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
-summary(MR_MG_Rodent_lnRRf)    
-save(MR_MG_Rodent_lnRRf, file = here("Rdata/MR_MG_Rodent_lnRRf.Rdata"))
+MR_MG_Rodent_lnRRr <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~relevel(data_MG$Rodent_Type, ref="Rat"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_Rodent_lnRRr)    
+save(MR_MG_Rodent_lnRRr, file = here("Rdata/MR_MG_Rodent_lnRRr.Rdata"))
 
 R2(MR_MG_Rodent_lnRRi)
 
@@ -270,9 +260,9 @@ summary(MR_MG_Rodent_lnCVRi)
 save(MR_MG_Rodent_lnCVRi, file = here("Rdata/MR_MG_Rodent_lnCVRi.Rdata"))
 
 ## MG lnCVR - ref Rat
-MR_MG_Rodent_lnCVRf <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~relevel(data_MG$Rodent_Type, ref="Rat"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
-summary(MR_MG_Rodent_lnCVRf)    
-save(MR_MG_Rodent_lnCVRf, file = here("Rdata/MR_MG_Rodent_lnCVRf.Rdata"))
+MR_MG_Rodent_lnCVRr <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~relevel(data_MG$Rodent_Type, ref="Rat"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
+summary(MR_MG_Rodent_lnCVRr)    
+save(MR_MG_Rodent_lnCVRr, file = here("Rdata/MR_MG_Rodent_lnCVRr.Rdata"))
 
 R2(MR_MG_Rodent_lnCVRi)
 ```
