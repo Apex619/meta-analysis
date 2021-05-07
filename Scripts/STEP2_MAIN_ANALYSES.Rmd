@@ -28,7 +28,7 @@ pacman::p_load(tidyverse, # tidy family and related pacakges below
 
 #Load environment
 
-load(here('myEnvironment.RData'))
+#load(here('myEnvironment.RData'))
 
 # Load custom functions
 #source("./Scripts/custom_functions.R") #load custom functions
@@ -217,7 +217,7 @@ R2(MR_all_ExpT_lnCVR)
 
 ### Meta-regression model on OF and MG data with rodent type as moderator
 ```{r}
-## OF lnRR - intercepts (both, female, male)
+## OF lnRR - intercepts (both, rat and mouse)
 MR_OF_Rodent_lnRRi <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~Rodent_Type - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
 summary(MR_OF_Rodent_lnRRi)    
 save(MR_OF_Rodent_lnRRi, file = here("Rdata/MR_OF_Rodent_lnRRi.Rdata"))
@@ -234,7 +234,7 @@ save(MR_OF_Rodent_lnRRm, file = here("Rdata/MR_OF_Rodent_lnRRm.Rdata"))
 
 R2(MR_OF_Rodent_lnRRi)
 
-## OF lnCVR - intercepts (both, female, male)
+## OF lnCVR - intercepts (both, rat and mouse)
 MR_OF_Rodent_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~Rodent_Type - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
 summary(MR_OF_Rodent_lnCVRi)    
 save(MR_OF_Rodent_lnCVRi, file = here("Rdata/MR_OF_Rodent_lnCVRi.Rdata"))

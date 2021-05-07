@@ -1038,7 +1038,6 @@ t18$PI.ub[pos] <- round(c(
 write.csv(t18, file = "../Tables/Table_S18.csv", row.names = F, na = "")    
 ```
 
-
 ## Supplementary Figures    
 
 ```{r FigureS1, out.width = "400px"}
