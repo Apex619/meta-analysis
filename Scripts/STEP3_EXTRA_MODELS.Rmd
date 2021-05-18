@@ -36,7 +36,7 @@ pacman::p_load(tidyverse, # tidy family and related pacakges below
 
 #Load environment
 
-load('myEnvironment.RData')
+#load('myEnvironment.RData')
 ```
 
 <!-- ### Load data     -->
@@ -287,7 +287,7 @@ PB_OF_Full_lnRR <- rma.mv(yi = lnRR, V = Vmat_lnRR_OF, mods = ~sqrt(VlnRR) + F0_
 PB_OF_Full_lnCVR <- rma.mv(yi = lnCVR, V = Vmat_lnCVR_OF, mods = ~sqrt(VlnCVR) + F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_OF, test = "t")
 PB_MG_Full_lnRR <- rma.mv(yi = lnRR, V = Vmat_lnRR_MG, mods = ~sqrt(VlnRR) + F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_MG, test = "t")
 PB_MG_Full_lnCVR <- rma.mv(yi = lnCVR, V = Vmat_lnCVR_MG, mods = ~sqrt(VlnCVR) + F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_MG, test = "t")
-save(PB_OF_Full_lnRR, PB_OF_Full_lnCVR, PB_MG_Full_lnRR, PB_MG_Full_lnCVR, file = "./Rdata/PB_OF_MG_Full.Rdata")
+save(PB_OF_Full_lnRR, PB_OF_Full_lnCVR, PB_MG_Full_lnRR, PB_MG_Full_lnCVR, file = "../Rdata/PB_OF_MG_Full.Rdata")
 
 #for funnel plot on residuals (RFP):
 RFP_OF_Full_lnRR <- rma.mv(yi = lnRR, V = Vmat_lnRR_OF, mods = ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_OF, test = "t")
@@ -298,7 +298,7 @@ RFP_MG_Full_lnRR <- rma.mv(yi = lnRR, V = Vmat_lnRR_MG, mods = ~F0_Parent_Expose
 #funnel(RFP_MG_Full_lnRR, yaxis = "seinv", level = c(90, 95, 99), shade = c("white", "gray55", "gray75"), refline = 0, legend = FALSE)
 RFP_MG_Full_lnCVR <- rma.mv(yi = lnCVR, V = Vmat_lnCVR_MG, mods = ~F0_Parent_Exposed + Offspring_Sex + Trait, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), method = "REML", data = data_MG, test = "t")
 #funnel(RFP_MG_Full_lnCVR, yaxis = "seinv", level = c(90, 95, 99), shade = c("white", "gray55", "gray75"), refline = 0, legend = FALSE)
-save(RFP_OF_Full_lnRR, RFP_OF_Full_lnCVR, RFP_MG_Full_lnRR, RFP_MG_Full_lnCVR, file = "./Rdata/RFP_OF_MG_Full.Rdata")
+save(RFP_OF_Full_lnRR, RFP_OF_Full_lnCVR, RFP_MG_Full_lnRR, RFP_MG_Full_lnCVR, file = "../Rdata/RFP_OF_MG_Full.Rdata")
 ```
 
 
@@ -310,25 +310,25 @@ save(RFP_OF_Full_lnRR, RFP_OF_Full_lnCVR, RFP_MG_Full_lnRR, RFP_MG_Full_lnCVR, f
 MR_OF_Year_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Year), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
 summary(MR_OF_Year_lnRR) # no signif slope 
 R2(MR_OF_Year_lnRR)
-save(MR_OF_Year_lnRR, file = "./Rdata/MR_OF_Year_lnRR.Rdata")
+save(MR_OF_Year_lnRR, file = "../Rdata/MR_OF_Year_lnRR.Rdata")
 
 ### OF lnCVR
 MR_OF_Year_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Year), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
 summary(MR_OF_Year_lnCVR) # no signif slope 
 R2(MR_OF_Year_lnCVR)
-save(MR_OF_Year_lnCVR, file = "./Rdata/MR_OF_Year_lnCVR.Rdata")
+save(MR_OF_Year_lnCVR, file = "../Rdata/MR_OF_Year_lnCVR.Rdata")
 
 ### MG lnRR
 MR_MG_Year_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Year), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
 summary(MR_MG_Year_lnRR) # no signif slope 
 R2(MR_MG_Year_lnRR)
-save(MR_MG_Year_lnRR, file = "./Rdata/MR_MG_Year_lnRR.Rdata")
+save(MR_MG_Year_lnRR, file = "../Rdata/MR_MG_Year_lnRR.Rdata")
 
 ### MG lnCVR
 MR_MG_Year_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Year), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
 summary(MR_MG_Year_lnCVR) # no signif slope 
 R2(MR_MG_Year_lnCVR)
-save(MR_MG_Year_lnCVR, file = "./Rdata/MR_MG_Year_lnCVR.Rdata")
+save(MR_MG_Year_lnCVR, file = "../Rdata/MR_MG_Year_lnCVR.Rdata")
 ```
 
 #####################################
@@ -345,25 +345,25 @@ save(MR_MG_Year_lnCVR, file = "./Rdata/MR_MG_Year_lnCVR.Rdata")
 MR_OF_DietE_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Diet_Energy_kcal_g), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
 #MR_OF_DietE_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Diet_Energy_kcal_g) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
 summary(MR_OF_DietE_lnRR)    
-save(MR_OF_DietE_lnRR, file = "./Rdata/MR_OF_DietE_lnRR.Rdata")
+save(MR_OF_DietE_lnRR, file = "../Rdata/MR_OF_DietE_lnRR.Rdata")
 
 ## OF lnCVR - slope 
 MR_OF_DietE_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Diet_Energy_kcal_g), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
 #MR_OF_DietE_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Diet_Energy_kcal_g) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
 summary(MR_OF_DietE_lnCVR)    
-save(MR_OF_DietE_lnCVR, file = "./Rdata/MR_OF_DietE_lnCVR.Rdata")
+save(MR_OF_DietE_lnCVR, file = "../Rdata/MR_OF_DietE_lnCVR.Rdata")
 
 ## MG lnRR - slope 
 MR_MG_DietE_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Diet_Energy_kcal_g), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 #MR_MG_DietE_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Diet_Energy_kcal_g) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
 summary(MR_MG_DietE_lnRR)   # signif slope
-save(MR_MG_DietE_lnRR, file = "./Rdata/MR_MG_DietE_lnRR.Rdata")
+save(MR_MG_DietE_lnRR, file = "../Rdata/MR_MG_DietE_lnRR.Rdata")
 
 ## MG lnCVR - slope 
 MR_MG_DietE_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Diet_Energy_kcal_g), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 #MR_MG_DietE_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Diet_Energy_kcal_g) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 summary(MR_MG_DietE_lnCVR)    
-save(MR_MG_DietE_lnCVR, file = "./Rdata/MR_MG_DietE_lnCVR.Rdata")
+save(MR_MG_DietE_lnCVR, file = "../Rdata/MR_MG_DietE_lnCVR.Rdata")
 
 # MR_MG_DietE_lnRR - positive slope in MG - more effect for diets with higher total energy
 #par(mfrow=c(1,1))
@@ -379,25 +379,25 @@ save(MR_MG_DietE_lnCVR, file = "./Rdata/MR_MG_DietE_lnCVR.Rdata")
 MR_OF_DietPNP_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Diet_PNP_ratio), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
 #MR_OF_DietPNP_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Diet_PNP_ratio) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
 summary(MR_OF_DietPNP_lnRR)    
-save(MR_OF_DietPNP_lnRR, file = "./Rdata/MR_OF_DietPNP_lnRR.Rdata")
+save(MR_OF_DietPNP_lnRR, file = "../Rdata/MR_OF_DietPNP_lnRR.Rdata")
 
 ## OF lnCVR - slope 
 MR_OF_DietPNP_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Diet_PNP_ratio), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
 #MR_OF_DietPNP_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Diet_PNP_ratio) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
 summary(MR_OF_DietPNP_lnCVR)    
-save(MR_OF_DietPNP_lnCVR, file = "./Rdata/MR_OF_DietPNP_lnCVR.Rdata")
+save(MR_OF_DietPNP_lnCVR, file = "../Rdata/MR_OF_DietPNP_lnCVR.Rdata")
 
 ## MG lnRR - slope 
 MR_MG_DietPNP_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Diet_PNP_ratio), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 #MR_MG_DietPNP_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Diet_PNP_ratio) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
 summary(MR_MG_DietPNP_lnRR)    
-save(MR_MG_DietPNP_lnRR, file = "./Rdata/MR_MG_DietPNP_lnRR.Rdata")
+save(MR_MG_DietPNP_lnRR, file = "../Rdata/MR_MG_DietPNP_lnRR.Rdata")
 
 ## MG lnCVR - slope 
 MR_MG_DietPNP_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Diet_PNP_ratio), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 #MR_MG_DietPNP_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Diet_PNP_ratio) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
 summary(MR_MG_DietPNP_lnCVR)    
-save(MR_MG_DietPNP_lnCVR, file = "./Rdata/MR_MG_DietPNP_lnCVR.Rdata")
+save(MR_MG_DietPNP_lnCVR, file = "../Rdata/MR_MG_DietPNP_lnCVR.Rdata")
 ```
 
 
@@ -409,25 +409,25 @@ save(MR_MG_DietPNP_lnCVR, file = "./Rdata/MR_MG_DietPNP_lnCVR.Rdata")
 MR_OF_TDur_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Duration_F0), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
 #MR_OF_TDur_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~scale(Treatment_Duration_F0) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
 summary(MR_OF_TDur_lnRR)    
-save(MR_OF_TDur_lnRR, file = "./Rdata/MR_OF_TDur_lnRR.Rdata")
+save(MR_OF_TDur_lnRR, file = "../Rdata/MR_OF_TDur_lnRR.Rdata")
 
 ## OF lnCVR - slope 
 MR_OF_TDur_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Duration_F0), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
 #MR_OF_TDur_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~scale(Treatment_Duration_F0) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #interaction model
 summary(MR_OF_TDur_lnCVR)    
-save(MR_OF_TDur_lnCVR, file = "./Rdata/MR_OF_TDur_lnCVR.Rdata")
+save(MR_OF_TDur_lnCVR, file = "../Rdata/MR_OF_TDur_lnCVR.Rdata")
 
 ## MG lnRR - slope 
 MR_MG_TDur_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Duration_F0), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 #MR_MG_TDur_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~scale(Treatment_Duration_F0) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
 summary(MR_MG_TDur_lnRR)    
-save(MR_MG_TDur_lnRR, file = "./Rdata/MR_MG_TDur_lnRR.Rdata")
+save(MR_MG_TDur_lnRR, file = "../Rdata/MR_MG_TDur_lnRR.Rdata")
 
 ## MG lnCVR - slope 
 MR_MG_TDur_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Duration_F0), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") 
 #MR_MG_TDur_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~scale(Treatment_Duration_F0) * F0_Parent_Exposed, random = list(~1|Study_ID, ~1|Cohort_ID, ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML") #interaction model
 summary(MR_MG_TDur_lnCVR)    
-save(MR_MG_TDur_lnCVR, file = "./Rdata/MR_MG_TDur_lnCVR.Rdata")
+save(MR_MG_TDur_lnCVR, file = "../Rdata/MR_MG_TDur_lnCVR.Rdata")
 ```
 
 
@@ -438,38 +438,38 @@ save(MR_MG_TDur_lnCVR, file = "./Rdata/MR_MG_TDur_lnCVR.Rdata")
 ## OF lnRR 
 MR_OF_OffGen_lnRR <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~Offspring_Generation, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
 summary(MR_OF_OffGen_lnRR)    
-save(MR_OF_OffGen_lnRR, file = "./Rdata/MR_OF_OffGen_lnRR.Rdata")
+save(MR_OF_OffGen_lnRR, file = "../Rdata/MR_OF_OffGen_lnRR.Rdata")
 
 MR_OF_OffGen_lnRRi <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~Offspring_Generation -1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
 summary(MR_OF_OffGen_lnRRi)    
-save(MR_OF_OffGen_lnRRi, file = "./Rdata/MR_OF_OffGen_lnRRi.Rdata")
+save(MR_OF_OffGen_lnRRi, file = "../Rdata/MR_OF_OffGen_lnRRi.Rdata")
 
 ## OF lnCVR 
 MR_OF_OffGen_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~Offspring_Generation, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
 summary(MR_OF_OffGen_lnCVR)    
-save(MR_OF_OffGen_lnCVR, file = "./Rdata/MR_OF_OffGen_lnCVR.Rdata")
+save(MR_OF_OffGen_lnCVR, file = "../Rdata/MR_OF_OffGen_lnCVR.Rdata")
 
 MR_OF_OffGen_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_OF, mods= ~Offspring_Generation -1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML")
 summary(MR_OF_OffGen_lnCVRi)    
-save(MR_OF_OffGen_lnCVRi, file = "./Rdata/MR_OF_OffGen_lnCVRi.Rdata")
+save(MR_OF_OffGen_lnCVRi, file = "../Rdata/MR_OF_OffGen_lnCVRi.Rdata")
 
 ## MG lnRR 
 MR_MG_OffGen_lnRR <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~Offspring_Generation, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 summary(MR_MG_OffGen_lnRR)    
-save(MR_MG_OffGen_lnRR, file = "./Rdata/MR_MG_OffGen_lnRR.Rdata")
+save(MR_MG_OffGen_lnRR, file = "../Rdata/MR_MG_OffGen_lnRR.Rdata")
 
 MR_MG_OffGen_lnRRi <- rma.mv(lnRR, Vmat_lnRR_MG, mods= ~Offspring_Generation -1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 summary(MR_MG_OffGen_lnRRi)    
-save(MR_MG_OffGen_lnRRi, file = "./Rdata/MR_MG_OffGen_lnRRi.Rdata")
+save(MR_MG_OffGen_lnRRi, file = "../Rdata/MR_MG_OffGen_lnRRi.Rdata")
 
 ## MG lnCVR
 MR_MG_OffGen_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~Offspring_Generation, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 summary(MR_MG_OffGen_lnCVR)    
-save(MR_MG_OffGen_lnCVR, file = "./Rdata/MR_MG_OffGen_lnCVR.Rdata")
+save(MR_MG_OffGen_lnCVR, file = "../Rdata/MR_MG_OffGen_lnCVR.Rdata")
 
 MR_MG_OffGen_lnCVRi <- rma.mv(lnCVR, Vmat_lnCVR_MG, mods= ~Offspring_Generation -1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG, method = "REML")
 summary(MR_MG_OffGen_lnCVRi)    
-save(MR_MG_OffGen_lnCVRi, file = "./Rdata/MR_MG_OffGen_lnCVRi.Rdata")
+save(MR_MG_OffGen_lnCVRi, file = "../Rdata/MR_MG_OffGen_lnCVRi.Rdata")
 ```
 
 
@@ -477,7 +477,7 @@ save(MR_MG_OffGen_lnCVRi, file = "./Rdata/MR_MG_OffGen_lnCVRi.Rdata")
 
 ```{r MR F0 body weights, include = FALSE}
 ## Load and preprocess F0 data
-data_F0 <- read_excel("./Data/ALL_TRAITS_20200514.xlsx", sheet = "F0")
+data_F0 <- read_excel("../Data/ALL_TRAITS_20200514.xlsx", sheet = "F0")
 str(data_F0) #27 effect sizes
 length(table(data_F0$Study_ID)) #from 17 studies
 table(data_F0$F0_Sex) #20 female and 7 male F0 bw
@@ -501,8 +501,8 @@ data_F0 <- escalc(measure="CVR", m1i=F0_Treatment_Mean, sd1i=F0_Treatment_SD, n1
 #hist(data_F0$VlnCVR)
 
 # Save data with effect sizes
-write.csv(data_F0, file ="./Data/data_F0_ES.csv")
-save(data_F0, file = "./Rdata/data_F0_ES.RData")
+write.csv(data_F0, file ="../Data/data_F0_ES.csv")
+save(data_F0, file = "../Rdata/data_F0_ES.RData")
 
 ## Make VCV matrice
 Vmat_lnRR_F0_bw <- make_VCV_matrix(data = data_F0, V = "VlnRR", cluster = "Cohort_ID", obs = "ES_ID")
@@ -522,13 +522,13 @@ hist(data_F0$Age_Days, breaks=10) # most body weight measurements around 100 day
 ## Run MR model for F0 body weights with F0 Age_Days as a moderator
 MR_F0_age <- rma.mv(lnRR, Vmat_lnRR_F0_bw, mods = ~Age_Days, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_F0, method = "REML")
 summary(MR_F0_age) #small positive slope
-save(MR_F0_age, file = "./Rdata/MR_F0_age.Rdata")
+save(MR_F0_age, file = "../Rdata/MR_F0_age.Rdata")
 
 ## Make prediction of the effect size at specific age:
 #prediction_F0 <- predict(MR_F0_age, newmods = c(50, 100, 150))
 prediction_F0 <- predict(MR_F0_age, newmods = c(100)) #most of our data is around 100 days old, with 0 being birth day
 prediction_F0
-save(prediction_F0, file = "./Rdata/prediction_F0.Rdata")
+save(prediction_F0, file = "../Rdata/prediction_F0.Rdata")
 
 ### compare to grand-offspring body weights
 ## filter out bodyweight data
@@ -542,25 +542,25 @@ Vmat_lnRR_MG_bw <- make_VCV_matrix(data = data_MG_bw, V = "VlnRR", cluster = "Co
 #hist(data_OF_bw$Age_at_Measurement_Days, breaks=10)
 MR_OF_age <- rma.mv(lnRR, Vmat_lnRR_OF_bw, mods = ~Age_at_Measurement_Days, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_OF_bw, method = "REML")
 summary(MR_OF_age) #ns slope
-save(MR_OF_age, file = "./Rdata/MR_OF_age.Rdata")
+save(MR_OF_age, file = "../Rdata/MR_OF_age.Rdata")
 
 ## Make prediction of the effect size at specific age:
 #prediction_OF <- predict(MR_OF_age, newmods = c(50, 100, 150))
 prediction_OF <- predict(MR_OF_age, newmods = c(100+21)) #most of our data is around 100 days old, with 0 being conception day (day -21)
 prediction_OF
-save(prediction_OF, file = "./Rdata/prediction_OF.Rdata")
+save(prediction_OF, file = "../Rdata/prediction_OF.Rdata")
 
 ## MG - Run MR model for MG body weights with Age_at_Measurement_Days as a moderator
 #hist(data_MG_bw$Age_at_Measurement_Days, breaks=10)
 MR_MG_age <- rma.mv(lnRR, Vmat_lnRR_MG_bw, mods = ~Age_at_Measurement_Days, random = list(~1|Rodent_Strain, ~1|Study_ID, ~1|ES_ID), data = data_MG_bw, method = "REML")
 summary(MR_MG_age) #small positive slope
-save(MR_MG_age, file = "./Rdata/MR_MG_age.Rdata")
+save(MR_MG_age, file = "../Rdata/MR_MG_age.Rdata")
 
 ## Make prediction of the effect size at specific age:
 #prediction_MG <- predict(MR_MG_age, newmods = c(50, 100, 150))
 prediction_MG <- predict(MR_MG_age, newmods = c(100+21)) #most of our data is around 100 days old, with 0 being conception day (day -21)
 prediction_MG
-save(prediction_MG, file = "./Rdata/prediction_MG.Rdata")
+save(prediction_MG, file = "../Rdata/prediction_MG.Rdata")
 
 #Express predictions as percentages difference: 
 (exp(prediction_F0$pred)-1)*100 # 14.9% incresed bw in F0 treatment group at around 100 days old
@@ -586,12 +586,12 @@ Vmat_lnCVR_all_pure <- make_VCV_matrix(data = data_all_purelinages, V = "VlnCVR"
 ### lnRR
 MR_all_ExpT_lnRR_pure <- rma.mv(lnRR, Vmat_lnRR_all_pure, mods= ~Exposure_Type, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all_purelinages, method = "REML") 
 summary(MR_all_ExpT_lnRR_pure)    
-save(MR_all_ExpT_lnRR_pure, file = "./Rdata/MR_all_ExpT_lnRR_pure.Rdata")
+save(MR_all_ExpT_lnRR_pure, file = "../Rdata/MR_all_ExpT_lnRR_pure.Rdata")
 
 ### lnCVR
 MR_all_ExpT_lnCVR_pure <- rma.mv(lnCVR, Vmat_lnCVR_all_pure, mods= ~Exposure_Type, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_all_purelinages, method = "REML") 
 summary(MR_all_ExpT_lnCVR_pure)    
-save(MR_all_ExpT_lnCVR_pure, file = "./Rdata/MR_all_ExpT_lnCVR_pure.Rdata")
+save(MR_all_ExpT_lnCVR_pure, file = "../Rdata/MR_all_ExpT_lnCVR_pure.Rdata")
 
 
 ## re-run Exposed_F0_Sex models
@@ -606,13 +606,13 @@ table(data_OF_purelinages$Lineage_HFD)
 Vmat_lnRR_OF_pure <- make_VCV_matrix(data = data_OF_purelinages, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
 MR_OF_ExpSex_lnRR_pure <- rma.mv(lnRR, Vmat_lnRR_OF_pure, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF_purelinages, method = "REML") 
 summary(MR_OF_ExpSex_lnRR_pure)    
-save(MR_OF_ExpSex_lnRR_pure, file = "./Rdata/MR_OF_ExpSex_lnRR_pure.Rdata")
+save(MR_OF_ExpSex_lnRR_pure, file = "../Rdata/MR_OF_ExpSex_lnRR_pure.Rdata")
 
 ## OF lnCVR - (female, male)
 Vmat_lnCVR_OF_pure <- make_VCV_matrix(data = data_OF_purelinages, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID")
 MR_OF_ExpSex_lnCVR_pure <- rma.mv(lnCVR, Vmat_lnCVR_OF_pure, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF_purelinages, method = "REML") 
 summary(MR_OF_ExpSex_lnCVR_pure)    
-save(MR_OF_ExpSex_lnCVR_pure, file = "./Rdata/MR_OF_ExpSex_lnCVR_pure.Rdata")
+save(MR_OF_ExpSex_lnCVR_pure, file = "../Rdata/MR_OF_ExpSex_lnCVR_pure.Rdata")
 
 
 ### MG
@@ -625,14 +625,69 @@ table(data_MG_purelinages$Lineage_HFD)
 Vmat_lnRR_MG_pure <- make_VCV_matrix(data = data_MG_purelinages, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID")
 MR_MG_ExpSex_lnRR_pure <- rma.mv(lnRR, Vmat_lnRR_MG_pure, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG_purelinages, method = "REML") 
 summary(MR_MG_ExpSex_lnRR_pure)    
-save(MR_MG_ExpSex_lnRR_pure, file = "./Rdata/MR_MG_ExpSex_lnRR_pure.Rdata")
+save(MR_MG_ExpSex_lnRR_pure, file = "../Rdata/MR_MG_ExpSex_lnRR_pure.Rdata")
 
 ## MG lnCVR - (female, male)
 Vmat_lnCVR_MG_pure <- make_VCV_matrix(data = data_MG_purelinages, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID")
 MR_MG_ExpSex_lnCVR_pure <- rma.mv(lnCVR, Vmat_lnCVR_MG_pure, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_MG_purelinages, method = "REML") 
 summary(MR_MG_ExpSex_lnCVR_pure)    
-save(MR_MG_ExpSex_lnCVR_pure, file = "./Rdata/MR_MG_ExpSex_lnCVR_pure.Rdata")
+save(MR_MG_ExpSex_lnCVR_pure, file = "../Rdata/MR_MG_ExpSex_lnCVR_pure.Rdata")
 ```
+
+###Treatment periods analysis
+```{r}
+#Code to help get started
+
+# names(data_MG)
+# data_MG$Treatment_Duration_F0
+# data_MG$Treatment_Start_F0
+# table(data_MG$Treatment_Start_F0, data_MG$F0_Parent_Exposed)
+# table(data_MG$Treatment_End_F0, data_MG$F0_Parent_Exposed)
+# table(data_OF$Treatment_End_F0, data_OF$F0_Parent_Exposed)
+# table(data_OF$Treatment_Start_F0, data_OF$Treatment_End_F0, data_OF$F0_Parent_Exposed)
+
+#First, comparing males to females before pregnancy
+
+#Need to subset data for both OF and MG
+
+#MG Model
+
+before_pregnancy_mg <- data_MG %>% filter(Treatment_Start_F0 <= "0", Treatment_End_F0 == "0") #subset
+
+Vmat_lnRR_MG_before_pregnancy <- make_VCV_matrix(data = before_pregnancy_mg, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") #matrix from subset
+
+#intercepts model
+before_pregnancy_sex_intercepts <- rma.mv(lnRR, Vmat_lnRR_MG_before_pregnancy, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_mg, method = "REML")
+
+summary(before_pregnancy_sex_intercepts)
+
+#contrast model
+before_pregnancy_sex <- rma.mv(lnRR, Vmat_lnRR_MG_before_pregnancy, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_mg, method = "REML")
+
+summary(before_pregnancy_sex)
+
+
+
+#OF Model
+
+before_pregnancy_OF <- data_OF %>% filter(Treatment_Start_F0 <= "0", Treatment_End_F0 == "0") #subset
+
+Vmat_lnRR_OF_before_pregnancy <- make_VCV_matrix(data = before_pregnancy_OF, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") #matrix from subset
+
+#intercepts model
+before_pregnancy_sex_intercepts_of <- rma.mv(lnRR, Vmat_lnRR_OF_before_pregnancy, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_OF, method = "REML")
+
+summary(before_pregnancy_sex_intercepts_of)
+
+#contrast model
+before_pregnancy_sex_of <- rma.mv(lnRR, Vmat_lnRR_OF_before_pregnancy, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_OF, method = "REML")
+
+summary(before_pregnancy_sex_of)
+
+
+
+```
+
 
 
 *NEXT: make plots using STEP4_PLOTS.Rmd script* 

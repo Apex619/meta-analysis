@@ -29,7 +29,7 @@ pacman::p_load(tidyverse,# tidy family and related pacakges below
 
 #Load environment
 
-load('myEnvironment.RData')
+#load('myEnvironment.RData')
 ```
 
 ### Load data    
@@ -37,7 +37,10 @@ Unprocessed data for analyses is stored in ALL_TRAITS.xlsx file.
 
 ```{r load and check data, include = FALSE}
 #Load Data
-data_all <- read_excel("../data/ALL_TRAITS_20200514.xlsx", sheet = "main")
+#data_all <- read_excel("../data/ALL_TRAITS_20200514.xlsx", sheet = "main")
+
+data_all <- read_excel("../data/ALL_TRAITS_20200514_REVISED.xlsx", sheet = "main")
+#Need to import newly revised data
 #data_all <- read_excel("../data/ALL_TRAITS.xlsx")
 #str(data_all)
 # taking a quick look
