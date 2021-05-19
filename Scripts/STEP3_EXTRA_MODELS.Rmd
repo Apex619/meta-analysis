@@ -32,7 +32,7 @@ pacman::p_load(tidyverse, # tidy family and related pacakges below
 
 # Load custom functions
 
-#source("./Scripts/custom_functions.R") #load custom functions
+source("../Scripts/custom_functions.R") #load custom functions
 
 #Load environment
 
@@ -634,7 +634,7 @@ summary(MR_MG_ExpSex_lnCVR_pure)
 save(MR_MG_ExpSex_lnCVR_pure, file = "../Rdata/MR_MG_ExpSex_lnCVR_pure.Rdata")
 ```
 
-###Treatment periods analysis
+###Treatment periods analysis - males to females (exposed before pregnancy)
 ```{r}
 #Code to help get started
 
@@ -646,47 +646,122 @@ save(MR_MG_ExpSex_lnCVR_pure, file = "../Rdata/MR_MG_ExpSex_lnCVR_pure.Rdata")
 # table(data_OF$Treatment_End_F0, data_OF$F0_Parent_Exposed)
 # table(data_OF$Treatment_Start_F0, data_OF$Treatment_End_F0, data_OF$F0_Parent_Exposed)
 
-#First, comparing males to females before pregnancy
+#First, comparing males to females before pregnancy (lnRR)
 
 #Need to subset data for both OF and MG
 
-#MG Model
+#MG Models
 
 before_pregnancy_mg <- data_MG %>% filter(Treatment_Start_F0 <= "0", Treatment_End_F0 == "0") #subset
 
-Vmat_lnRR_MG_before_pregnancy <- make_VCV_matrix(data = before_pregnancy_mg, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") #matrix from subset
+#lnRR matrix
+Vmat_lnRR_MG_before_pregnancy <- make_VCV_matrix(data = before_pregnancy_mg, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") 
 
-#intercepts model
+#lnCVR matrix
+Vmat_lnCVR_MG_before_pregnancy <- make_VCV_matrix(data = before_pregnancy_mg, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID")
+
+#intercepts model lnRR
 before_pregnancy_sex_intercepts <- rma.mv(lnRR, Vmat_lnRR_MG_before_pregnancy, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_mg, method = "REML")
 
 summary(before_pregnancy_sex_intercepts)
 
-#contrast model
+#contrast model lnRR
 before_pregnancy_sex <- rma.mv(lnRR, Vmat_lnRR_MG_before_pregnancy, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_mg, method = "REML")
 
 summary(before_pregnancy_sex)
 
+#intercepts model lnCVR MG
+before_pregnancy_sex_intercepts_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG_before_pregnancy, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_mg, method = "REML")
+
+summary(before_pregnancy_sex_intercepts_lnCVR)
+
+#contrast model lnCVR MG
+before_pregnancy_sex_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG_before_pregnancy, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_mg, method = "REML")
+
+summary(before_pregnancy_sex_lnCVR)
 
 
-#OF Model
+
+#OF Models
 
 before_pregnancy_OF <- data_OF %>% filter(Treatment_Start_F0 <= "0", Treatment_End_F0 == "0") #subset
 
-Vmat_lnRR_OF_before_pregnancy <- make_VCV_matrix(data = before_pregnancy_OF, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") #matrix from subset
+#lnRR matrix
+Vmat_lnRR_OF_before_pregnancy <- make_VCV_matrix(data = before_pregnancy_OF, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") 
 
-#intercepts model
+
+#lnCVR matrix
+Vmat_lnCVR_OF_before_pregnancy <- make_VCV_matrix(data = before_pregnancy_OF, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID") 
+
+#intercepts model lnRR OF
 before_pregnancy_sex_intercepts_of <- rma.mv(lnRR, Vmat_lnRR_OF_before_pregnancy, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_OF, method = "REML")
 
 summary(before_pregnancy_sex_intercepts_of)
 
-#contrast model
+#contrast model lnRR OF
 before_pregnancy_sex_of <- rma.mv(lnRR, Vmat_lnRR_OF_before_pregnancy, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_OF, method = "REML")
 
 summary(before_pregnancy_sex_of)
 
+#intercepts model lnCVR OF
+before_pregnancy_sex_intercepts_of_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF_before_pregnancy, mods= ~F0_Parent_Exposed - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_OF, method = "REML")
 
+summary(before_pregnancy_sex_intercepts_of_lnCVR)
+
+#contrast model lnCVR OF
+before_pregnancy_sex_of_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_OF_before_pregnancy, mods= ~F0_Parent_Exposed, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = before_pregnancy_OF, method = "REML")
+
+summary(before_pregnancy_sex_of_lnCVR)
 
 ```
+
+
+#Comparing females to females during different experimental periods
+```{r}
+
+#Need to subset data for both MG and OF (and then mutate a new column for categorical variable of "developmental period")
+
+#MG Model, filter and subset data
+
+before_pregnancy_mg_females <- data_MG %>% filter(Treatment_Start_F0 <= "0", Treatment_End_F0 == "0", F0_Parent_Exposed == "Female") %>% mutate(devel_period = "before pregnancy") 
+
+before_during_and_after_pregnancy_mg_females <- data_MG %>% filter(Treatment_Start_F0 <= "0", Treatment_End_F0 > "0", F0_Parent_Exposed == "Female") %>% mutate(devel_period = "before, during and after pregnancy") 
+
+during_and_after_pregnancy_mg_females <- data_MG %>% filter(Treatment_Start_F0 >= "0", Treatment_End_F0 > "0", F0_Parent_Exposed == "Female") %>% mutate(devel_period = "during and after pregnancy")
+
+
+#bind rows 
+df <- bind_rows(before_pregnancy_mg_females,before_during_and_after_pregnancy_mg_females,during_and_after_pregnancy_mg_females)
+
+
+Vmat_lnRR_MG_females <- make_VCV_matrix(data = df, V = "VlnRR", cluster = "Cohort_ID_Control", obs = "ES_ID") 
+
+Vmat_lnCVR_MG_females <- make_VCV_matrix(data = df, V = "VlnCVR", cluster = "Cohort_ID_Control", obs = "ES_ID") 
+
+#intercepts model (females vs females during developmental periods) lnRR
+females_devel_periods_intercepts <- rma.mv(lnRR, Vmat_lnRR_MG_females, mods= ~devel_period - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = df, method = "REML")
+
+summary(females_devel_periods_intercepts)
+
+#contrasts model (females vs females during developmental periods) lnRR
+females_devel_periods_contrast <- rma.mv(lnRR, Vmat_lnRR_MG_females, mods= ~devel_period, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = df, method = "REML")
+
+summary(females_devel_periods_contrast)
+
+
+
+#intercepts model (females vs females during developmental periods) lnCVR
+females_devel_periods_intercepts_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG_females, mods= ~devel_period - 1, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = df, method = "REML")
+
+summary(females_devel_periods_intercepts_lnCVR)
+
+#contrasts model (females vs females during developmental periods) lnCVR
+females_devel_periods_contrast_lnCVR <- rma.mv(lnCVR, Vmat_lnCVR_MG_females, mods= ~devel_period, random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = df, method = "REML")
+
+summary(females_devel_periods_contrast_lnCVR)
+
+```
+
 
 
 
