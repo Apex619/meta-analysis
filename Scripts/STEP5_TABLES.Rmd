@@ -86,14 +86,16 @@ Search keywords strings for the main database searches.
 
 ### Table S2      
 List of excluded studies with main reasons for exclusion.   
-[will be also inserted manually in Word ufter updating the search / otherwise first update csv file]   
+[will be also inserted manually in Word ufter updating the search / otherwise first update csv file]  
+
+UPDATE: TABLE HAS BEEN FORMATTED MANUALLY IN WORD, NO NEED TO RUN THIS CHUNK
 ```{r TableS2, include = FALSE, warnings = FALSE}
 #for html use:
 #read_csv("../Data/Excluded_fulltext_papers_list.csv", na = "NA", col_names = c("Ref_short",	"Title",	"Main_reason")) %>%  mutate_if(is.character, as.factor) %>%  kable("html") %>% kable_styling("striped", position = "left")
 #%>% kable_as_image() #use for Word documents?
 
 #for Word try:
-pander(read_csv("../Tables/Excluded_fulltext_papers_list.csv", na = "NA", col_names = c("Ref_short",	"Title",	 "Main_reason")), split.cells = c(10, 30, 10), justify = 'left')
+# pander(read_csv("../Tables/Excluded_fulltext_papers_list.csv", na = "NA", col_names = c("Ref_short",	"Title",	 "Main_reason")), split.cells = c(10, 30, 10), justify = 'left')
 ```
 
 ### Table S3    
@@ -625,7 +627,7 @@ MR model selection analysis for lnRR and lnCVR on OF and MG datasets
 ```{r Table model selection}
 #list.files("./Rdata/")
 #loading data
-load(file = "../Rdata/MR_OF_Full_lnRR_ML_meta_AICc_seltable.Rdata")
+load(file = "../Rdata/MR_OF_Full_lnRR.Rdata") #DOUBLE CHECK IF FILE NAMES ARE CORRECT !!! HAVE REMOVED: _ML_meta_AICc_seltable FROM FILE NAME
 MR_OF_Full_lnRRst <- sel.table
 load(file = "../Rdata/MR_OF_Full_lnCVR_ML_meta_AICc_seltable.Rdata")
 MR_OF_Full_lnCVRst <- sel.table

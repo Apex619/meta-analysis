@@ -32,11 +32,25 @@ pacman::p_load(tidyverse, # tidy family and related pacakges below
                magrittr, # extending piping
                ggplot2,  # nice plots
                patchwork,  # arranging plots
-               orchaRd #orchard plots, !!! actually using custom function - modified version with new argument k = FALSE !!!
+               orchaRd #orchard plots
 )
 
+# install.packages("devtools")
+# install.packages("tidyverse")
+# install.packages("metafor")
+# install.packages("patchwork")
+# install.packages("R.rsp")
+# 
+# devtools::install_github("itchyshin/orchard_plot", subdir = "orchaRd", force = TRUE, build_vignettes = TRUE)
+# 
+# 
+# library(orchaRd)
+# library(patchwork)
+# library(tidyverse)
+# library(metafor)
+
 # Load custom functions
-#source("./Scripts/custom_functions.R") #load custom functions
+source("../Scripts/custom_functions.R") #load custom functions
 ```
 
 <!-- ### Load data     -->
@@ -60,35 +74,37 @@ pacman::p_load(tidyverse, # tidy family and related pacakges below
 
 # ```{r load models, include = FALSE}
 # 
-# # for Figure2
-# load(file = "../Rdata/MR_all_ExpT_lnRRi.Rdata")
-# load(file = "../Rdata/MR_all_ExpT_lnCVRi.Rdata")
+#  # for Figure2
+#  load(file = "../Rdata/MR_all_ExpT_lnRRi.Rdata")
+#  load(file = "../Rdata/MR_all_ExpT_lnCVRi.Rdata")
 # 
-# # for Figure3
-# load(file = "../Rdata/MR_OF_ExpSex_lnRRi.Rdata")
-# load(file = "../Rdata/MR_OF_ExpSex_lnCVRi.Rdata")
-# load(file = "../Rdata/MR_MG_ExpSex_lnRRi.Rdata")
-# load(file = "../Rdata/MR_MG_ExpSex_lnCVRi.Rdata")
+#  # for Figure3
+#  load(file = "../Rdata/MR_OF_ExpSex_lnRRi.Rdata")
+#  load(file = "../Rdata/MR_OF_ExpSex_lnCVRi.Rdata")
+#  load(file = "../Rdata/MR_MG_ExpSex_lnRRi.Rdata")
+#  load(file = "../Rdata/MR_MG_ExpSex_lnCVRi.Rdata")
 # 
-# # for Figure4
-# load(file = "../Rdata/MR_OF_OffSex_lnRRi.Rdata")
-# load(file = "../Rdata/MR_OF_OffSex_lnCVRi.Rdata")
-# load(file = "../Rdata/MR_MG_OffSex_lnRRi.Rdata")
-# load(file = "../Rdata/MR_MG_OffSex_lnCVRi.Rdata")
+#  # for Figure4
+#  load(file = "../Rdata/MR_OF_OffSex_lnRRi.Rdata")
+#  load(file = "../Rdata/MR_OF_OffSex_lnCVRi.Rdata")
+#  load(file = "../Rdata/MR_MG_OffSex_lnRRi.Rdata")
+#  load(file = "../Rdata/MR_MG_OffSex_lnCVRi.Rdata")
 # 
-# # for Figure5
-# load(file = "../Rdata/MR_OF_Trait_lnRRi.Rdata")
-# load(file = "../Rdata/MR_OF_Trait_lnCVRi.Rdata")
-# load(file = "../Rdata/MR_MG_Trait_lnRRi.Rdata")
-# load(file = "../Rdata/MR_MG_Trait_lnCVRi.Rdata")
+# #for Figure5
+#  load(file = "../Rdata/MR_OF_Trait_lnRRi.Rdata")
+#  load(file = "../Rdata/MR_OF_Trait_lnCVRi.Rdata")
+#  load(file = "../Rdata/MR_MG_Trait_lnRRi.Rdata")
+#  load(file = "../Rdata/MR_MG_Trait_lnCVRi.Rdata")
 # 
-# # for funnel plots
-# load(file = "../Rdata/PB_OF_Full_lnRR.Rdata")
-# load(file = "../Rdata/PB_OF_Full_lnCVR.Rdata")
-# load(file = "../Rdata/PB_MG_Full_lnRR.Rdata")
-# load(file = "../Rdata/PB_MG_Full_lnCVR.Rdata")
+# #for funnel plots
+#  load(file = "../Rdata/PB_OF_Full_lnRR.Rdata")
+#  load(file = "../Rdata/PB_OF_Full_lnCVR.Rdata")
+#  load(file = "../Rdata/PB_MG_Full_lnRR.Rdata")
+#  load(file = "../Rdata/PB_MG_Full_lnCVR.Rdata")
 # 
-# ```
+# ``` 
+ 
+ 
 
 
 ### Figure1 - summarise sample sizes for the 3 main moderators (F0_Parent_Exposed, Offspring_Sex, Trait) for ODF and MG data   

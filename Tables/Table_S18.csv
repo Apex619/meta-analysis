@@ -1,4 +1,4 @@
 "Data","Mean","SE","CI.lb","CI.ub","PI.lb","PI.ub","row"
 "lnRR for predicted grandparents body weights",0.139,0.04,0.062,0.216,-0.105,0.383,1
-"lnRR for One-off grand-offspring predicted body weights",0.065,0.03,0.006,0.125,-0.092,0.222,2
+"lnRR for One-off grand-offspring predicted body weights",0.067,0.03,0.008,0.126,-0.089,0.223,2
 "lnRR for Multigenerational grand-offspring predicted body weights",0.156,0.07,0.02,0.293,-0.331,0.644,3

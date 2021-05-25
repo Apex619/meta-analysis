@@ -1,9 +1,9 @@
 "Effect size","Exposure type","Mean","CI.lb","CI.ub","k","R2","row"
-"lnRR",,,,,,0.096,1
-,"One-off",0.119,0.001,0.237,264,,2
-,"Multigenerational",0.306,0.182,0.429,135,,3
-,"One-off Multigenerational",-0.187,-0.257,-0.117,,,4
+"lnRR",,,,,,0.099,1
+,"One-off",0.115,0.001,0.229,272,,2
+,"Multigenerational",0.302,0.181,0.422,135,,3
+,"One-off Multigenerational",-0.187,-0.256,-0.118,,,4
 "lnCVR",,,,,,0.001,5
-,"One-off",-0.032,-0.16,0.096,264,,6
-,"Multigenerational",-0.003,-0.152,0.145,135,,7
-,"One-off Multigenerational",-0.029,-0.179,0.122,,,8
+,"One-off",-0.026,-0.152,0.101,272,,6
+,"Multigenerational",-0.001,-0.151,0.148,135,,7
+,"One-off Multigenerational",-0.024,-0.173,0.124,,,8

@@ -1,0 +1,13 @@
+"Data","Exposure duration to obesogenic diet","Mean","CI.lb","CI.ub","p","R2","row"
+"One-off lnRR",,,,,,0.001,1
+,"Intercept",0.08,-0.079,0.24,0.322,,2
+,"Slope",-0.006,-0.028,0.016,0.605,,3
+"One-off lnCVR",,,,,,0.017,4
+,"Intercept",0.011,-0.149,0.171,0.893,,5
+,"Slope",-0.057,-0.17,0.055,0.319,,6
+"Multigenerational lnRR",,,,,,0.017,7
+,"Intercept",0.354,0.085,0.623,0.01,,8
+,"Slope",0.063,-0.069,0.194,0.351,,9
+"Multigenerational lnCVR",,,,,,0,10
+,"Intercept",-0.073,-0.288,0.143,0.508,,11
+,"Slope",-0.003,-0.127,0.121,0.964,,12

@@ -2,9 +2,9 @@
 "Grandparents body weight lnRR",,,,,,0.22,1
 ,"Intercept",0.009,-0.093,0.11,0.87,,2
 ,"Slope",0.001,0.001,0.002,0,,3
-"OF grand-offspring body weight lnRR",,,,,,0.007,4
-,"Intercept",0.054,-0.008,0.116,0.09,,5
-,"Slope",0,0,0,0.273,,6
+"OF grand-offspring body weight lnRR",,,,,,0.006,4
+,"Intercept",0.056,-0.006,0.118,0.076,,5
+,"Slope",0,0,0,0.272,,6
 "MG grand-offspring body weight lnRR",,,,,,0.062,7
 ,"Intercept",0.06,-0.08,0.201,0.401,,8
 ,"Slope",0.001,0,0.001,0,,9

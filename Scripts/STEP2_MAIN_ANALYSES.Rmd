@@ -51,6 +51,12 @@ dim(data_MG)
 dim(data_OF)
 data_MG <- droplevels(data_MG) #adjust factor levels
 data_OF <- droplevels(data_OF) #adjust factor levels
+
+str(data_OF) #need to convert characters to factors
+str(data_MG) #need to convert characters to factors
+
+data_OF %>% type.convert() -> data_OF 
+data_MG %>% type.convert() -> data_MG 
 ```
 
 Make VCV (variance-covariance matices    
@@ -235,11 +241,9 @@ summary(MR_MG_Rodent_lnCVRm)
 save(MR_MG_Rodent_lnCVRm, file = here("Rdata/MR_MG_Rodent_lnCVRm.Rdata"))
 
 R2(MR_MG_Rodent_lnCVRi)
-```
 
 ### Meta-regression model on OF and MG data with exposed F0 sex as moderator
 
-#CHANGE relevel function add factor() in front ! Se below
 
 ```{r MR F0_Parent_Exposed, include = TRUE, warning = FALSE}
 
@@ -249,7 +253,7 @@ summary(MR_OF_ExpSex_lnRRi)
 save(MR_OF_ExpSex_lnRRi, file = "../Rdata/MR_OF_ExpSex_lnRRi.Rdata")
 
 ## OF lnRR - ref female
-MR_OF_ExpSex_lnRRf <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(factor(data_OF$F0_Parent_Exposed), ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") #Adding factor() !!!
+MR_OF_ExpSex_lnRRf <- rma.mv(lnRR, Vmat_lnRR_OF, mods= ~relevel(data_OF$F0_Parent_Exposed, ref="Female"), random = list(~1|Rodent_Strain, ~1|Study_ID,  ~1|Trait, ~1|ES_ID), data = data_OF, method = "REML") 
 summary(MR_OF_ExpSex_lnRRf)    
 save(MR_OF_ExpSex_lnRRf, file = "../Rdata/MR_OF_ExpSex_lnRRf.Rdata")
 

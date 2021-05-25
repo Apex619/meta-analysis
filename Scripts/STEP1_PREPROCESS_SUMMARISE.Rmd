@@ -53,6 +53,8 @@ add_column(data_all, ES_ID = paste("ES_",c(1:dim(data_all)[1]),sep=""), .before 
 # Change all character columns into factors
 data_all %>% type.convert() -> data_all 
 
+str(data_all)
+
 #names(data_all)
 #colnames(data_all)
 ```
