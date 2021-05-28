@@ -627,7 +627,7 @@ MR model selection analysis for lnRR and lnCVR on OF and MG datasets
 ```{r Table model selection}
 #list.files("./Rdata/")
 #loading data
-load(file = "../Rdata/MR_OF_Full_lnRR.Rdata") #DOUBLE CHECK IF FILE NAMES ARE CORRECT !!! HAVE REMOVED: _ML_meta_AICc_seltable FROM FILE NAME
+load(file = "../Rdata/MR_OF_Full_lnRR_ML_meta_AICc_seltable.Rdata") 
 MR_OF_Full_lnRRst <- sel.table
 load(file = "../Rdata/MR_OF_Full_lnCVR_ML_meta_AICc_seltable.Rdata")
 MR_OF_Full_lnCVRst <- sel.table

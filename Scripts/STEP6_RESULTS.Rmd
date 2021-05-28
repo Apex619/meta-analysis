@@ -39,86 +39,87 @@ pacman::p_load(tidyverse, # tidy family and related pacakges below
 source("../Scripts/custom_functions.R") #load custom functions
 ```
 
-<!-- ### Load data     -->
-<!-- Processed data for analyses is stored in data_all_ES.csv and data_all_ES.RData fils.  -->
-<!-- It needs to be split into One-off and Multigenerational data.       -->
+### Load data 
+Processed data for analyses is stored in data_all_ES.csv and data_all_ES.RData fils.
+It needs to be split into One-off and Multigenerational data.
 
-<!-- ```{r load and subset data, include = FALSE} -->
+```{r load and subset data, include = FALSE}
 
-<!-- # Load preprocessed data with effect sizes -->
-<!-- data_all <- read.csv(file ="../Data/data_all_ES.csv")   -->
-<!-- #load(data_all, file = "../Rdata/data_all_ES.RData") #alternative -->
-<!-- #str(data_all) -->
-
-
-<!-- # Subset by One off and Multigenerational -->
-<!-- data_MG <- filter(data_all, Exposure_Type == "Multigenerational") -->
-<!-- data_OF <- filter(data_all, Exposure_Type == "One-off") -->
-<!-- dim(data_MG) -->
-<!-- dim(data_OF) -->
-<!-- data_MG <- droplevels(data_MG) #adjust factor levels -->
-<!-- data_OF <- droplevels(data_OF) #adjust factor levels -->
-<!-- ``` -->
+#Load preprocessed data with effect sizes 
+data_all <- read.csv(file ="../Data/data_all_ES.csv")  
+#load(data_all, file = "../Rdata/data_all_ES.RData") #alternative 
+str(data_all) 
 
 
-<!-- ```{r load summaries and models, include = FALSE} -->
-<!-- # for dataset summary #A FIDDLY LINE! (may not knit - shift up/down save, re-knit) -->
-<!-- load(file = "../Rdata/data_summaries.Rdata") #this should load data objects: N_unique_animals_Treatment, N_unique_animals_Control,N_papers_Exposure, N_papers_Rodent_Type, N_papers_F0_Parent_Exposed, N_papers_Offspring_Generation, N_papers_Offspring_Sex, N_papers_Trait -->
+# Subset by One off and Multigenerational
+data_MG <- filter(data_all, Exposure_Type == "Multigenerational") 
+data_OF <- filter(data_all, Exposure_Type == "One-off") 
+dim(data_MG) 
+dim(data_OF) 
+data_MG <- droplevels(data_MG) #adjust factor levels 
+data_OF <- droplevels(data_OF) #adjust factor levels 
+``` 
 
-<!-- # for meta-analytic models -->
-<!-- load(file = "../Rdata/MA_OF_lnRR.Rdata") -->
-<!-- load(file = "../Rdata/MA_OF_lnCVR.Rdata") -->
-<!-- load(file = "../Rdata/MA_MG_lnRR.Rdata") -->
-<!-- load(file = "../Rdata/MA_MG_lnCVR.Rdata") -->
 
-<!-- # for Exposure_Type analyses -->
-<!-- load(file = "../Rdata/MR_all_ExpT_lnRRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_all_ExpT_lnCVRi.Rdata") -->
+```{r load summaries and models, include = FALSE}
+ # for dataset summary #A FIDDLY LINE! (may not knit - shift up/down save, re-knit) 
+ load(file = "../Rdata/data_summaries.Rdata") #this should load data objects: N_unique_animals_Treatment, N_unique_animals_Control,N_papers_Exposure, N_papers_Rodent_Type, N_papers_F0_Parent_Exposed, N_papers_Offspring_Generation, N_papers_Offspring_Sex, N_papers_Trait 
 
-<!-- # for F0 exposed sex analyses -->
-<!-- load(file = "../Rdata/MR_OF_ExpSex_lnRRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_OF_ExpSex_lnRRf.Rdata") -->
-<!-- load(file = "../Rdata/MR_OF_ExpSex_lnRRm.Rdata") -->
-<!-- load(file = "../Rdata/MR_OF_ExpSex_lnCVRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_ExpSex_lnRRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_ExpSex_lnRRf.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_ExpSex_lnCVRi.Rdata") -->
+ # for meta-analytic models 
+ load(file = "../Rdata/MA_OF_lnRR.Rdata") 
+ load(file = "../Rdata/MA_OF_lnCVR.Rdata") 
+ load(file = "../Rdata/MA_MG_lnRR.Rdata") 
+ load(file = "../Rdata/MA_MG_lnCVR.Rdata") 
 
-<!-- # for Offspring_Sex analyses -->
-<!-- load(file = "../Rdata/MR_OF_OffSex_lnRRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_OF_OffSex_lnRRf.Rdata") -->
-<!-- load(file = "../Rdata/MR_OF_OffSex_lnCVRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_OF_OffSex_lnCVRf.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_OffSex_lnRRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_OffSex_lnRRf.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_OffSex_lnCVRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_OffSex_lnCVRf.Rdata") -->
+ # for Exposure_Type analyses 
+ load(file = "../Rdata/MR_all_ExpT_lnRRi.Rdata") 
+ load(file = "../Rdata/MR_all_ExpT_lnCVRi.Rdata") 
 
-<!-- # for Trait analyses -->
-<!-- load(file = "../Rdata/MR_OF_Trait_lnRRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_OF_Trait_lnCVRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_Trait_lnRRi.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_Trait_lnCVRi.Rdata") -->
+ # for F0 exposed sex analyses 
+ load(file = "../Rdata/MR_OF_ExpSex_lnRRi.Rdata") 
+ load(file = "../Rdata/MR_OF_ExpSex_lnRRf.Rdata") 
+ load(file = "../Rdata/MR_OF_ExpSex_lnRRm.Rdata") 
+ load(file = "../Rdata/MR_OF_ExpSex_lnCVRi.Rdata") 
+ load(file = "../Rdata/MR_MG_ExpSex_lnRRi.Rdata") 
+ load(file = "../Rdata/MR_MG_ExpSex_lnRRf.Rdata") 
+ load(file = "../Rdata/MR_MG_ExpSex_lnCVRi.Rdata") 
 
-<!-- # for Full Model analyses -->
-<!-- load(file = "../Rdata/MR_OF_Full_lnRR.Rdata") -->
-<!-- load(file = "../Rdata/MR_OF_Full_lnCVR.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_Full_lnRR.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_Full_lnCVR.Rdata") -->
+ # for Offspring_Sex analyses 
+ load(file = "../Rdata/MR_OF_OffSex_lnRRi.Rdata") 
+ load(file = "../Rdata/MR_OF_OffSex_lnRRf.Rdata") 
+ load(file = "../Rdata/MR_OF_OffSex_lnCVRi.Rdata") 
+ load(file = "../Rdata/MR_OF_OffSex_lnCVRf.Rdata") 
+ load(file = "../Rdata/MR_MG_OffSex_lnRRi.Rdata") 
+ load(file = "../Rdata/MR_MG_OffSex_lnRRf.Rdata") 
+ load(file = "../Rdata/MR_MG_OffSex_lnCVRi.Rdata") 
+ load(file = "../Rdata/MR_MG_OffSex_lnCVRf.Rdata") 
 
-<!-- # for Publication Bias analyses -->
+ # for Trait analyses 
+ load(file = "../Rdata/MR_OF_Trait_lnRRi.Rdata") 
+ load(file = "../Rdata/MR_OF_Trait_lnCVRi.Rdata") 
+ load(file = "../Rdata/MR_MG_Trait_lnRRi.Rdata") 
+ load(file = "../Rdata/MR_MG_Trait_lnCVRi.Rdata") 
 
-<!-- # for Additional Models analyses -->
-<!-- load(file = "../Rdata/MR_OF_DietE_lnRR.Rdata") -->
-<!-- load(file = "../Rdata/MR_OF_DietE_lnCVR.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_DietE_lnRR.Rdata") -->
-<!-- load(file = "../Rdata/MR_MG_DietE_lnCVR.Rdata") -->
+ # for Full Model analyses 
+ load(file = "../Rdata/MR_OF_Full_lnRR.Rdata") 
+ load(file = "../Rdata/MR_OF_Full_lnCVR.Rdata") 
+ load(file = "../Rdata/MR_MG_Full_lnRR.Rdata") 
+ load(file = "../Rdata/MR_MG_Full_lnCVR.Rdata") 
 
-<!-- load(file = "../Rdata/prediction_F0.Rdata") -->
-<!-- load(file = "../Rdata/prediction_OF.Rdata") -->
-<!-- load(file = "../Rdata/prediction_MG.Rdata") -->
+ # for Publication Bias analyses 
 
-<!-- ``` -->
+ # for Additional Models analyses 
+ load(file = "../Rdata/MR_OF_DietE_lnRR.Rdata") 
+ load(file = "../Rdata/MR_OF_DietE_lnCVR.Rdata") 
+ load(file = "../Rdata/MR_MG_DietE_lnRR.Rdata") 
+ load(file = "../Rdata/MR_MG_DietE_lnCVR.Rdata") 
+
+ load(file = "../Rdata/prediction_F0.Rdata") 
+ load(file = "../Rdata/prediction_OF.Rdata") 
+ load(file = "../Rdata/prediction_MG.Rdata") 
+
+``` 
+
 
 
 *Note:* Positive lnRR effect sizes indicate higher mean trait values in grand-offspring of exposed F0 parents, whereas positive lnCVR effect sizes indicate greater trait variance in grand-offspring of F0-exposed parents, relatively to offspring of non-exposed F0 parents. Conversely, negative effect sizes indicate lower mean trait values (lnRR) and lower variance (lnCVR) in grand-offspring of F0-exposed parents, relatively to offspring of non-exposed F0 parents.     
